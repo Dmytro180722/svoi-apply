@@ -286,6 +286,7 @@ textarea { min-height: 60px; resize: vertical; }
   <!-- FULFILLMENT -->
   <div class="section">
     <h2>Fulfillment</h2>
+    <p class="section-desc">Mon–Thu 7 AM – 7 PM · Fri 7 AM – 8 PM · Sat–Sun 10 AM – 5 PM · Last dine-in seating 45 min before close</p>
     <div class="two-col">
       <div class="q">
         <label class="q-label">Fulfillment Type <span class="required">*</span></label>
@@ -319,81 +320,48 @@ textarea { min-height: 60px; resize: vertical; }
   <!-- CUSTOM CAKE DETAILS -->
   <div class="section hidden" id="sec-cake">
     <h2>🎂 Custom Cake Details</h2>
+    <p class="section-desc">Each cake is a complete composition. Cream, filling, and structure cannot be changed separately. We do not use buttercream.</p>
     <div class="two-col">
       <div class="q">
         <label class="q-label">Cake Size <span class="required">*</span></label>
         <select id="cakeSize">
           <option value="" disabled selected>Select…</option>
-          <option>6" (serves 6-8)</option>
-          <option>8" (serves 10-14)</option>
-          <option>10" (serves 16-20)</option>
-          <option>Tiered / Multi-tier</option>
-          <option>Custom size</option>
+          <option>4" Mousse Heart (Bento) — serves 3-4</option>
+          <option>6" Cake — serves 10-18</option>
+          <option>8" Cake — serves up to 22</option>
+          <option>10" Napoleon/Medovik — serves 10-12</option>
+          <option>10" Sponge Cake — serves 16-20</option>
+          <option>2-3 Tier (wedding/large event)</option>
         </select>
       </div>
-      <div class="q">
-        <label class="q-label">Layers</label>
-        <select id="cakeLayers">
-          <option>1 layer</option>
-          <option selected>2 layers</option>
-          <option>3 layers</option>
-          <option>4+ layers</option>
-        </select>
-      </div>
-    </div>
-    <div class="two-col">
       <div class="q">
         <label class="q-label">Cake Flavor <span class="required">*</span></label>
         <select id="cakeFlavor">
           <option value="" disabled selected>Select…</option>
-          <option>Vanilla</option>
-          <option>Chocolate</option>
-          <option>Red Velvet</option>
-          <option>Honey (Medovik)</option>
-          <option>Napoleon</option>
-          <option>Prague</option>
-          <option>Kyiv Cake</option>
-          <option>Carrot</option>
-          <option>Lemon</option>
-          <option>Berry</option>
-          <option>Custom / Mixed</option>
+          <optgroup label="Signature Cakes">
+            <option>Vanilla Mango Passionfruit</option>
+            <option>Pistachio Raspberry</option>
+            <option>Hazelnut Chocolate Caramel</option>
+            <option>Red Velvet</option>
+            <option>Carrot Cake with Caramel</option>
+            <option>Honey Cake (Medovik)</option>
+            <option>Napoleon</option>
+          </optgroup>
+          <optgroup label="Optional / Seasonal">
+            <option>Esterhazy</option>
+            <option>Vanilla Cheesecake</option>
+            <option>Pistachio Cheesecake</option>
+            <option>Chocolate Cheesecake</option>
+            <option>Matcha Cheesecake</option>
+          </optgroup>
         </select>
       </div>
-      <div class="q">
-        <label class="q-label">Frosting / Cream</label>
-        <select id="cakeFrosting">
-          <option value="" disabled selected>Select…</option>
-          <option>Buttercream</option>
-          <option>Cream cheese</option>
-          <option>Whipped cream</option>
-          <option>Ganache</option>
-          <option>Fondant</option>
-          <option>Mousse</option>
-          <option>Custard</option>
-          <option>Other</option>
-        </select>
-      </div>
-    </div>
-    <div class="q">
-      <label class="q-label">Filling</label>
-      <input type="text" id="cakeFilling" placeholder="e.g., Berry compote, Nutella, Caramel…">
     </div>
     <hr class="divider">
     <div class="q">
-      <label class="q-label">Decoration Style</label>
-      <select id="cakeDecorStyle">
-        <option value="" disabled selected>Select…</option>
-        <option>Minimalist / Clean</option>
-        <option>Fresh flowers</option>
-        <option>Fresh fruits & berries</option>
-        <option>Chocolate drip</option>
-        <option>Fondant figures</option>
-        <option>Piped design</option>
-        <option>Gold leaf / Metallic</option>
-        <option>Photo print (edible)</option>
-        <option>Themed / Character</option>
-        <option>Custom — see notes</option>
-      </select>
+      <label class="q-label">Decoration Idea <span class="required">*</span></label>
+      <p class="helper">Each cake is individually designed. Describe your idea or attach an inspiration photo link.</p>
+      <textarea id="cakeDecorNotes" placeholder="Describe decoration: style, theme, occasion, reference photo link…"></textarea>
     </div>
     <div class="two-col">
       <div class="q">
@@ -401,13 +369,22 @@ textarea { min-height: 60px; resize: vertical; }
         <input type="text" id="cakeInscription" placeholder='e.g., Happy Birthday Anna!'>
       </div>
       <div class="q">
-        <label class="q-label">Color Scheme</label>
-        <input type="text" id="cakeColors" placeholder="e.g., Pink & gold, Pastel, White">
+        <label class="q-label">Color Preference</label>
+        <input type="text" id="cakeColors" placeholder="e.g., Gold & pastel, Pink, Neutral">
       </div>
     </div>
     <div class="q">
-      <label class="q-label">Decoration Notes</label>
-      <textarea id="cakeDecorNotes" placeholder="Special requests, reference photos described, etc."></textarea>
+      <label class="q-label">Colors to Avoid</label>
+      <input type="text" id="cakeColorsAvoid" placeholder="e.g., No red, no black">
+    </div>
+    <div class="q">
+      <label class="q-label">Optional Additions</label>
+      <div class="chip-group" id="cakeAddonsGroup">
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Happy Birthday topper"> 🎂 Birthday Topper</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Gold accents"> ✨ Gold Accents</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Fresh berries"> 🍓 Fresh Berries</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Minimal modern style"> 🤍 Minimal Modern</label>
+      </div>
     </div>
   </div>
 
@@ -517,6 +494,7 @@ textarea { min-height: 60px; resize: vertical; }
   <!-- PAYMENT & PRICING -->
   <div class="section">
     <h2>Payment</h2>
+    <p class="section-desc">A deposit is required to confirm the order. Remaining balance must be paid before pickup or delivery.</p>
     <div class="two-col">
       <div class="q">
         <label class="q-label">Quoted Price</label>
@@ -540,12 +518,10 @@ textarea { min-height: 60px; resize: vertical; }
         <label class="q-label">Payment Method</label>
         <select id="paymentMethod">
           <option value="" disabled selected>Select…</option>
+          <option>Card (Square)</option>
           <option>Cash</option>
-          <option>Square (card)</option>
-          <option>Venmo</option>
-          <option>Zelle</option>
-          <option>Apple Pay</option>
-          <option>Other</option>
+          <option>Website</option>
+          <option>Paid in-store (Square)</option>
         </select>
       </div>
     </div>
@@ -633,6 +609,45 @@ document.getElementById('orderTypeGroup').addEventListener('change', function() 
   if (types.includes('Individual Items')) document.getElementById('sec-individual').classList.add('visible');
 });
 
+// Business hours
+var HOURS = {
+  1: {open: "07:00", close: "19:00", last_table: "18:15"}, // Monday
+  2: {open: "07:00", close: "19:00", last_table: "18:15"}, // Tuesday
+  3: {open: "07:00", close: "19:00", last_table: "18:15"}, // Wednesday
+  4: {open: "07:00", close: "19:00", last_table: "18:15"}, // Thursday
+  5: {open: "07:00", close: "20:00", last_table: "19:15"}, // Friday
+  6: {open: "10:00", close: "17:00", last_table: "16:15"}, // Saturday
+  0: {open: "10:00", close: "17:00", last_table: "16:15"}  // Sunday
+};
+
+function validateTime() {
+  var dateVal = document.getElementById('dateNeeded').value;
+  var timeVal = document.getElementById('timeNeeded').value;
+  if (!dateVal || !timeVal) return true; // will be caught by required check
+  
+  var d = new Date(dateVal + "T12:00:00");
+  var day = d.getUTCDay();
+  var h = HOURS[day];
+  if (!h) return true;
+  
+  var fulfillment = gr('fulfillment');
+  
+  if (fulfillment === "Dine-in") {
+    // Must be at least 45 min before closing
+    if (timeVal < h.open || timeVal > h.last_table) {
+      alert("⏰ Dine-in not available at " + timeVal + " on this day.\n\nHours: " + h.open + " – " + h.close + "\nLast seating: " + h.last_table + " (45 min before close)");
+      return false;
+    }
+  } else {
+    // Pick-up / Delivery must be during open hours
+    if (timeVal < h.open || timeVal > h.close) {
+      alert("⏰ We are closed at " + timeVal + " on this day.\n\nHours: " + h.open + " – " + h.close);
+      return false;
+    }
+  }
+  return true;
+}
+
 function getCheckedValues(groupId) {
   var vals = [];
   document.querySelectorAll('#' + groupId + ' input:checked').forEach(function(cb) { vals.push(cb.value); });
@@ -658,7 +673,7 @@ function validateOrder() {
   if (!gv('dateNeeded') || !gv('timeNeeded')) return false;
   if (!gr('fulfillment') || !gr('payment')) return false;
   if (gr('fulfillment') === 'Delivery' && !gv('deliveryAddress')) return false;
-  if (types.includes('Custom Cake') && (!gv('cakeSize') || !gv('cakeFlavor'))) return false;
+  if (types.includes('Custom Cake') && (!gv('cakeSize') || !gv('cakeFlavor') || !document.getElementById('cakeDecorNotes').value)) return false;
   if (types.includes('Pastry Box') && !gv('pastryBoxSize')) return false;
   if (types.includes('Catering') && !gv('cateringGuests')) return false;
   if (types.includes('Individual Items') && !document.getElementById('individualItems').value) return false;
@@ -670,6 +685,7 @@ function submitOrder() {
     document.getElementById('formError').style.display = 'block';
     return;
   }
+  if (!validateTime()) return;
   document.getElementById('formError').style.display = 'none';
 
   var btn = document.getElementById('submitBtn');
@@ -692,13 +708,11 @@ function submitOrder() {
     tableInfo: gv('tableInfo'),
     // Cake
     cakeSize: gv('cakeSize'),
-    cakeLayers: gv('cakeLayers'),
     cakeFlavor: gv('cakeFlavor'),
-    cakeFrosting: gv('cakeFrosting'),
-    cakeFilling: gv('cakeFilling'),
-    cakeDecorStyle: gv('cakeDecorStyle'),
     cakeInscription: gv('cakeInscription'),
     cakeColors: gv('cakeColors'),
+    cakeColorsAvoid: gv('cakeColorsAvoid'),
+    cakeAddons: getCheckedValues('cakeAddonsGroup').join(', '),
     cakeDecorNotes: document.getElementById('cakeDecorNotes') ? document.getElementById('cakeDecorNotes').value : "",
     // Pastry Box
     pastryBoxSize: gv('pastryBoxSize'),
@@ -787,7 +801,6 @@ function resetForm() {
   document.getElementById('dateNeeded').value = tomorrow.toISOString().split('T')[0];
   document.getElementById('timeNeeded').value = '10:00';
   document.getElementById('pastryBoxQty').value = '1';
-  document.getElementById('cakeLayers').selectedIndex = 1;
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitBtn').textContent = '📋 Submit Order';
   document.getElementById('formError').style.display = 'none';
