@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patisserie SVOI — Order Form</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --ivory: #F5F0E8;
+  --olive: #8B8B5E;
+  --olive-dark: #6B6B42;
+  --olive-deep: #4A4A2E;
+  --gold: #BFA24E;
+  --gold-light: #D4BC6A;
+  --beige: #E8DFC8;
+  --beige-light: #F0EBE0;
+  --error: #A63D3D;
+  --success: #5A7D4A;
+  --warning: #D4A017;
+  --section-bg: #FDFBF6;
+  --border: #D8D0BA;
+  --text-main: #3A3A28;
+  --text-muted: #8A8470;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ivory);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.form-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 12px 60px;
+}
+
+.form-header {
+  background: linear-gradient(135deg, var(--olive-deep) 0%, var(--olive-dark) 60%, var(--olive) 100%);
+  border-radius: 12px 12px 0 0;
+  padding: 28px 28px 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-header h1 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--beige);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.form-header .subtitle {
+  color: var(--gold-light);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.gold-bar { height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold), var(--olive)); }
+
+.section {
+  background: var(--section-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-top: 12px;
+  padding: 22px 24px;
+}
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 4px;
+  color: var(--olive-dark);
+}
+
+.section-desc { color: var(--text-muted); font-size: 12px; margin-bottom: 16px; }
+
+.q { margin-bottom: 16px; }
+.q:last-child { margin-bottom: 0; }
+
+.q-label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--text-main);
+}
+
+.required { color: var(--error); }
+.helper { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+
+select, input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="time"], input[type="number"], textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--beige-light);
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B42' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-color: var(--beige-light);
+  cursor: pointer;
+}
+
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(191, 162, 78, 0.18);
+}
+
+textarea { min-height: 60px; resize: vertical; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  background: var(--beige-light);
+  font-size: 13px;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.chip:hover { border-color: var(--gold); }
+.chip.selected { background: var(--olive); color: white; border-color: var(--olive); }
+.chip input { display: none; }
+
+.toggle-group { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); }
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--beige-light);
+  border: none;
+  border-right: 1px solid var(--border);
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.toggle-btn:last-child { border-right: none; }
+.toggle-btn.active { background: var(--olive); color: white; }
+.toggle-btn input { display: none; }
+
+.divider { border: none; border-top: 1px dashed var(--border); margin: 16px 0; }
+
+.hidden { display: none !important; }
+.visible { display: block !important; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--olive-deep), var(--olive-dark), var(--olive));
+  color: var(--beige);
+  border: none;
+  padding: 14px 40px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+}
+
+.btn-submit:hover { box-shadow: 0 4px 16px rgba(74, 74, 46, 0.3); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.payment-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-paid { background: #E0FFE8; color: #2E7D32; }
+.badge-deposit { background: #FFF8E0; color: #F57F17; }
+.badge-unpaid { background: #FFE0E0; color: #B33A3A; }
+
+.success-screen { text-align: center; padding: 48px 24px; }
+.success-screen h2 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--olive-dark); margin-bottom: 12px; }
+.success-screen p { color: var(--text-muted); font-size: 14px; }
+.success-screen .order-id { font-size: 32px; font-weight: 700; color: var(--gold); margin: 16px 0; }
+
+.form-footer { text-align: center; color: var(--text-muted); font-size: 11px; margin-top: 24px; }
+
+@media (max-width: 600px) {
+  .form-container { padding: 8px 6px 40px; }
+  .section { padding: 16px 14px; }
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="form-container">
+
+  <div class="form-header">
+    <h1>🥐 Patisserie SVOI — New Order</h1>
+    <div class="subtitle">Order Management System · St. Louis, MO</div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <div id="orderForm">
+
+  <!-- ORDER TYPE -->
+  <div class="section">
+    <h2>Order Type</h2>
+    <p class="section-desc">Tap to select. You can choose multiple.</p>
+    <div class="q">
+      <div class="chip-group" id="orderTypeGroup">
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Custom Cake"> 🎂 Custom Cake</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Pastry Box"> 🥐 Pastry Box</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Catering"> 🍽 Catering</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Individual Items"> 🧁 Individual Items</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOMER INFO -->
+  <div class="section">
+    <h2>Customer Info</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Name <span class="required">*</span></label>
+        <input type="text" id="custName" placeholder="Full Name" autocomplete="off">
+      </div>
+      <div class="q">
+        <label class="q-label">Phone <span class="required">*</span></label>
+        <input type="tel" id="custPhone" placeholder="(314) 555-0000">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Email</label>
+        <input type="email" id="custEmail" placeholder="Optional">
+      </div>
+      <div class="q">
+        <label class="q-label">Order Source</label>
+        <select id="orderSource">
+          <option value="In-store">In-store</option>
+          <option value="Phone">Phone</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Website">Website</option>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Referral">Referral</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULFILLMENT -->
+  <div class="section">
+    <h2>Fulfillment</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Fulfillment Type <span class="required">*</span></label>
+        <div class="toggle-group" id="fulfillmentGroup">
+          <label class="toggle-btn active" onclick="setToggle(this,'fulfillment')"><input type="radio" name="fulfillment" value="Pick-up" checked> 📦 Pick-up</label>
+          <label class="toggle-btn" onclick="setToggle(this,'fulfillment')"><input type="radio" name="fulfillment" value="Delivery"> 🚗 Delivery</label>
+          <label class="toggle-btn" onclick="setToggle(this,'fulfillment')"><input type="radio" name="fulfillment" value="Dine-in"> 🍽 Dine-in</label>
+        </div>
+      </div>
+      <div class="q">
+        <label class="q-label">Date Needed <span class="required">*</span></label>
+        <input type="date" id="dateNeeded">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Time <span class="required">*</span></label>
+        <input type="time" id="timeNeeded">
+      </div>
+      <div class="q hidden" id="deliveryAddressWrap">
+        <label class="q-label">Delivery Address <span class="required">*</span></label>
+        <input type="text" id="deliveryAddress" placeholder="Full address">
+      </div>
+      <div class="q hidden" id="tableInfoWrap">
+        <label class="q-label">Table / # of Guests</label>
+        <input type="text" id="tableInfo" placeholder="e.g., Table 4 / 6 guests">
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM CAKE DETAILS -->
+  <div class="section hidden" id="sec-cake">
+    <h2>🎂 Custom Cake Details</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Cake Size <span class="required">*</span></label>
+        <select id="cakeSize">
+          <option value="" disabled selected>Select…</option>
+          <option>6" (serves 6-8)</option>
+          <option>8" (serves 10-14)</option>
+          <option>10" (serves 16-20)</option>
+          <option>Tiered / Multi-tier</option>
+          <option>Custom size</option>
+        </select>
+      </div>
+      <div class="q">
+        <label class="q-label">Layers</label>
+        <select id="cakeLayers">
+          <option>1 layer</option>
+          <option selected>2 layers</option>
+          <option>3 layers</option>
+          <option>4+ layers</option>
+        </select>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Cake Flavor <span class="required">*</span></label>
+        <select id="cakeFlavor">
+          <option value="" disabled selected>Select…</option>
+          <option>Vanilla</option>
+          <option>Chocolate</option>
+          <option>Red Velvet</option>
+          <option>Honey (Medovik)</option>
+          <option>Napoleon</option>
+          <option>Prague</option>
+          <option>Kyiv Cake</option>
+          <option>Carrot</option>
+          <option>Lemon</option>
+          <option>Berry</option>
+          <option>Custom / Mixed</option>
+        </select>
+      </div>
+      <div class="q">
+        <label class="q-label">Frosting / Cream</label>
+        <select id="cakeFrosting">
+          <option value="" disabled selected>Select…</option>
+          <option>Buttercream</option>
+          <option>Cream cheese</option>
+          <option>Whipped cream</option>
+          <option>Ganache</option>
+          <option>Fondant</option>
+          <option>Mousse</option>
+          <option>Custard</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="q">
+      <label class="q-label">Filling</label>
+      <input type="text" id="cakeFilling" placeholder="e.g., Berry compote, Nutella, Caramel…">
+    </div>
+    <hr class="divider">
+    <div class="q">
+      <label class="q-label">Decoration Style</label>
+      <select id="cakeDecorStyle">
+        <option value="" disabled selected>Select…</option>
+        <option>Minimalist / Clean</option>
+        <option>Fresh flowers</option>
+        <option>Fresh fruits & berries</option>
+        <option>Chocolate drip</option>
+        <option>Fondant figures</option>
+        <option>Piped design</option>
+        <option>Gold leaf / Metallic</option>
+        <option>Photo print (edible)</option>
+        <option>Themed / Character</option>
+        <option>Custom — see notes</option>
+      </select>
+    </div>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Inscription / Text on Cake</label>
+        <input type="text" id="cakeInscription" placeholder='e.g., Happy Birthday Anna!'>
+      </div>
+      <div class="q">
+        <label class="q-label">Color Scheme</label>
+        <input type="text" id="cakeColors" placeholder="e.g., Pink & gold, Pastel, White">
+      </div>
+    </div>
+    <div class="q">
+      <label class="q-label">Decoration Notes</label>
+      <textarea id="cakeDecorNotes" placeholder="Special requests, reference photos described, etc."></textarea>
+    </div>
+  </div>
+
+  <!-- PASTRY BOX -->
+  <div class="section hidden" id="sec-pastrybox">
+    <h2>🥐 Pastry Box Details</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Box Size <span class="required">*</span></label>
+        <select id="pastryBoxSize">
+          <option value="" disabled selected>Select…</option>
+          <option>Small (4-6 pieces)</option>
+          <option>Medium (8-12 pieces)</option>
+          <option>Large (16-20 pieces)</option>
+          <option>Custom quantity</option>
+        </select>
+      </div>
+      <div class="q">
+        <label class="q-label">Quantity of Boxes</label>
+        <input type="number" id="pastryBoxQty" value="1" min="1" max="50">
+      </div>
+    </div>
+    <div class="q">
+      <label class="q-label">Items to Include</label>
+      <textarea id="pastryBoxItems" placeholder="e.g., 4 eclairs, 4 macarons, 2 Napoleon slices, 2 choux…"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label">Special Requests</label>
+      <input type="text" id="pastryBoxNotes" placeholder="Packaging, ribbon color, gift card…">
+    </div>
+  </div>
+
+  <!-- CATERING -->
+  <div class="section hidden" id="sec-catering">
+    <h2>🍽 Catering Details</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Number of Guests <span class="required">*</span></label>
+        <input type="number" id="cateringGuests" placeholder="e.g., 50" min="1">
+      </div>
+      <div class="q">
+        <label class="q-label">Event Type</label>
+        <select id="cateringEventType">
+          <option value="" disabled selected>Select…</option>
+          <option>Wedding</option>
+          <option>Birthday party</option>
+          <option>Corporate event</option>
+          <option>Baby shower</option>
+          <option>Bridal shower</option>
+          <option>Holiday party</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="q">
+      <label class="q-label">Menu / Items Requested</label>
+      <textarea id="cateringMenu" placeholder="List of items, quantities, and any specifics…"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label">Setup Needed?</label>
+      <select id="cateringSetup">
+        <option>No — drop-off only</option>
+        <option>Yes — basic setup (platters, display)</option>
+        <option>Yes — full setup with serving staff</option>
+      </select>
+    </div>
+    <div class="q">
+      <label class="q-label">Venue / Location</label>
+      <input type="text" id="cateringVenue" placeholder="Event address or venue name">
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL ITEMS -->
+  <div class="section hidden" id="sec-individual">
+    <h2>🧁 Individual Items</h2>
+    <div class="q">
+      <label class="q-label">Items & Quantities <span class="required">*</span></label>
+      <textarea id="individualItems" placeholder="e.g., 6x Macarons (assorted), 2x Eclair (chocolate), 1x Napoleon slice…"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label">Special Requests</label>
+      <input type="text" id="individualNotes" placeholder="Packaging, presentation, etc.">
+    </div>
+  </div>
+
+  <!-- ALLERGIES & PREFERENCES -->
+  <div class="section">
+    <h2>Allergies & Preferences</h2>
+    <div class="q">
+      <label class="q-label">Allergens</label>
+      <p class="helper">Tap all that apply</p>
+      <div class="chip-group" id="allergenGroup">
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Nuts"> 🥜 Nuts</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Gluten"> 🌾 Gluten</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Dairy"> 🥛 Dairy</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Eggs"> 🥚 Eggs</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Soy"> 🫘 Soy</label>
+        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="None"> ✅ None</label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="q-label">Other Allergy / Preference Notes</label>
+      <input type="text" id="allergyNotes" placeholder="Any other details…">
+    </div>
+  </div>
+
+  <!-- PAYMENT & PRICING -->
+  <div class="section">
+    <h2>Payment</h2>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Quoted Price</label>
+        <input type="text" id="quotedPrice" placeholder="$0.00">
+      </div>
+      <div class="q">
+        <label class="q-label">Payment Status <span class="required">*</span></label>
+        <div class="toggle-group" id="paymentGroup">
+          <label class="toggle-btn" onclick="setToggle(this,'payment')"><input type="radio" name="payment" value="Paid"> ✅ Paid</label>
+          <label class="toggle-btn active" onclick="setToggle(this,'payment')"><input type="radio" name="payment" value="Deposit" checked> 💰 Deposit</label>
+          <label class="toggle-btn" onclick="setToggle(this,'payment')"><input type="radio" name="payment" value="Unpaid"> ❌ Unpaid</label>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="q">
+        <label class="q-label">Deposit Amount</label>
+        <input type="text" id="depositAmount" placeholder="$0.00">
+      </div>
+      <div class="q">
+        <label class="q-label">Payment Method</label>
+        <select id="paymentMethod">
+          <option value="" disabled selected>Select…</option>
+          <option>Cash</option>
+          <option>Square (card)</option>
+          <option>Venmo</option>
+          <option>Zelle</option>
+          <option>Apple Pay</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERNAL NOTES -->
+  <div class="section">
+    <h2>Internal Notes</h2>
+    <div class="q">
+      <label class="q-label">Staff Notes (not visible to customer)</label>
+      <textarea id="staffNotes" placeholder="Kitchen instructions, special handling, priority level…"></textarea>
+    </div>
+    <div class="q">
+      <label class="q-label">Taken By</label>
+      <select id="takenBy">
+        <option value="" disabled selected>Select…</option>
+        <option>Dmytro</option>
+        <option>Taisiia</option>
+        <option>Staff</option>
+        <option>Online</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <div class="section">
+    <div id="formError" style="color:#A63D3D;font-size:13px;margin-bottom:8px;display:none;">Please fill in all required fields.</div>
+    <button class="btn-submit" id="submitBtn" onclick="submitOrder()">📋 Submit Order</button>
+  </div>
+
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="section hidden" id="successScreen">
+    <div class="success-screen">
+      <h2>✓ Order Submitted!</h2>
+      <div class="order-id" id="orderIdDisplay"></div>
+      <p>Order has been added to the system, Google Sheet, and Calendar.</p>
+      <p style="margin-top:12px;font-size:13px;">Reminders set for 24h and 1h before fulfillment.</p>
+      <button class="btn-submit" style="margin-top:20px;max-width:300px;margin-left:auto;margin-right:auto;display:block;" onclick="resetForm()">+ New Order</button>
+    </div>
+  </div>
+
+  <div class="form-footer">Patisserie SVOI · Order Management System</div>
+
+</div>
+
+<script>
+// Set default date to tomorrow
+var tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+document.getElementById('dateNeeded').value = tomorrow.toISOString().split('T')[0];
+document.getElementById('timeNeeded').value = '10:00';
+
+function toggleChip(el) {
+  el.classList.toggle('selected');
+  var cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+}
+
+function setToggle(el, group) {
+  var parent = el.parentElement;
+  parent.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
+  el.classList.add('active');
+  el.querySelector('input').checked = true;
+
+  if (group === 'fulfillment') {
+    var val = el.querySelector('input').value;
+    document.getElementById('deliveryAddressWrap').classList.toggle('hidden', val !== 'Delivery');
+    document.getElementById('tableInfoWrap').classList.toggle('hidden', val !== 'Dine-in');
+  }
+}
+
+// Show/hide order type sections
+document.getElementById('orderTypeGroup').addEventListener('change', function() {
+  var types = getCheckedValues('orderTypeGroup');
+  document.getElementById('sec-cake').classList.toggle('hidden', !types.includes('Custom Cake'));
+  document.getElementById('sec-pastrybox').classList.toggle('hidden', !types.includes('Pastry Box'));
+  document.getElementById('sec-catering').classList.toggle('hidden', !types.includes('Catering'));
+  document.getElementById('sec-individual').classList.toggle('hidden', !types.includes('Individual Items'));
+
+  if (types.includes('Custom Cake')) document.getElementById('sec-cake').classList.add('visible');
+  if (types.includes('Pastry Box')) document.getElementById('sec-pastrybox').classList.add('visible');
+  if (types.includes('Catering')) document.getElementById('sec-catering').classList.add('visible');
+  if (types.includes('Individual Items')) document.getElementById('sec-individual').classList.add('visible');
+});
+
+function getCheckedValues(groupId) {
+  var vals = [];
+  document.querySelectorAll('#' + groupId + ' input:checked').forEach(function(cb) { vals.push(cb.value); });
+  return vals;
+}
+
+function gv(id) { var el = document.getElementById(id); return el ? (el.value || "") : ""; }
+function gr(name) { var el = document.querySelector('input[name="'+name+'"]:checked'); return el ? el.value : ""; }
+
+function generateOrderId() {
+  var now = new Date();
+  var y = String(now.getFullYear()).slice(-2);
+  var m = String(now.getMonth()+1).padStart(2,'0');
+  var d = String(now.getDate()).padStart(2,'0');
+  var r = String(Math.floor(Math.random()*900)+100);
+  return 'SVOI-' + y + m + d + '-' + r;
+}
+
+function validateOrder() {
+  var types = getCheckedValues('orderTypeGroup');
+  if (types.length === 0) return false;
+  if (!gv('custName') || !gv('custPhone')) return false;
+  if (!gv('dateNeeded') || !gv('timeNeeded')) return false;
+  if (!gr('fulfillment') || !gr('payment')) return false;
+  if (gr('fulfillment') === 'Delivery' && !gv('deliveryAddress')) return false;
+  if (types.includes('Custom Cake') && (!gv('cakeSize') || !gv('cakeFlavor'))) return false;
+  if (types.includes('Pastry Box') && !gv('pastryBoxSize')) return false;
+  if (types.includes('Catering') && !gv('cateringGuests')) return false;
+  if (types.includes('Individual Items') && !document.getElementById('individualItems').value) return false;
+  return true;
+}
+
+function submitOrder() {
+  if (!validateOrder()) {
+    document.getElementById('formError').style.display = 'block';
+    return;
+  }
+  document.getElementById('formError').style.display = 'none';
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  var orderId = generateOrderId();
+
+  var payload = {
+    orderId: orderId,
+    orderTypes: getCheckedValues('orderTypeGroup').join(', '),
+    custName: gv('custName'),
+    custPhone: gv('custPhone'),
+    custEmail: gv('custEmail'),
+    orderSource: gv('orderSource'),
+    fulfillment: gr('fulfillment'),
+    dateNeeded: gv('dateNeeded'),
+    timeNeeded: gv('timeNeeded'),
+    deliveryAddress: gv('deliveryAddress'),
+    tableInfo: gv('tableInfo'),
+    // Cake
+    cakeSize: gv('cakeSize'),
+    cakeLayers: gv('cakeLayers'),
+    cakeFlavor: gv('cakeFlavor'),
+    cakeFrosting: gv('cakeFrosting'),
+    cakeFilling: gv('cakeFilling'),
+    cakeDecorStyle: gv('cakeDecorStyle'),
+    cakeInscription: gv('cakeInscription'),
+    cakeColors: gv('cakeColors'),
+    cakeDecorNotes: document.getElementById('cakeDecorNotes') ? document.getElementById('cakeDecorNotes').value : "",
+    // Pastry Box
+    pastryBoxSize: gv('pastryBoxSize'),
+    pastryBoxQty: gv('pastryBoxQty'),
+    pastryBoxItems: document.getElementById('pastryBoxItems') ? document.getElementById('pastryBoxItems').value : "",
+    pastryBoxNotes: gv('pastryBoxNotes'),
+    // Catering
+    cateringGuests: gv('cateringGuests'),
+    cateringEventType: gv('cateringEventType'),
+    cateringMenu: document.getElementById('cateringMenu') ? document.getElementById('cateringMenu').value : "",
+    cateringSetup: gv('cateringSetup'),
+    cateringVenue: gv('cateringVenue'),
+    // Individual
+    individualItems: document.getElementById('individualItems') ? document.getElementById('individualItems').value : "",
+    individualNotes: gv('individualNotes'),
+    // Allergies
+    allergens: getCheckedValues('allergenGroup').join(', '),
+    allergyNotes: gv('allergyNotes'),
+    // Payment
+    quotedPrice: gv('quotedPrice'),
+    paymentStatus: gr('payment'),
+    depositAmount: gv('depositAmount'),
+    paymentMethod: gv('paymentMethod'),
+    // Internal
+    staffNotes: document.getElementById('staffNotes') ? document.getElementById('staffNotes').value : "",
+    takenBy: gv('takenBy'),
+    status: "📋 New"
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycby0EzEUllNrfi2TuW74QzgLpWoMI9tzkX2k402LocoNmuunyY-kqpOXmwsa5qz1cFtHLA/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(function() {
+    document.getElementById('orderForm').style.display = 'none';
+    document.getElementById('orderIdDisplay').textContent = orderId;
+    document.getElementById('successScreen').classList.remove('hidden');
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo(0, 0);
+  })
+  .catch(function(err) {
+    alert('Error submitting. Please try again.');
+    btn.disabled = false;
+    btn.textContent = '📋 Submit Order';
+  });
+}
+
+function resetForm() {
+  document.getElementById('orderForm').style.display = 'block';
+  document.getElementById('successScreen').classList.add('hidden');
+
+  // Reset all inputs
+  document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea').forEach(function(el) { el.value = ''; });
+  document.querySelectorAll('.chip.selected').forEach(function(el) { el.classList.remove('selected'); el.querySelector('input').checked = false; });
+  ['sec-cake','sec-pastrybox','sec-catering','sec-individual'].forEach(function(id) {
+    document.getElementById(id).classList.add('hidden');
+  });
+
+  // Reset defaults
+  var tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('dateNeeded').value = tomorrow.toISOString().split('T')[0];
+  document.getElementById('timeNeeded').value = '10:00';
+  document.getElementById('pastryBoxQty').value = '1';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = '📋 Submit Order';
+
+  window.scrollTo(0, 0);
+}
+</script>
+
+</body>
+</html>
