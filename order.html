@@ -145,7 +145,7 @@ textarea { min-height: 60px; resize: vertical; }
 }
 
 .chip:hover { border-color: var(--gold); }
-.chip.selected { background: var(--olive); color: white; border-color: var(--olive); }
+.chip.selected { background: var(--olive); color: white; border-color: var(--olive); box-shadow: 0 2px 8px rgba(74, 74, 46, 0.35); transform: scale(1.05); }
 .chip input { display: none; }
 
 .toggle-group { display: flex; gap: 0; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); }
@@ -166,7 +166,7 @@ textarea { min-height: 60px; resize: vertical; }
 }
 
 .toggle-btn:last-child { border-right: none; }
-.toggle-btn.active { background: var(--olive); color: white; }
+.toggle-btn.active { background: var(--olive); color: white; font-weight: 700; box-shadow: inset 0 2px 4px rgba(0,0,0,0.15); }
 .toggle-btn input { display: none; }
 
 .divider { border: none; border-top: 1px dashed var(--border); margin: 16px 0; }
@@ -752,11 +752,33 @@ function resetForm() {
   document.getElementById('orderForm').style.display = 'block';
   document.getElementById('successScreen').classList.add('hidden');
 
-  // Reset all inputs
+  // Reset all text inputs and textareas
   document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="number"], textarea').forEach(function(el) { el.value = ''; });
+  
+  // Reset all selects to first option
+  document.querySelectorAll('select').forEach(function(el) {
+    el.selectedIndex = 0;
+  });
+  
+  // Reset all chips
   document.querySelectorAll('.chip.selected').forEach(function(el) { el.classList.remove('selected'); el.querySelector('input').checked = false; });
+  
+  // Hide conditional sections
   ['sec-cake','sec-pastrybox','sec-catering','sec-individual'].forEach(function(id) {
     document.getElementById(id).classList.add('hidden');
+    document.getElementById(id).classList.remove('visible');
+  });
+  document.getElementById('deliveryAddressWrap').classList.add('hidden');
+  document.getElementById('tableInfoWrap').classList.add('hidden');
+
+  // Reset toggles to defaults
+  document.querySelectorAll('#fulfillmentGroup .toggle-btn').forEach(function(b, i) { 
+    b.classList.toggle('active', i === 0); 
+    b.querySelector('input').checked = (i === 0);
+  });
+  document.querySelectorAll('#paymentGroup .toggle-btn').forEach(function(b, i) { 
+    b.classList.toggle('active', i === 1); 
+    b.querySelector('input').checked = (i === 1);
   });
 
   // Reset defaults
@@ -765,8 +787,10 @@ function resetForm() {
   document.getElementById('dateNeeded').value = tomorrow.toISOString().split('T')[0];
   document.getElementById('timeNeeded').value = '10:00';
   document.getElementById('pastryBoxQty').value = '1';
+  document.getElementById('cakeLayers').selectedIndex = 1;
   document.getElementById('submitBtn').disabled = false;
   document.getElementById('submitBtn').textContent = '📋 Submit Order';
+  document.getElementById('formError').style.display = 'none';
 
   window.scrollTo(0, 0);
 }
