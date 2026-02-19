@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --ivory: #F5F0E8;
+  --olive: #8B8B5E;
+  --olive-dark: #6B6B42;
+  --olive-deep: #4A4A2E;
+  --gold: #BFA24E;
+  --gold-light: #D4BC6A;
+  --beige: #E8DFC8;
+  --beige-light: #F0EBE0;
+  --error: #A63D3D;
+  --success: #5A7D4A;
+  --section-bg: #FDFBF6;
+  --border: #D8D0BA;
+  --text-main: #3A3A28;
+  --text-muted: #8A8470;
+  --rose-hint: #C4A0A0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ivory);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.form-container {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.form-header {
+  background: linear-gradient(135deg, var(--olive-deep) 0%, var(--olive-dark) 60%, var(--olive) 100%);
+  border-radius: 12px 12px 0 0;
+  padding: 40px 36px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(191, 162, 78, 0.1);
+}
+
+.form-header::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 15%;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(191, 162, 78, 0.05);
+}
+
+.form-header h1 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--beige);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  position: relative; z-index: 1;
+}
+
+.form-header .subtitle {
+  color: var(--gold-light);
+  font-size: 14px;
+  margin-top: 6px;
+  position: relative; z-index: 1;
+  letter-spacing: 0.3px;
+}
+
+.gold-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 40%, var(--gold) 70%, var(--olive) 100%);
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 3px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  border-radius: 3px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.progress-text {
+  text-align: right;
+  font-size: 11px;
+  color: var(--gold-light);
+  margin-top: 4px;
+  position: relative; z-index: 1;
+}
+
+.section {
+  background: var(--section-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 16px;
+  padding: 28px 32px;
+  transition: box-shadow 0.3s ease;
+}
+
+.section:hover { box-shadow: 0 2px 12px rgba(74, 74, 46, 0.08); }
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 4px;
+  color: var(--olive-dark);
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.question { margin-bottom: 22px; }
+.question:last-child { margin-bottom: 0; }
+
+.q-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.required { color: var(--error); margin-left: 2px; }
+
+.helper {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+select, input[type="text"], input[type="email"], input[type="tel"], textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--beige-light);
+  transition: border-color 0.2s ease;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B6B42' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  cursor: pointer;
+}
+
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(191, 162, 78, 0.18);
+}
+
+textarea { min-height: 80px; resize: vertical; }
+
+.radio-group { display: flex; flex-direction: column; gap: 8px; }
+
+.radio-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--beige-light);
+}
+
+.radio-option:hover { border-color: var(--gold); background: var(--ivory); }
+.radio-option input[type="radio"] { accent-color: var(--olive); width: 16px; height: 16px; }
+
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.checkbox-option {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--beige-light);
+  font-size: 13px;
+}
+
+.checkbox-option:hover { border-color: var(--gold); }
+.checkbox-option input[type="checkbox"] { accent-color: var(--olive); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.divider { border: none; border-top: 1px dashed var(--border); margin: 20px 0; }
+
+.hidden { display: none !important; }
+.visible { display: block !important; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--olive-deep), var(--olive-dark), var(--olive));
+  color: var(--beige);
+  border: none;
+  padding: 14px 40px;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 8px;
+  letter-spacing: 0.3px;
+}
+
+.btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(74, 74, 46, 0.3);
+}
+
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.form-footer {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.success-screen, .dq-screen {
+  text-align: center;
+  padding: 60px 32px;
+}
+
+.success-screen h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--olive-dark);
+  margin-bottom: 12px;
+}
+
+.success-screen p, .dq-screen p {
+  color: var(--text-muted);
+  font-size: 15px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.dq-screen h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px;
+  color: var(--error);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-container { padding: 12px 8px 40px; }
+  .section { padding: 20px 18px; }
+  .form-header { padding: 28px 20px 24px; }
+  .form-header h1 { font-size: 22px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="form-container">
+
+  <div class="form-header">
+    <h1>Patisserie SVOI — Employment Application</h1>
+    <div class="subtitle">Eastern European Specialty Café & Patisserie · St. Louis, MO</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText"></div>
+  </div>
+  <div class="gold-bar"></div>
+
+  <div id="hiringForm">
+
+  <!-- SECTION 1: POSITION -->
+  <div class="section">
+    <h2>Position Selection</h2>
+    <p class="section-desc">Select the position you're applying for.</p>
+    <div class="question">
+      <label class="q-label">Position applying for <span class="required">*</span></label>
+      <select id="position" onchange="handlePosition()">
+        <option value="" disabled selected>Choose a position…</option>
+        <option value="barista">Barista</option>
+        <option value="dishwasher">Dishwasher</option>
+        <option value="lead">Lead Barista / Manager</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="question hidden" id="otherPositionWrap">
+      <label class="q-label">Please specify the position <span class="required">*</span></label>
+      <input type="text" id="otherPosition" placeholder="e.g., Baker, Pastry Assistant, Delivery…">
+    </div>
+  </div>
+
+  <!-- SECTION 2: PERSONAL INFO -->
+  <div class="section">
+    <h2>Personal Information</h2>
+    <p class="section-desc">Basic contact and eligibility information.</p>
+    <div class="two-col">
+      <div class="question">
+        <label class="q-label">Full Name <span class="required">*</span></label>
+        <input type="text" id="fullName" placeholder="First and Last Name">
+      </div>
+      <div class="question">
+        <label class="q-label">Phone Number <span class="required">*</span></label>
+        <input type="tel" id="phone" placeholder="(314) 555-0000">
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="question">
+        <label class="q-label">Email Address <span class="required">*</span></label>
+        <input type="email" id="email" placeholder="you@email.com">
+      </div>
+      <div class="question">
+        <label class="q-label">How did you hear about us? <span class="required">*</span></label>
+        <select id="howHeard">
+          <option value="" disabled selected>Select…</option>
+          <option>Indeed</option>
+          <option>Google Search</option>
+          <option>Instagram / Social Media</option>
+          <option>Walk-in / Visited the café</option>
+          <option>Referral from employee</option>
+          <option>Referral from friend/family</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="question">
+      <label class="q-label">Are you legally authorized to work in the United States? <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="workAuth" value="Yes"><span>Yes</span></label>
+        <label class="radio-option"><input type="radio" name="workAuth" value="No"><span>No</span></label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">Are you at least 18 years old? <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="age18" value="Yes"><span>Yes</span></label>
+        <label class="radio-option"><input type="radio" name="age18" value="No"><span>No</span></label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">Do you have reliable transportation? <span class="required">*</span></label>
+      <select id="transportation">
+        <option value="" disabled selected>Select…</option>
+        <option>Yes — own vehicle</option>
+        <option>Yes — public transit / rideshare</option>
+        <option>Sometimes — depends on schedule</option>
+        <option>No — would need assistance</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SECTION 3: AVAILABILITY -->
+  <div class="section">
+    <h2>Availability & Schedule</h2>
+    <p class="section-desc">Our café hours: Mon–Thu 7:00 AM – 7:00 PM · Fri 7:00 AM – 8:00 PM · Sat–Sun 10:00 AM – 5:00 PM</p>
+    <div class="question">
+      <label class="q-label">Employment type preferred <span class="required">*</span></label>
+      <select id="employmentType">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Full-time (35+ hours/week)</option>
+        <option value="3">Part-time (20–34 hours/week)</option>
+        <option value="1">Flexible / On-call</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Days available to work <span class="required">*</span></label>
+      <p class="helper">Check all that apply. Weekend availability is highly preferred.</p>
+      <div class="checkbox-group" id="daysGroup">
+        <label class="checkbox-option"><input type="checkbox" value="Monday"> Monday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Tuesday"> Tuesday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Wednesday"> Wednesday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Thursday"> Thursday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Friday"> Friday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Saturday"> Saturday</label>
+        <label class="checkbox-option"><input type="checkbox" value="Sunday"> Sunday</label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">How soon can you start? <span class="required">*</span></label>
+      <select id="startDate">
+        <option value="" disabled selected>Select…</option>
+        <option>Immediately</option>
+        <option>Within 1 week</option>
+        <option>Within 2 weeks</option>
+        <option>1 month or more</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- BARISTA -->
+  <div class="section hidden" id="sec-barista">
+    <h2>☕ Barista — Technical Skills</h2>
+    <p class="section-desc">Espresso knowledge, speed, and craft beverage skills.</p>
+    <div class="question">
+      <label class="q-label">Espresso machine experience <span class="required">*</span></label>
+      <select id="espressoExp">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience — never used one</option>
+        <option value="4">Basic — I can pull shots but still learning</option>
+        <option value="7">Intermediate — confident, steaming milk, latte art basics</option>
+        <option value="10">Advanced — dial-in grinder, consistent pours, can train others</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Latte art proficiency <span class="required">*</span></label>
+      <select id="latteArt">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">Cannot pour latte art</option>
+        <option value="2">Learning — sometimes get a heart</option>
+        <option value="4">Consistent hearts and rosettas</option>
+        <option value="5">Advanced — tulips, swans, multi-layer</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Drinks per hour during a rush <span class="required">*</span></label>
+      <select id="drinksPerHour">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">Under 15</option>
+        <option value="5">15–25</option>
+        <option value="8">26–40</option>
+        <option value="10">40+</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Pour-over / manual brew experience <span class="required">*</span></label>
+      <select id="manualBrew">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="2">Familiar but not proficient</option>
+        <option value="4">Proficient with 1–2 methods</option>
+        <option value="5">Expert with multiple methods</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">POS system experience (Square preferred) <span class="required">*</span></label>
+      <select id="posExp">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No POS experience</option>
+        <option value="3">Used a POS but not Square</option>
+        <option value="5">Experienced with Square POS</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Total years of barista experience <span class="required">*</span></label>
+      <select id="baristaYears">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No experience (willing to learn)</option>
+        <option value="3">Less than 6 months</option>
+        <option value="5">6 months – 1 year</option>
+        <option value="8">1–3 years</option>
+        <option value="10">3+ years</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Food handling / ServSafe certification</label>
+      <select id="foodSafety">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No</option>
+        <option value="3">Food handler's card / basic training</option>
+        <option value="5">ServSafe certified (current)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- DISHWASHER -->
+  <div class="section hidden" id="sec-dishwasher">
+    <h2>🍽 Dishwasher — Experience & Readiness</h2>
+    <p class="section-desc">Physical readiness, reliability, and pace.</p>
+    <div class="question">
+      <label class="q-label">Previous kitchen/dishwashing experience <span class="required">*</span></label>
+      <select id="dwKitchenExp">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">No restaurant experience</option>
+        <option value="5">Some experience (not in a restaurant)</option>
+        <option value="8">1–2 years in a restaurant kitchen</option>
+        <option value="10">3+ years in a restaurant kitchen</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Can you stand for 6–8 hours straight? <span class="required">*</span></label>
+      <select id="dwStandHours">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes, no problem</option>
+        <option value="3">Yes, with occasional short breaks</option>
+        <option value="0">No, I cannot</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Comfort with heavy lifting (up to 50 lbs) <span class="required">*</span></label>
+      <select id="dwHeavyLift">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Fully comfortable</option>
+        <option value="3">Comfortable with most loads</option>
+        <option value="0">Cannot lift heavy items</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Commercial dishwashing equipment experience</label>
+      <select id="dwCommercial">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="3">Some experience</option>
+        <option value="5">Experienced operator</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Comfortable in a hot, wet kitchen environment? <span class="required">*</span></label>
+      <select id="dwHotEnv">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes — I thrive in it</option>
+        <option value="3">Yes — I can handle it</option>
+        <option value="0">No — it would be difficult</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">How would you rate your work pace? <span class="required">*</span></label>
+      <select id="dwPace">
+        <option value="" disabled selected>Select…</option>
+        <option value="3">Steady and careful</option>
+        <option value="7">Fast and consistent</option>
+        <option value="10">Very fast — pride in keeping up during rush</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LEAD / MANAGER -->
+  <div class="section hidden" id="sec-lead">
+    <h2>👑 Lead Barista / Manager</h2>
+    <p class="section-desc">Management experience, team leadership, and operational skills.</p>
+    <div class="question">
+      <label class="q-label">Years of café/restaurant management <span class="required">*</span></label>
+      <select id="leadMgmtYears">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No management experience</option>
+        <option value="4">Shift lead / some supervisory role</option>
+        <option value="7">1–3 years as assistant manager or manager</option>
+        <option value="10">3+ years as café/restaurant manager</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Espresso machine proficiency <span class="required">*</span></label>
+      <select id="leadEspresso">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="3">Basic — can pull shots</option>
+        <option value="7">Intermediate — confident with all standard drinks</option>
+        <option value="10">Advanced — dial-in, train others, quality control</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Largest team you've supervised <span class="required">*</span></label>
+      <select id="leadTeamSize">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">Never supervised</option>
+        <option value="3">1–3 people</option>
+        <option value="4">4–8 people</option>
+        <option value="5">9+ people</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Inventory management & ordering <span class="required">*</span></label>
+      <select id="leadInventory">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="3">Assisted with inventory</option>
+        <option value="5">Managed independently</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">POS, reporting, scheduling software <span class="required">*</span></label>
+      <select id="leadSoftware">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No experience</option>
+        <option value="3">Basic use</option>
+        <option value="5">Advanced — Square, 7shifts, Google Workspace</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">How do you handle an underperforming team member? <span class="required">*</span></label>
+      <p class="helper">2–3 sentences.</p>
+      <textarea id="leadUnderperformer" placeholder="Your approach…"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Opening and closing procedures <span class="required">*</span></label>
+      <select id="leadOpenClose">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No experience</option>
+        <option value="3">Familiar with one (open or close)</option>
+        <option value="5">Experienced with both</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Cash handling & daily reconciliation <span class="required">*</span></label>
+      <select id="leadCashRecon">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="3">Basic cash handling</option>
+        <option value="5">Full till management and daily reconciliation</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- OTHER -->
+  <div class="section hidden" id="sec-other">
+    <h2>📋 General Experience</h2>
+    <p class="section-desc">Tell us about your relevant skills.</p>
+    <div class="question">
+      <label class="q-label">Years of relevant work experience <span class="required">*</span></label>
+      <select id="otherYearsExp">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">None</option>
+        <option value="5">Less than 1 year</option>
+        <option value="8">1–3 years</option>
+        <option value="10">3+ years</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Describe your relevant skills <span class="required">*</span></label>
+      <textarea id="otherSkills" placeholder="Your skills and what you bring to Patisserie SVOI…"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Any food service experience?</label>
+      <select id="otherFoodService">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">None</option>
+        <option value="3">Some (non-café)</option>
+        <option value="5">Yes — café, bakery, or restaurant</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PHYSICAL -->
+  <div class="section">
+    <h2>Physical Requirements</h2>
+    <p class="section-desc">All positions require some physical activity.</p>
+    <div class="question">
+      <label class="q-label">Can you stand for extended periods (4–8 hours)? <span class="required">*</span></label>
+      <select id="standExtended">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes — no issues at all</option>
+        <option value="3">Yes — with occasional breaks</option>
+        <option value="0">No — I cannot stand for long periods</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Can you lift and carry up to 30 lbs? <span class="required">*</span></label>
+      <select id="lift30">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes — fully comfortable</option>
+        <option value="3">Yes — with some effort</option>
+        <option value="0">No</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SPEED -->
+  <div class="section">
+    <h2>Speed & Performance Under Pressure</h2>
+    <p class="section-desc">How you handle the Saturday morning rush matters.</p>
+    <div class="question">
+      <label class="q-label">Ability to work quickly under pressure <span class="required">*</span></label>
+      <select id="pressureAbility">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">I prefer a slower pace</option>
+        <option value="3">I can keep up but it's stressful</option>
+        <option value="5">I thrive under pressure</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Multiple tasks at once? <span class="required">*</span></label>
+      <select id="multitasking">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">Prefer one thing at a time</option>
+        <option value="3">Can juggle a few tasks</option>
+        <option value="5">Multitasking is natural to me</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Customer complains about wrong drink during rush <span class="required">*</span></label>
+      <select id="customerComplaint">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">Ask them to wait</option>
+        <option value="3">Apologize and remake when I can</option>
+        <option value="5">Immediately apologize, remake, check in after</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CULTURE -->
+  <div class="section">
+    <h2>Culture & Values Fit</h2>
+    <p class="section-desc">We're a tight-knit team with high standards.</p>
+    <div class="question">
+      <label class="q-label">What motivates you most at work? <span class="required">*</span></label>
+      <select id="motivation">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">Paycheck — I work to earn</option>
+        <option value="3">Routine — I like predictable work</option>
+        <option value="4">Team — I love working with good people</option>
+        <option value="5">Craft — I take pride in doing things well</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">How important is attention to detail? <span class="required">*</span></label>
+      <select id="attentionDetail">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">Speed over details</option>
+        <option value="3">Important — I try to be thorough</option>
+        <option value="5">Critical — I notice what others miss</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Coworker not meeting quality standards? <span class="required">*</span></label>
+      <select id="coworkerQuality">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">Mind my own business</option>
+        <option value="3">Let a manager know</option>
+        <option value="5">Politely mention it and offer to help</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">What does "Eastern European hospitality" mean to you?</label>
+      <p class="helper">Optional.</p>
+      <textarea id="eeHospitality" placeholder="Share your thoughts…"></textarea>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="section">
+    <h2>Final Questions</h2>
+    <div class="question">
+      <label class="q-label">Expected hourly rate <span class="required">*</span></label>
+      <select id="expectedPay">
+        <option value="" disabled selected>Select…</option>
+        <option>$10–12/hr</option>
+        <option>$13–15/hr</option>
+        <option>$16–18/hr</option>
+        <option>$19–22/hr</option>
+        <option>$23+/hr</option>
+        <option>Open / Negotiable</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Have you ever been terminated from a job? <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="everTerminated" value="No"><span>No</span></label>
+        <label class="radio-option"><input type="radio" name="everTerminated" value="Yes"><span>Yes</span></label>
+      </div>
+    </div>
+    <div class="question">
+      <label class="q-label">If yes, briefly explain</label>
+      <textarea id="terminationExplain" placeholder="Optional"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">Anything else you'd like us to know?</label>
+      <textarea id="anythingElse" placeholder="Optional"></textarea>
+    </div>
+    <div class="question">
+      <label class="q-label">I confirm all information is accurate <span class="required">*</span></label>
+      <div class="radio-group">
+        <label class="radio-option"><input type="radio" name="confirmedAccurate" value="Yes"><span>Yes, I confirm</span></label>
+      </div>
+    </div>
+    <div id="formError" style="color:#A63D3D;font-size:13px;margin-bottom:8px;display:none;">Please fill in all required fields before submitting.</div>
+    <button class="btn-submit" id="submitBtn" onclick="submitForm()">Submit Application</button>
+  </div>
+
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="section hidden" id="successScreen">
+    <div class="success-screen">
+      <h2>✓ Application Received!</h2>
+      <p>Thank you for applying to Patisserie SVOI. We will review your application and contact you if we'd like to schedule an interview.</p>
+      <p style="margin-top:16px;font-size:13px;">You may close this page now.</p>
+    </div>
+  </div>
+
+  <div class="form-footer">Patisserie SVOI · St. Louis, MO · Equal Opportunity Employer</div>
+
+</div>
+
+<script>
+function handlePosition() {
+  var val = document.getElementById('position').value;
+  ['sec-barista','sec-dishwasher','sec-lead','sec-other'].forEach(function(id) {
+    document.getElementById(id).classList.remove('visible');
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('otherPositionWrap').classList.add('hidden');
+
+  var map = {barista:'sec-barista', dishwasher:'sec-dishwasher', lead:'sec-lead', other:'sec-other'};
+  if (map[val]) {
+    document.getElementById(map[val]).classList.remove('hidden');
+    document.getElementById(map[val]).classList.add('visible');
+  }
+  if (val === 'other') {
+    document.getElementById('otherPositionWrap').classList.remove('hidden');
+    document.getElementById('otherPositionWrap').classList.add('visible');
+  }
+  updateProgress();
+}
+
+function gv(id) {
+  var el = document.getElementById(id);
+  return el ? (el.value || "") : "";
+}
+
+function gl(id) {
+  var el = document.getElementById(id);
+  if (!el || !el.selectedOptions || !el.selectedOptions[0]) return "";
+  return el.selectedOptions[0].text || "";
+}
+
+function gr(name) {
+  var el = document.querySelector('input[name="'+name+'"]:checked');
+  return el ? el.value : "";
+}
+
+function getDays() {
+  var days = [];
+  document.querySelectorAll('#daysGroup input[type="checkbox"]:checked').forEach(function(cb) {
+    days.push(cb.value);
+  });
+  return days.join(', ');
+}
+
+function getDaysScore() {
+  var c = document.querySelectorAll('#daysGroup input[type="checkbox"]:checked').length;
+  if (c >= 5) return 5;
+  if (c >= 3) return 3;
+  return c > 0 ? 1 : 0;
+}
+
+function updateProgress() {
+  var fields = document.querySelectorAll('#hiringForm select, #hiringForm input[type="text"], #hiringForm input[type="email"], #hiringForm input[type="tel"]');
+  var total = 0;
+  var filled = 0;
+  fields.forEach(function(f) {
+    if (!f.closest('.hidden')) {
+      total++;
+      if (f.value && f.value !== '') filled++;
+    }
+  });
+  var pct = total > 0 ? Math.round((filled / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = Math.min(pct, 100) + '%';
+  document.getElementById('progressText').textContent = Math.min(pct, 100) + '% complete';
+}
+
+document.addEventListener('change', updateProgress);
+document.addEventListener('input', updateProgress);
+
+function validateForm() {
+  var pos = gv('position');
+  if (!pos || !gv('fullName') || !gv('phone') || !gv('email') || !gv('howHeard') ||
+      !gr('workAuth') || !gr('age18') || !gv('transportation') ||
+      !gv('employmentType') || !gv('startDate') ||
+      !gv('standExtended') || !gv('lift30') ||
+      !gv('pressureAbility') || !gv('multitasking') || !gv('customerComplaint') ||
+      !gv('motivation') || !gv('attentionDetail') || !gv('coworkerQuality') ||
+      !gv('expectedPay') || !gr('everTerminated') || !gr('confirmedAccurate')) {
+    return false;
+  }
+  if (pos === 'barista' && (!gv('espressoExp') || !gv('latteArt') || !gv('drinksPerHour') || !gv('manualBrew') || !gv('posExp') || !gv('baristaYears'))) return false;
+  if (pos === 'dishwasher' && (!gv('dwKitchenExp') || !gv('dwStandHours') || !gv('dwHeavyLift') || !gv('dwHotEnv') || !gv('dwPace'))) return false;
+  if (pos === 'lead' && (!gv('leadMgmtYears') || !gv('leadEspresso') || !gv('leadTeamSize') || !gv('leadInventory') || !gv('leadSoftware') || !document.getElementById('leadUnderperformer').value || !gv('leadOpenClose') || !gv('leadCashRecon'))) return false;
+  if (pos === 'other' && (!gv('otherYearsExp') || !document.getElementById('otherSkills').value)) return false;
+  return true;
+}
+
+function submitForm() {
+  if (!validateForm()) {
+    document.getElementById('formError').style.display = 'block';
+    return;
+  }
+  document.getElementById('formError').style.display = 'none';
+
+  var btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  var payload = {
+    position: gv('position'),
+    otherPosition: gv('otherPosition'),
+    fullName: gv('fullName'),
+    phone: gv('phone'),
+    email: gv('email'),
+    howHeard: gv('howHeard'),
+    workAuth: gr('workAuth'),
+    age18: gr('age18'),
+    transportation: gv('transportation'),
+    employmentType: gv('employmentType'),
+    employmentTypeLabel: gl('employmentType'),
+    daysAvailable: getDays(),
+    daysScore: getDaysScore().toString(),
+    startDate: gv('startDate'),
+    espressoExp: gv('espressoExp'),
+    espressoExpLabel: gl('espressoExp'),
+    latteArt: gv('latteArt'),
+    latteArtLabel: gl('latteArt'),
+    drinksPerHour: gv('drinksPerHour'),
+    drinksPerHourLabel: gl('drinksPerHour'),
+    manualBrew: gv('manualBrew'),
+    manualBrewLabel: gl('manualBrew'),
+    posExp: gv('posExp'),
+    posExpLabel: gl('posExp'),
+    baristaYears: gv('baristaYears'),
+    baristaYearsLabel: gl('baristaYears'),
+    foodSafety: gv('foodSafety'),
+    foodSafetyLabel: gl('foodSafety'),
+    dwKitchenExp: gv('dwKitchenExp'),
+    dwKitchenExpLabel: gl('dwKitchenExp'),
+    dwStandHours: gv('dwStandHours'),
+    dwStandHoursLabel: gl('dwStandHours'),
+    dwHeavyLift: gv('dwHeavyLift'),
+    dwHeavyLiftLabel: gl('dwHeavyLift'),
+    dwCommercial: gv('dwCommercial'),
+    dwCommercialLabel: gl('dwCommercial'),
+    dwHotEnv: gv('dwHotEnv'),
+    dwHotEnvLabel: gl('dwHotEnv'),
+    dwPace: gv('dwPace'),
+    dwPaceLabel: gl('dwPace'),
+    leadMgmtYears: gv('leadMgmtYears'),
+    leadMgmtYearsLabel: gl('leadMgmtYears'),
+    leadEspresso: gv('leadEspresso'),
+    leadEspressoLabel: gl('leadEspresso'),
+    leadTeamSize: gv('leadTeamSize'),
+    leadTeamSizeLabel: gl('leadTeamSize'),
+    leadInventory: gv('leadInventory'),
+    leadInventoryLabel: gl('leadInventory'),
+    leadSoftware: gv('leadSoftware'),
+    leadSoftwareLabel: gl('leadSoftware'),
+    leadUnderperformer: document.getElementById('leadUnderperformer') ? document.getElementById('leadUnderperformer').value : "",
+    leadOpenClose: gv('leadOpenClose'),
+    leadOpenCloseLabel: gl('leadOpenClose'),
+    leadCashRecon: gv('leadCashRecon'),
+    leadCashReconLabel: gl('leadCashRecon'),
+    otherYearsExp: gv('otherYearsExp'),
+    otherYearsExpLabel: gl('otherYearsExp'),
+    otherSkills: document.getElementById('otherSkills') ? document.getElementById('otherSkills').value : "",
+    otherFoodService: gv('otherFoodService'),
+    otherFoodServiceLabel: gl('otherFoodService'),
+    standExtended: gv('standExtended'),
+    standExtendedLabel: gl('standExtended'),
+    lift30: gv('lift30'),
+    lift30Label: gl('lift30'),
+    pressureAbility: gv('pressureAbility'),
+    pressureAbilityLabel: gl('pressureAbility'),
+    multitasking: gv('multitasking'),
+    multitaskingLabel: gl('multitasking'),
+    customerComplaint: gv('customerComplaint'),
+    customerComplaintLabel: gl('customerComplaint'),
+    motivation: gv('motivation'),
+    motivationLabel: gl('motivation'),
+    attentionDetail: gv('attentionDetail'),
+    attentionDetailLabel: gl('attentionDetail'),
+    coworkerQuality: gv('coworkerQuality'),
+    coworkerQualityLabel: gl('coworkerQuality'),
+    eeHospitality: document.getElementById('eeHospitality') ? document.getElementById('eeHospitality').value : "",
+    expectedPay: gv('expectedPay'),
+    everTerminated: gr('everTerminated'),
+    terminationExplain: document.getElementById('terminationExplain') ? document.getElementById('terminationExplain').value : "",
+    anythingElse: document.getElementById('anythingElse') ? document.getElementById('anythingElse').value : "",
+    confirmedAccurate: gr('confirmedAccurate')
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbxrcJsmpaKt_MVQQzgYoAtBww-JGlbGCRuSRGVpm7nKPvXlCuN7gsYnTiFzvq2quLjI/exec", {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(function() {
+    document.getElementById('hiringForm').style.display = 'none';
+    document.getElementById('successScreen').classList.remove('hidden');
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo(0, 0);
+  })
+  .catch(function(err) {
+    alert('Error submitting. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Application';
+  });
+}
+</script>
+
+</body>
+</html>
