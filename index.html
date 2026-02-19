@@ -318,6 +318,7 @@ textarea { min-height: 80px; resize: vertical; }
         <option value="" disabled selected>Choose a position…</option>
         <option value="barista">Barista</option>
         <option value="dishwasher">Dishwasher</option>
+        <option value="baker">Baker's Assistant</option>
         <option value="lead">Lead Barista / Manager</option>
         <option value="other">Other</option>
       </select>
@@ -558,6 +559,92 @@ textarea { min-height: 80px; resize: vertical; }
         <option value="3">Steady and careful</option>
         <option value="7">Fast and consistent</option>
         <option value="10">Very fast — pride in keeping up during rush</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- BAKER'S ASSISTANT -->
+  <div class="section hidden" id="sec-baker">
+    <h2>🥐 Baker's Assistant</h2>
+    <p class="section-desc">Baking experience, technique, and kitchen readiness.</p>
+    <div class="question">
+      <label class="q-label">Bakery / pastry experience <span class="required">*</span></label>
+      <select id="bakerExp">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">No bakery experience</option>
+        <option value="5">Less than 1 year</option>
+        <option value="8">1–3 years in a bakery or pastry kitchen</option>
+        <option value="10">3+ years in a professional bakery</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Basic baking techniques <span class="required">*</span></label>
+      <p class="helper">Dough mixing, rolling, shaping, working with fillings.</p>
+      <select id="bakerTechniques">
+        <option value="" disabled selected>Select…</option>
+        <option value="1">No experience — willing to learn</option>
+        <option value="4">Familiar with some basics</option>
+        <option value="7">Comfortable with most techniques</option>
+        <option value="10">Highly skilled — can work independently</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Professional equipment experience <span class="required">*</span></label>
+      <p class="helper">Commercial mixers, convection ovens, blast chillers, proofers.</p>
+      <select id="bakerEquipment">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience with commercial equipment</option>
+        <option value="3">Some experience (1–2 types)</option>
+        <option value="5">Experienced with most commercial bakery equipment</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Decorating & finishing experience <span class="required">*</span></label>
+      <p class="helper">Glazing, piping, chocolate work, garnishing, plating desserts.</p>
+      <select id="bakerDecorating">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No decorating experience</option>
+        <option value="3">Basic — simple glazes and finishes</option>
+        <option value="5">Intermediate — piping, decorating cakes, garnishing</option>
+        <option value="8">Advanced — complex designs, chocolate work, sugar art</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Cream & frosting work <span class="required">*</span></label>
+      <p class="helper">Buttercream, custard, ganache, whipped cream, pastry cream.</p>
+      <select id="bakerCream">
+        <option value="" disabled selected>Select…</option>
+        <option value="0">No experience</option>
+        <option value="3">Basic — can whip cream, simple frostings</option>
+        <option value="5">Intermediate — custards, buttercream, ganache</option>
+        <option value="8">Advanced — pastry cream, mousse, tempered chocolate</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Following recipes precisely by weight <span class="required">*</span></label>
+      <select id="bakerPrecision">
+        <option value="" disabled selected>Select…</option>
+        <option value="2">I usually eyeball measurements</option>
+        <option value="5">I follow recipes but sometimes adjust</option>
+        <option value="8">Exact to the gram — precision is key in baking</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Ready for early morning shifts (5–6 AM start)? <span class="required">*</span></label>
+      <select id="bakerEarlyShift">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes — no problem, I'm an early riser</option>
+        <option value="3">Yes — I can adjust my schedule</option>
+        <option value="0">No — early mornings are difficult for me</option>
+      </select>
+    </div>
+    <div class="question">
+      <label class="q-label">Can you lift 50 lb bags of flour regularly? <span class="required">*</span></label>
+      <select id="bakerHeavyLift">
+        <option value="" disabled selected>Select…</option>
+        <option value="5">Yes — fully comfortable</option>
+        <option value="3">Yes — with some effort</option>
+        <option value="0">No — I cannot</option>
       </select>
     </div>
   </div>
@@ -822,13 +909,13 @@ textarea { min-height: 80px; resize: vertical; }
 <script>
 function handlePosition() {
   var val = document.getElementById('position').value;
-  ['sec-barista','sec-dishwasher','sec-lead','sec-other'].forEach(function(id) {
+  ['sec-barista','sec-dishwasher','sec-baker','sec-lead','sec-other'].forEach(function(id) {
     document.getElementById(id).classList.remove('visible');
     document.getElementById(id).classList.add('hidden');
   });
   document.getElementById('otherPositionWrap').classList.add('hidden');
 
-  var map = {barista:'sec-barista', dishwasher:'sec-dishwasher', lead:'sec-lead', other:'sec-other'};
+  var map = {barista:'sec-barista', dishwasher:'sec-dishwasher', baker:'sec-baker', lead:'sec-lead', other:'sec-other'};
   if (map[val]) {
     document.getElementById(map[val]).classList.remove('hidden');
     document.getElementById(map[val]).classList.add('visible');
@@ -902,6 +989,7 @@ function validateForm() {
   }
   if (pos === 'barista' && (!gv('espressoExp') || !gv('latteArt') || !gv('drinksPerHour') || !gv('manualBrew') || !gv('posExp') || !gv('baristaYears'))) return false;
   if (pos === 'dishwasher' && (!gv('dwKitchenExp') || !gv('dwStandHours') || !gv('dwHeavyLift') || !gv('dwHotEnv') || !gv('dwPace'))) return false;
+  if (pos === 'baker' && (!gv('bakerExp') || !gv('bakerTechniques') || !gv('bakerEquipment') || !gv('bakerDecorating') || !gv('bakerCream') || !gv('bakerPrecision') || !gv('bakerEarlyShift') || !gv('bakerHeavyLift'))) return false;
   if (pos === 'lead' && (!gv('leadMgmtYears') || !gv('leadEspresso') || !gv('leadTeamSize') || !gv('leadInventory') || !gv('leadSoftware') || !document.getElementById('leadUnderperformer').value || !gv('leadOpenClose') || !gv('leadCashRecon'))) return false;
   if (pos === 'other' && (!gv('otherYearsExp') || !document.getElementById('otherSkills').value)) return false;
   return true;
@@ -959,6 +1047,22 @@ function submitForm() {
     dwHotEnvLabel: gl('dwHotEnv'),
     dwPace: gv('dwPace'),
     dwPaceLabel: gl('dwPace'),
+    bakerExp: gv('bakerExp'),
+    bakerExpLabel: gl('bakerExp'),
+    bakerTechniques: gv('bakerTechniques'),
+    bakerTechniquesLabel: gl('bakerTechniques'),
+    bakerEquipment: gv('bakerEquipment'),
+    bakerEquipmentLabel: gl('bakerEquipment'),
+    bakerDecorating: gv('bakerDecorating'),
+    bakerDecoratingLabel: gl('bakerDecorating'),
+    bakerCream: gv('bakerCream'),
+    bakerCreamLabel: gl('bakerCream'),
+    bakerPrecision: gv('bakerPrecision'),
+    bakerPrecisionLabel: gl('bakerPrecision'),
+    bakerEarlyShift: gv('bakerEarlyShift'),
+    bakerEarlyShiftLabel: gl('bakerEarlyShift'),
+    bakerHeavyLift: gv('bakerHeavyLift'),
+    bakerHeavyLiftLabel: gl('bakerHeavyLift'),
     leadMgmtYears: gv('leadMgmtYears'),
     leadMgmtYearsLabel: gl('leadMgmtYears'),
     leadEspresso: gv('leadEspresso'),
