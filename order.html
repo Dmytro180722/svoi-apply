@@ -242,10 +242,10 @@ textarea { min-height: 60px; resize: vertical; }
     <p class="section-desc">Tap to select. You can choose multiple.</p>
     <div class="q">
       <div class="chip-group" id="orderTypeGroup">
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Custom Cake"> 🎂 Custom Cake</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Pastry Box"> 🥐 Pastry Box</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Catering"> 🍽 Catering</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Individual Items"> 🧁 Individual Items</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Custom Cake"> 🎂 Custom Cake</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Pastry Box"> 🥐 Pastry Box</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Catering"> 🍽 Catering</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Individual Items"> 🧁 Individual Items</label>
       </div>
     </div>
   </div>
@@ -380,10 +380,10 @@ textarea { min-height: 60px; resize: vertical; }
     <div class="q">
       <label class="q-label">Optional Additions</label>
       <div class="chip-group" id="cakeAddonsGroup">
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Happy Birthday topper"> 🎂 Birthday Topper</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Gold accents"> ✨ Gold Accents</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Fresh berries"> 🍓 Fresh Berries</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Minimal modern style"> 🤍 Minimal Modern</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Happy Birthday topper"> 🎂 Birthday Topper</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Gold accents"> ✨ Gold Accents</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Fresh berries"> 🍓 Fresh Berries</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Minimal modern style"> 🤍 Minimal Modern</label>
       </div>
     </div>
   </div>
@@ -477,12 +477,12 @@ textarea { min-height: 60px; resize: vertical; }
       <label class="q-label">Allergens</label>
       <p class="helper">Tap all that apply</p>
       <div class="chip-group" id="allergenGroup">
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Nuts"> 🥜 Nuts</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Gluten"> 🌾 Gluten</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Dairy"> 🥛 Dairy</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Eggs"> 🥚 Eggs</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="Soy"> 🫘 Soy</label>
-        <label class="chip" onclick="toggleChip(this)"><input type="checkbox" value="None"> ✅ None</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Nuts"> 🥜 Nuts</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Gluten"> 🌾 Gluten</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Dairy"> 🥛 Dairy</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Eggs"> 🥚 Eggs</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Soy"> 🫘 Soy</label>
+        <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="None"> ✅ None</label>
       </div>
     </div>
     <div class="q">
@@ -576,10 +576,29 @@ tomorrow.setDate(tomorrow.getDate() + 1);
 document.getElementById('dateNeeded').value = tomorrow.toISOString().split('T')[0];
 document.getElementById('timeNeeded').value = '10:00';
 
-function toggleChip(el) {
-  el.classList.toggle('selected');
-  var cb = el.querySelector('input');
+function toggleChip(el, evt) {
+  if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+  var cb = el.querySelector('input[type="checkbox"]');
   cb.checked = !cb.checked;
+  el.classList.toggle('selected', cb.checked);
+  
+  // Trigger update for order type chips
+  if (el.closest('#orderTypeGroup')) {
+    updateOrderSections();
+  }
+}
+
+function updateOrderSections() {
+  var types = getCheckedValues('orderTypeGroup');
+  document.getElementById('sec-cake').classList.toggle('hidden', !types.includes('Custom Cake'));
+  document.getElementById('sec-pastrybox').classList.toggle('hidden', !types.includes('Pastry Box'));
+  document.getElementById('sec-catering').classList.toggle('hidden', !types.includes('Catering'));
+  document.getElementById('sec-individual').classList.toggle('hidden', !types.includes('Individual Items'));
+  
+  if (types.includes('Custom Cake')) document.getElementById('sec-cake').classList.add('visible');
+  if (types.includes('Pastry Box')) document.getElementById('sec-pastrybox').classList.add('visible');
+  if (types.includes('Catering')) document.getElementById('sec-catering').classList.add('visible');
+  if (types.includes('Individual Items')) document.getElementById('sec-individual').classList.add('visible');
 }
 
 function setToggle(el, group) {
@@ -595,19 +614,7 @@ function setToggle(el, group) {
   }
 }
 
-// Show/hide order type sections
-document.getElementById('orderTypeGroup').addEventListener('change', function() {
-  var types = getCheckedValues('orderTypeGroup');
-  document.getElementById('sec-cake').classList.toggle('hidden', !types.includes('Custom Cake'));
-  document.getElementById('sec-pastrybox').classList.toggle('hidden', !types.includes('Pastry Box'));
-  document.getElementById('sec-catering').classList.toggle('hidden', !types.includes('Catering'));
-  document.getElementById('sec-individual').classList.toggle('hidden', !types.includes('Individual Items'));
-
-  if (types.includes('Custom Cake')) document.getElementById('sec-cake').classList.add('visible');
-  if (types.includes('Pastry Box')) document.getElementById('sec-pastrybox').classList.add('visible');
-  if (types.includes('Catering')) document.getElementById('sec-catering').classList.add('visible');
-  if (types.includes('Individual Items')) document.getElementById('sec-individual').classList.add('visible');
-});
+// Order type sections handled by toggleChip → updateOrderSections
 
 // Business hours
 var HOURS = {
@@ -623,30 +630,39 @@ var HOURS = {
 function validateTime() {
   var dateVal = document.getElementById('dateNeeded').value;
   var timeVal = document.getElementById('timeNeeded').value;
-  if (!dateVal || !timeVal) return true; // will be caught by required check
+  if (!dateVal || !timeVal) return true;
   
-  var d = new Date(dateVal + "T12:00:00");
-  var day = d.getUTCDay();
+  // Parse date correctly - add T12:00 to avoid timezone shift
+  var parts = dateVal.split('-');
+  var d = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  var day = d.getDay(); // 0=Sunday, 1=Monday, etc.
   var h = HOURS[day];
   if (!h) return true;
   
+  var dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var fulfillment = gr('fulfillment');
   
   if (fulfillment === "Dine-in") {
-    // Must be at least 45 min before closing
     if (timeVal < h.open || timeVal > h.last_table) {
-      alert("⏰ Dine-in not available at " + timeVal + " on this day.\n\nHours: " + h.open + " – " + h.close + "\nLast seating: " + h.last_table + " (45 min before close)");
+      alert("⏰ Dine-in not available at " + timeVal + " on " + dayNames[day] + ".\n\nWe are open: " + h.open + " – " + h.close + "\nLast seating: " + h.last_table + " (45 min before close).\n\nPlease choose a different time.");
+      document.getElementById('timeNeeded').value = "";
       return false;
     }
   } else {
-    // Pick-up / Delivery must be during open hours
     if (timeVal < h.open || timeVal > h.close) {
-      alert("⏰ We are closed at " + timeVal + " on this day.\n\nHours: " + h.open + " – " + h.close);
+      alert("⏰ We are closed at " + timeVal + " on " + dayNames[day] + ".\n\nOur hours: " + h.open + " – " + h.close + "\n\nPlease choose a time within business hours.");
+      document.getElementById('timeNeeded').value = "";
       return false;
     }
   }
   return true;
 }
+
+// Real-time validation when time or date changes
+document.getElementById('timeNeeded').addEventListener('change', function() { validateTime(); });
+document.getElementById('dateNeeded').addEventListener('change', function() { 
+  if (document.getElementById('timeNeeded').value) validateTime(); 
+});
 
 function getCheckedValues(groupId) {
   var vals = [];
