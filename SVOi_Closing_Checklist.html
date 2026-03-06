@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SVOi — Closing Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#FAF6EF; --dark:#1C1612; --gold:#A07840; --gold-light:#C9A96E;
+  --gold-pale:#F0E4CC; --warm-mid:#EDE0CC; --warm-dark:#D4C4A8;
+  --muted:#8C7B6A; --green:#3A6B45; --green-bg:#EAF3EC; --green-light:#C8E6D0;
+  --border:#D4C4A8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;padding-bottom:120px}
+
+/* ── SETUP BANNER ── */
+.setup-banner{background:#FFF4E0;border-bottom:2px solid var(--gold);padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.setup-banner.hidden{display:none}
+.setup-banner-text{flex:1;font-size:13px;color:#7A5010;line-height:1.4}
+.setup-banner-text strong{display:block;font-size:14px;margin-bottom:2px}
+.setup-banner-arrow{font-size:18px;color:var(--gold)}
+
+/* ── SETUP MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,22,18,0.75);z-index:400;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal-sheet{background:white;border-radius:20px 20px 0 0;width:100%;padding:26px 22px 40px;animation:slideUp 0.3s cubic-bezier(.4,0,.2,1)}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-sheet h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--dark);margin-bottom:6px}
+.modal-sheet p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.setup-field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.setup-field input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--dark);padding:6px 0 10px;outline:none;background:transparent;transition:border-color 0.2s}
+.setup-field input:focus{border-bottom-color:var(--gold)}
+.setup-field input::placeholder{color:#CCC}
+.setup-note{font-size:12px;color:var(--muted);font-style:italic;margin-top:10px;line-height:1.5}
+.setup-actions{display:flex;gap:10px;margin-top:22px}
+.setup-save{flex:1;background:var(--dark);color:#F5EDD8;border:none;border-radius:12px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:1px;cursor:pointer}
+.setup-cancel{background:transparent;border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:14px;cursor:pointer;color:var(--muted)}
+
+/* ── LOCATION PICKER ── */
+.loc-screen{position:fixed;inset:0;background:var(--dark);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.loc-screen.hidden{display:none}
+.loc-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#F5EDD8;letter-spacing:3px;margin-bottom:6px}
+.loc-sub{font-size:12px;color:var(--gold-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:44px}
+.loc-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-light);margin-bottom:22px;font-style:italic}
+.loc-list{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
+.loc-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(201,169,110,0.3);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:14px;text-align:left}
+.loc-btn:active{transform:scale(0.97);background:rgba(255,255,255,0.12)}
+.loc-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.loc-btn-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:#F5EDD8;font-weight:600}
+.loc-btn-addr{font-size:12px;color:var(--muted);margin-top:2px}
+.loc-add-btn{margin-top:8px;background:transparent;border:1px dashed rgba(201,169,110,0.3);border-radius:14px;padding:14px;cursor:pointer;color:var(--muted);font-size:14px;transition:all 0.2s;width:100%;max-width:340px}
+.loc-add-btn:active{background:rgba(255,255,255,0.05)}
+
+/* ADD LOC MODAL */
+.add-loc-sheet{background:white;border-radius:20px 20px 0 0;width:100%;padding:26px 22px 40px;animation:slideUp 0.3s cubic-bezier(.4,0,.2,1)}
+.add-loc-sheet h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--dark);margin-bottom:22px}
+.add-field{margin-bottom:16px}
+.add-field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.add-field input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--dark);padding:4px 0 8px;outline:none;background:transparent;transition:border-color 0.2s}
+.add-field input:focus{border-bottom-color:var(--gold)}
+.color-row{display:flex;gap:10px;margin-top:6px}
+.color-swatch{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.2s}
+.color-swatch.selected{border-color:var(--dark);transform:scale(1.1)}
+.add-loc-actions{display:flex;gap:10px;margin-top:22px}
+.add-loc-save{flex:1;background:var(--dark);color:#F5EDD8;border:none;border-radius:12px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:1px;cursor:pointer}
+.add-loc-cancel{background:transparent;border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:14px;cursor:pointer;color:var(--muted)}
+
+/* ── HEADER ── */
+.app-header{background:var(--dark);padding:18px 20px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(28,22,18,0.3)}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header-left{display:flex;align-items:center;gap:10px}
+.loc-indicator{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.app-header h1{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#F5EDD8;letter-spacing:2px;text-transform:uppercase}
+.app-header .subtitle{font-size:11px;color:var(--gold-light);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.change-loc-btn{font-size:10px;color:var(--gold-light);background:rgba(255,255,255,0.08);border:1px solid rgba(201,169,110,0.3);border-radius:5px;padding:2px 7px;cursor:pointer;margin-top:3px;display:inline-block}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+#clock{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--gold-light);font-weight:600}
+.log-btn{font-size:10px;color:var(--gold-light);letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,0.08);border:1px solid rgba(201,169,110,0.3);border-radius:6px;padding:4px 10px;cursor:pointer}
+.progress-bar-wrap{margin-top:12px;background:rgba(255,255,255,0.1);border-radius:4px;height:5px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:4px;transition:width 0.4s cubic-bezier(.4,0,.2,1);width:0%}
+.progress-text{font-size:11px;color:var(--gold-light);margin-top:5px}
+
+/* ── BARISTA ── */
+.barista-section{margin:14px 16px 0;background:white;border-radius:12px;padding:15px 18px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(28,22,18,0.06)}
+.barista-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.barista-col label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.barista-col input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);background:transparent;font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--dark);padding:3px 0 7px;outline:none;transition:border-color 0.2s}
+.barista-col input:focus{border-bottom-color:var(--gold)}
+.barista-col input::placeholder{color:var(--gold-pale);font-style:italic}
+.barista-note{margin-top:9px;font-size:12px;color:var(--muted);font-style:italic}
+
+/* ── SECTIONS ── */
+.sections-wrap{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.section-card{background:white;border-radius:14px;border:1.5px solid var(--border);overflow:hidden;box-shadow:0 1px 6px rgba(28,22,18,0.05);transition:border-color 0.4s,box-shadow 0.4s}
+.section-card.completed{border-color:var(--green);box-shadow:0 2px 16px rgba(58,107,69,0.15)}
+.section-header{display:flex;align-items:center;padding:14px 15px;cursor:pointer;user-select:none;gap:11px;transition:background 0.15s}
+.section-header:active{background:#F9F5EE}
+.section-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold-pale);line-height:1;min-width:26px;transition:color 0.4s}
+.section-card.completed .section-num{color:var(--green)}
+.section-title-wrap{flex:1;min-width:0}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--dark)}
+.section-time{font-size:11px;color:var(--muted);margin-top:1px}
+.mini-progress{width:100%;height:3px;background:var(--gold-pale);border-radius:2px;overflow:hidden;margin-top:5px}
+.mini-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.3s}
+.section-card.completed .mini-progress-fill{background:var(--green)}
+.section-meta{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.section-count{font-size:12px;color:var(--muted);white-space:nowrap;font-weight:500}
+.section-count.all-done{color:var(--green)}
+.done-badge{width:24px;height:24px;background:var(--green);border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0}
+.section-card.completed .done-badge{display:flex;animation:popIn 0.35s cubic-bezier(.34,1.56,.64,1)}
+.chevron{width:18px;height:18px;color:var(--muted);transition:transform 0.3s,opacity 0.2s;flex-shrink:0}
+.section-card.open .chevron{transform:rotate(180deg)}
+.section-card.completed .chevron{opacity:0;width:0;overflow:hidden}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.section-body{display:none;border-top:1px solid var(--gold-pale)}
+.section-card.open .section-body{display:block;animation:fadeIn 0.18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+.group-label{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);padding:12px 15px 4px;font-weight:500}
+.check-item{display:flex;align-items:center;padding:12px 15px;gap:13px;cursor:pointer;transition:background 0.2s;border-bottom:1px solid #F7F2EA}
+.check-item:last-of-type{border-bottom:none}
+.check-item.checked{background:var(--green-bg)}
+.check-box{width:25px;height:25px;border-radius:7px;border:2px solid var(--warm-dark);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.25s cubic-bezier(.4,0,.2,1);background:white}
+.check-item.checked .check-box{background:var(--green);border-color:var(--green);box-shadow:0 2px 8px rgba(58,107,69,0.3);transform:scale(1.05)}
+.tick{opacity:0;transform:scale(0.3) rotate(-10deg);transition:all 0.25s cubic-bezier(.34,1.56,.64,1)}
+.check-item.checked .tick{opacity:1;transform:scale(1) rotate(0deg)}
+.check-text{flex:1;font-size:15px;line-height:1.4;color:var(--dark);transition:color 0.2s}
+.check-item.checked .check-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green-light)}
+.note-text{font-size:12px;color:var(--muted);font-style:italic;padding:2px 15px 10px 53px;line-height:1.4}
+.section-complete-banner{background:var(--green);color:white;text-align:center;padding:9px;font-size:13px;display:none}
+.section-card.completed .section-complete-banner{display:block}
+
+/* DESSERTS */
+.dessert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px 15px 8px}
+.dessert-cell{background:var(--cream);border-radius:8px;border:1px solid var(--border);overflow:hidden}
+.dessert-cell label{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px 8px 1px}
+.dessert-cell input{display:block;width:100%;border:none;background:transparent;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--dark);padding:0 8px 6px;outline:none;text-align:center}
+.dessert-cell input::placeholder{color:var(--gold-pale)}
+.tomorrow-row{padding:0 15px 14px}
+.tomorrow-row label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+.tomorrow-row input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);background:transparent;font-size:14px;color:var(--dark);padding:4px 0 7px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s}
+.tomorrow-row input:focus{border-bottom-color:var(--gold)}
+
+/* SUBMIT */
+.submit-footer{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--border);padding:12px 16px;box-shadow:0 -4px 20px rgba(28,22,18,0.08);z-index:100}
+.submit-btn{width:100%;background:var(--dark);color:#F5EDD8;border:none;border-radius:12px;padding:15px;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;opacity:0.4;pointer-events:none}
+.submit-btn.ready{opacity:1;background:var(--green);box-shadow:0 4px 16px rgba(58,107,69,0.3);pointer-events:all}
+.submit-btn.ready:active{transform:scale(0.98)}
+
+/* DONE */
+.done-screen{display:none;position:fixed;inset:0;background:var(--dark);z-index:200;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px}
+.done-screen.show{display:flex}
+.done-check{width:76px;height:76px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:22px;animation:popIn 0.5s cubic-bezier(.34,1.56,.64,1)}
+.done-screen h2{font-family:'Cormorant Garamond',serif;font-size:30px;color:#F5EDD8;margin-bottom:8px}
+.done-loc-badge{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border-radius:6px;padding:4px 12px;margin-bottom:10px;display:inline-block}
+.done-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);font-style:italic;margin-bottom:4px}
+.done-stamp{font-size:13px;color:var(--muted);background:rgba(255,255,255,0.05);border-radius:8px;padding:9px 18px;margin-top:6px}
+.saving-indicator{font-size:12px;color:var(--gold-light);margin-top:10px;min-height:18px}
+.done-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px;width:100%;max-width:300px}
+.done-btn{border-radius:10px;padding:13px 20px;font-size:14px;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif}
+.done-btn.primary{background:rgba(255,255,255,0.1);color:#F5EDD8}
+.done-btn.secondary{background:transparent;border:1px solid rgba(140,123,106,0.4);color:var(--muted)}
+.done-btn:active{transform:scale(0.97)}
+
+/* LOG MODAL */
+.log-modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,22,18,0.75);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.log-modal-overlay.show{display:flex}
+.log-sheet{background:white;border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.3s cubic-bezier(.4,0,.2,1)}
+.log-header{padding:18px 20px 14px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--gold-pale);flex-shrink:0}
+.log-header h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--dark)}
+.log-close{width:30px;height:30px;border-radius:50%;background:var(--cream);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.filter-tabs{display:flex;gap:0;border-bottom:1px solid var(--gold-pale);flex-shrink:0;overflow-x:auto;padding:0 16px}
+.filter-tab{font-size:12px;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;flex-shrink:0;font-weight:500}
+.filter-tab.active{color:var(--dark);border-bottom-color:var(--gold)}
+.log-body{overflow-y:auto;flex:1;padding:14px 16px}
+.log-empty{text-align:center;padding:48px 20px;color:var(--muted);font-style:italic;font-size:15px;line-height:1.7}
+.log-loading{text-align:center;padding:32px;color:var(--muted);font-size:14px}
+.log-row{border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px}
+.log-loc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.log-content{flex:1;min-width:0}
+.log-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.log-date{font-size:11px;color:var(--muted)}
+.log-time{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold);font-weight:600}
+.log-loc-name{font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;font-weight:600}
+.log-names{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--dark);font-weight:600}
+.log-tasks{font-size:12px;color:var(--muted);margin-top:2px}
+.log-badge{background:var(--green);color:white;border-radius:5px;padding:2px 8px;font-size:11px;display:inline-block;margin-top:5px}
+.clear-btn{width:100%;padding:12px;background:transparent;border:1px solid #E8D5D5;border-radius:10px;color:#8B1A1A;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px}
+.clear-btn:active{background:#FFF5F5}
+</style>
+</head>
+<body>
+
+<!-- SETUP BANNER -->
+<div class="setup-banner" id="setupBanner" onclick="openSetup()">
+  <div class="setup-banner-text">
+    <strong>⚙️ Connect to Google Sheets</strong>
+    Tap to enter your Apps Script URL so shifts are saved automatically.
+  </div>
+  <div class="setup-banner-arrow">›</div>
+</div>
+
+<!-- SETUP MODAL -->
+<div class="modal-overlay" id="setupModal">
+  <div class="modal-sheet">
+    <h3>Google Sheets Setup</h3>
+    <p>После того как ты задеплоил Apps Script — вставь сюда URL. Все смены будут автоматически сохраняться в таблицу на patisseriesvoi@gmail.com</p>
+    <div class="setup-field">
+      <label>Apps Script Web App URL</label>
+      <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocorrect="off">
+    </div>
+    <div class="setup-note">Этот URL вводится один раз на каждом планшете. После сохранения все смены идут в одну таблицу.</div>
+    <div class="setup-actions">
+      <button class="setup-cancel" onclick="closeSetup()">Cancel</button>
+      <button class="setup-save" onclick="saveScriptUrl()">Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOCATION PICKER -->
+<div class="loc-screen" id="locScreen">
+  <div class="loc-logo">PATISSERIE SVOi</div>
+  <div class="loc-sub">Closing Checklist</div>
+  <div class="loc-title">Select your location</div>
+  <div class="loc-list" id="locList"></div>
+  <button class="loc-add-btn" onclick="showAddLoc()">+ Add new location</button>
+</div>
+
+<!-- ADD LOCATION -->
+<div class="modal-overlay" id="addLocModal">
+  <div class="add-loc-sheet">
+    <h3>New Location</h3>
+    <div class="add-field">
+      <label>Location Name</label>
+      <input type="text" id="newLocName" placeholder="e.g. Central West End" autocorrect="off">
+    </div>
+    <div class="add-field">
+      <label>Address (optional)</label>
+      <input type="text" id="newLocAddr" placeholder="e.g. 8 S Euclid Ave" autocorrect="off">
+    </div>
+    <div class="add-field">
+      <label>Color</label>
+      <div class="color-row" id="colorRow"></div>
+    </div>
+    <div class="add-loc-actions">
+      <button class="add-loc-cancel" onclick="hideAddLoc()">Cancel</button>
+      <button class="add-loc-save" onclick="saveNewLoc()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP HEADER -->
+<div class="app-header">
+  <div class="header-top">
+    <div class="header-left">
+      <div class="loc-indicator" id="locIndicator"></div>
+      <div>
+        <h1 id="headerTitle">SVOi</h1>
+        <div class="subtitle">Closing Checklist
+          <span class="change-loc-btn" onclick="changeLoc()">change</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div id="clock"></div>
+      <div class="log-btn" onclick="openLog()">📋 Shift Log</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="globalFill"></div></div>
+  <div class="progress-text" id="progressText">0 of 0 tasks complete</div>
+</div>
+
+<div class="barista-section">
+  <div class="barista-row">
+    <div class="barista-col">
+      <label>Closing Captain</label>
+      <input type="text" id="name1" placeholder="Your name" autocomplete="off" autocorrect="off" autocapitalize="words">
+    </div>
+    <div class="barista-col">
+      <label>2nd Barista</label>
+      <input type="text" id="name2" placeholder="Optional" autocomplete="off" autocorrect="off" autocapitalize="words">
+    </div>
+  </div>
+  <div class="barista-note" id="syncStatus">Shifts saved to Google Sheets → patisseriesvoi@gmail.com</div>
+</div>
+
+<div class="sections-wrap" id="sectionsWrap"></div>
+
+<div class="submit-footer">
+  <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Sign &amp; Close Shift</button>
+</div>
+
+<!-- DONE -->
+<div class="done-screen" id="doneScreen">
+  <div class="done-check">
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2>Shift Closed</h2>
+  <div class="done-loc-badge" id="doneLocBadge"></div>
+  <div class="done-name" id="doneName"></div>
+  <div class="done-stamp" id="doneStamp"></div>
+  <div class="saving-indicator" id="savingIndicator"></div>
+  <div class="done-actions">
+    <button class="done-btn primary" onclick="openLogFromDone()">📋 View Shift Log</button>
+    <button class="done-btn secondary" onclick="resetAll()">Start New Checklist</button>
+  </div>
+</div>
+
+<!-- SHIFT LOG -->
+<div class="log-modal-overlay" id="logModal" onclick="closeLogOnOverlay(event)">
+  <div class="log-sheet">
+    <div class="log-header">
+      <h3>Shift Log</h3>
+      <button class="log-close" onclick="closeLog()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="filter-tabs" id="filterTabs"></div>
+    <div class="log-body" id="logBody"></div>
+  </div>
+</div>
+
+<script>
+// ── CHECKLIST DATA ────────────────────────────────────────
+const SECTIONS = [
+  { id:"prep", num:"1", title:"Preparation", time:"60 min before close",
+    groups:[
+      { label:null, items:["Begin closing prep if guest flow allows"] },
+      { label:"Guest area — restock", items:["Sugar","Sweetener","Napkins","Straws","Stirrers"] },
+      { label:"Bar — restock", items:["Cups (all sizes)","Lids","Syrups","Milk","Coffee in grinder"] },
+      { label:"Refrigerator", items:["Sufficient milk for morning","Products arranged by FIFO"] },
+    ]
+  },
+  { id:"display", num:"2", title:"Display Case & Pastries", time:"~45 min before close",
+    hasDessertsTable:true,
+    groups:[
+      { label:null, items:["Count remaining desserts","Record dessert count"] },
+      { label:"Display case", items:["Remove crumbs inside display case","Wipe display case glass","Arrange remaining pastries neatly","Place macarons in container"] },
+      { label:"Packaging for morning", items:["Dessert boxes","Cake boxes","Bags"] },
+    ]
+  },
+  { id:"machine", num:"3", title:"La Marzocco", time:"15–20 min before close",
+    groups:[
+      { label:"Group flush", items:["Press flush × 2 — Group 1","Press flush × 2 — Group 2"], note:"If one group not used — flush active group only." },
+      { label:"Portafilters", items:["Remove portafilters","Knock out coffee pucks","Rinse portafilters with hot water","Clean baskets"] },
+      { label:"Steam wands", items:["Wipe steam wands","Purge steam"] },
+      { label:"Drip tray", items:["Clean drip tray","Rinse drip tray","Remove coffee residue"] },
+    ]
+  },
+  { id:"equipment", num:"4", title:"Bar Equipment", time:"After machine",
+    groups:[{ label:null, items:["Wash milk pitchers","Clean rinser","Clean grinders","Wipe tamper","Wipe puck press","Remove coffee dust from bar"] }]
+  },
+  { id:"bar", num:"5", title:"Bar Surface", time:"After equipment",
+    groups:[{ label:null, items:["Wipe down entire bar surface","Remove all coffee dust","Wipe all equipment","Sanitize bar surface"] }]
+  },
+  { id:"dining", num:"6", title:"Dining Room", time:"After bar",
+    groups:[
+      { label:null, items:["Collect all dishes from tables","Bring dishes to kitchen"] },
+      { label:"Each table", items:["Remove crumbs with dry cloth","Wipe with damp cloth","Sanitize surface","Arrange chairs neatly"] },
+    ]
+  },
+  { id:"floors", num:"7", title:"Floors", time:"After dining room",
+    groups:[{ label:null, items:["Move chairs aside","Sweep entire dining room","Sweep under tables","Sweep behind the bar","Mop entire floor"] }]
+  },
+  { id:"dishes", num:"8", title:"Dishes", time:"Ongoing",
+    groups:[{ label:null, items:["Finish washing all remaining dishes","Leave to dry","Bring dry cups to bar","Set up cups for morning"] }]
+  },
+  { id:"drain", num:"9", title:"Drain", time:"Before leaving",
+    groups:[
+      { label:null, items:["Pour 2–3 kettles of hot water down the drain"] },
+      { label:"After full clean", items:["Add degreaser solution","Add odor eliminator"] },
+    ]
+  },
+  { id:"trash", num:"10", title:"Trash", time:"Before leaving",
+    groups:[{ label:null, items:["Collect all trash","Take trash out","Replace with new bags"] }]
+  },
+  { id:"precheck", num:"11", title:"Pre-Shutdown Check", time:"Almost done",
+    groups:[{ label:null, items:["Bar is clean","Display case is clean","Tables are clean","Floor is mopped","Dishes are ready","Bar prepared for morning shift"] }]
+  },
+  { id:"shutdown", num:"12", title:"Final Shutdown", time:"Last step",
+    groups:[
+      { label:"Display & refrigerators", items:["Turn off display case lighting","Confirm refrigerators running normally","Confirm all refrigerator doors closed"] },
+      { label:"Lighting", items:["Turn off dining room lights","Turn off bar lights","Leave night light on if required"] },
+      { label:"Temperature", items:["Check thermostat","Set to night mode if needed"], note:"Adjust dining room thermostat only." },
+      { label:"Final check", items:["Bar is clean","Display case is clean","Refrigerators closed","All lights off","Trash taken out","Door is locked","Alarm is set"] },
+    ]
+  },
+];
+
+// ── CONFIG ────────────────────────────────────────────────
+const COLORS = ["#4A6FA5","#A07840","#6B4A8C","#3A6B45","#8B4A3A","#4A7B6B"];
+let locations = JSON.parse(localStorage.getItem('svoi-locations') || 'null') || [
+  { id:"loc1", name:"Central West End", addr:"8 S Euclid Ave, St. Louis", color:"#4A6FA5" }
+];
+let currentLoc = null;
+let selectedColor = COLORS[0];
+let activeFilter = 'all';
+const checkState = {};
+
+// ── SCRIPT URL ────────────────────────────────────────────
+function getScriptUrl() { return localStorage.getItem('svoi-script-url') || ''; }
+function openSetup() { document.getElementById('scriptUrl').value = getScriptUrl(); document.getElementById('setupModal').classList.add('show'); }
+function closeSetup() { document.getElementById('setupModal').classList.remove('show'); }
+function saveScriptUrl() {
+  const url = document.getElementById('scriptUrl').value.trim();
+  if (!url) return;
+  localStorage.setItem('svoi-script-url', url);
+  document.getElementById('setupBanner').classList.add('hidden');
+  closeSetup();
+  alert('Connected! Shifts will now save to Google Sheets automatically.');
+}
+function checkSetupBanner() {
+  if (getScriptUrl()) document.getElementById('setupBanner').classList.add('hidden');
+}
+
+// ── LOCATIONS ─────────────────────────────────────────────
+function saveLocations() { localStorage.setItem('svoi-locations', JSON.stringify(locations)); }
+function renderLocPicker() {
+  const list = document.getElementById('locList');
+  list.innerHTML = '';
+  locations.forEach(loc => {
+    const btn = document.createElement('div');
+    btn.className = 'loc-btn';
+    btn.innerHTML = `<div class="loc-dot" style="background:${loc.color}"></div><div><div class="loc-btn-name">${loc.name}</div>${loc.addr?`<div class="loc-btn-addr">${loc.addr}</div>`:''}</div>`;
+    btn.onclick = () => selectLocation(loc);
+    list.appendChild(btn);
+  });
+}
+function selectLocation(loc) {
+  currentLoc = loc;
+  document.getElementById('locScreen').classList.add('hidden');
+  document.getElementById('locIndicator').style.background = loc.color;
+  document.getElementById('headerTitle').textContent = loc.name;
+  initState();
+  buildUI();
+}
+function changeLoc() { document.getElementById('locScreen').classList.remove('hidden'); renderLocPicker(); }
+
+function showAddLoc() {
+  const row = document.getElementById('colorRow');
+  row.innerHTML = '';
+  selectedColor = COLORS[0];
+  COLORS.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch' + (c === selectedColor ? ' selected' : '');
+    sw.style.background = c;
+    sw.onclick = () => { document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected')); sw.classList.add('selected'); selectedColor = c; };
+    row.appendChild(sw);
+  });
+  document.getElementById('newLocName').value = '';
+  document.getElementById('newLocAddr').value = '';
+  document.getElementById('addLocModal').classList.add('show');
+}
+function hideAddLoc() { document.getElementById('addLocModal').classList.remove('show'); }
+function saveNewLoc() {
+  const name = document.getElementById('newLocName').value.trim();
+  if (!name) { document.getElementById('newLocName').focus(); return; }
+  locations.push({ id:'loc_'+Date.now(), name, addr:document.getElementById('newLocAddr').value.trim(), color:selectedColor });
+  saveLocations();
+  hideAddLoc();
+  renderLocPicker();
+}
+
+// ── STATE ─────────────────────────────────────────────────
+function initState() {
+  SECTIONS.forEach(s => {
+    checkState[s.id] = {};
+    s.groups.forEach(g => g.items.forEach(item => checkState[s.id][item] = false));
+  });
+}
+function totalItems() { let n=0; SECTIONS.forEach(s => n += Object.keys(checkState[s.id]).length); return n; }
+function checkedItems() { let n=0; SECTIONS.forEach(s => n += Object.values(checkState[s.id]).filter(Boolean).length); return n; }
+function sectionChecked(id) { return Object.values(checkState[id]).filter(Boolean).length; }
+function sectionTotal(id) { return Object.keys(checkState[id]).length; }
+function sectionDone(id) { return sectionChecked(id) === sectionTotal(id); }
+function allDone() { return checkedItems() === totalItems(); }
+
+function updateGlobalProgress() {
+  const pct = totalItems() ? (checkedItems()/totalItems()*100) : 0;
+  document.getElementById('globalFill').style.width = pct+'%';
+  document.getElementById('progressText').textContent = `${checkedItems()} of ${totalItems()} tasks complete`;
+  document.getElementById('submitBtn').classList.toggle('ready', allDone());
+}
+function updateSectionUI(secId) {
+  const card = document.getElementById('card-'+secId);
+  const wasDone = card.classList.contains('completed');
+  const done = sectionDone(secId);
+  card.classList.toggle('completed', done);
+  const checked = sectionChecked(secId), total = sectionTotal(secId);
+  card.querySelector('.section-count').textContent = done ? '✓ Complete' : `${checked} / ${total}`;
+  card.querySelector('.section-count').classList.toggle('all-done', done);
+  card.querySelector('.mini-progress-fill').style.width = (checked/total*100)+'%';
+  if (done && !wasDone) {
+    card.classList.remove('open');
+    const idx = SECTIONS.findIndex(s => s.id === secId);
+    if (idx < SECTIONS.length-1) {
+      setTimeout(() => {
+        const next = document.getElementById('card-'+SECTIONS[idx+1].id);
+        if (!next.classList.contains('completed')) { next.classList.add('open'); setTimeout(() => next.scrollIntoView({behavior:'smooth',block:'start'}), 50); }
+      }, 350);
+    }
+  }
+}
+function toggleItem(secId, item) {
+  checkState[secId][item] = !checkState[secId][item];
+  document.getElementById(`ci--${secId}--${item}`).classList.toggle('checked', checkState[secId][item]);
+  updateSectionUI(secId);
+  updateGlobalProgress();
+}
+function toggleSection(secId) { document.getElementById('card-'+secId).classList.toggle('open'); }
+
+// ── BUILD UI ──────────────────────────────────────────────
+function buildUI() {
+  const wrap = document.getElementById('sectionsWrap');
+  wrap.innerHTML = '';
+  SECTIONS.forEach((sec, idx) => {
+    const card = document.createElement('div');
+    card.className = 'section-card'+(idx===0?' open':'');
+    card.id = 'card-'+sec.id;
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.onclick = () => toggleSection(sec.id);
+    hdr.innerHTML = `<div class="section-num">${sec.num}</div><div class="section-title-wrap"><div class="section-title">${sec.title}</div><div class="section-time">${sec.time}</div><div class="mini-progress"><div class="mini-progress-fill" style="width:0%"></div></div></div><div class="section-meta"><span class="section-count">0 / ${sectionTotal(sec.id)}</span><div class="done-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>`;
+    card.appendChild(hdr);
+    const body = document.createElement('div');
+    body.className = 'section-body';
+    if (sec.hasDessertsTable) {
+      const grid = document.createElement('div'); grid.className = 'dessert-grid';
+      ['Napoleon','Honey Cake','Eclair','Macaron','Tart','Other'].forEach(d => { const c=document.createElement('div'); c.className='dessert-cell'; c.innerHTML=`<label>${d}</label><input type="number" placeholder="0" min="0" inputmode="numeric">`; grid.appendChild(c); });
+      body.appendChild(grid);
+      const tmr=document.createElement('div'); tmr.className='tomorrow-row';
+      tmr.innerHTML=`<label>Notes for kitchen — needed tomorrow</label><input type="text" placeholder="e.g. More eclairs, restock honey cake..." autocomplete="off">`;
+      body.appendChild(tmr);
+    }
+    sec.groups.forEach(group => {
+      if (group.label) { const gl=document.createElement('div'); gl.className='group-label'; gl.textContent=group.label; body.appendChild(gl); }
+      group.items.forEach(item => {
+        const el=document.createElement('div'); el.className='check-item'; el.id=`ci--${sec.id}--${item}`;
+        el.innerHTML=`<div class="check-box"><svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">${item}</div>`;
+        el.addEventListener('click', () => toggleItem(sec.id, item));
+        body.appendChild(el);
+      });
+      if (group.note) { const nt=document.createElement('div'); nt.className='note-text'; nt.textContent='↳ '+group.note; body.appendChild(nt); }
+    });
+    const banner=document.createElement('div'); banner.className='section-complete-banner';
+    banner.innerHTML=`<svg style="display:inline;vertical-align:middle;margin-right:6px" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Section complete`;
+    body.appendChild(banner);
+    card.appendChild(body);
+    wrap.appendChild(card);
+  });
+  updateGlobalProgress();
+}
+
+// ── SUBMIT + SAVE TO SHEETS ───────────────────────────────
+async function handleSubmit() {
+  if (!allDone()) return;
+  const name1 = document.getElementById('name1').value.trim();
+  const name2 = document.getElementById('name2').value.trim();
+  const names = [name1,name2].filter(Boolean).join(' & ') || 'Team';
+  const now = new Date();
+  const entry = {
+    locId:    currentLoc.id,
+    locName:  currentLoc.name,
+    locColor: currentLoc.color,
+    date:     now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}),
+    time:     now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+    names,
+    tasks:    checkedItems(),
+    total:    totalItems(),
+    ts:       now.getTime()
+  };
+
+  // Save to localStorage always
+  const local = JSON.parse(localStorage.getItem('svoi-local-log')||'[]');
+  local.unshift(entry);
+  localStorage.setItem('svoi-local-log', JSON.stringify(local.slice(0,200)));
+
+  // Update done screen
+  document.getElementById('doneLocBadge').textContent = currentLoc.name;
+  document.getElementById('doneLocBadge').style.background = currentLoc.color+'22';
+  document.getElementById('doneLocBadge').style.color = currentLoc.color;
+  document.getElementById('doneName').textContent = names;
+  document.getElementById('doneStamp').textContent = `${entry.date}  ·  ${entry.time}`;
+  document.getElementById('savingIndicator').textContent = '⏳ Saving to Google Sheets...';
+  document.getElementById('doneScreen').classList.add('show');
+
+  // Send to Google Sheets
+  const url = getScriptUrl();
+  if (url) {
+    try {
+      await fetch(url, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(entry)
+      });
+      document.getElementById('savingIndicator').textContent = '✅ Saved to Google Sheets';
+    } catch(err) {
+      document.getElementById('savingIndicator').textContent = '⚠️ Saved locally — will sync when online';
+    }
+  } else {
+    document.getElementById('savingIndicator').textContent = '💾 Saved locally (connect Sheets to sync)';
+  }
+}
+
+function resetAll() {
+  initState();
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('logModal').classList.remove('show');
+  document.getElementById('name1').value='';
+  document.getElementById('name2').value='';
+  buildUI();
+}
+
+// ── SHIFT LOG ─────────────────────────────────────────────
+async function openLog() {
+  document.getElementById('logModal').classList.add('show');
+  renderLogTabs();
+  await loadAndRenderLog();
+}
+function openLogFromDone() { document.getElementById('doneScreen').classList.remove('show'); openLog(); }
+function closeLog() { document.getElementById('logModal').classList.remove('show'); }
+function closeLogOnOverlay(e) { if (e.target.id==='logModal') closeLog(); }
+
+function renderLogTabs() {
+  const tabs = document.getElementById('filterTabs');
+  tabs.innerHTML='';
+  const addTab = (id, label) => {
+    const t=document.createElement('div'); t.className='filter-tab'+(activeFilter===id?' active':'');
+    t.innerHTML=label; t.onclick=async()=>{activeFilter=id; renderLogTabs(); await loadAndRenderLog();};
+    tabs.appendChild(t);
+  };
+  addTab('all','All locations');
+  locations.forEach(loc => addTab(loc.id, `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${loc.color};margin-right:5px;vertical-align:middle"></span>${loc.name}`));
+}
+
+async function loadAndRenderLog() {
+  const body = document.getElementById('logBody');
+  body.innerHTML = '<div class="log-loading">Loading shifts...</div>';
+  let data = [];
+  const url = getScriptUrl();
+  if (url) {
+    try {
+      const res = await fetch(url+'?action=history');
+      const json = await res.json();
+      if (json.ok && json.data) {
+        data = json.data.map(r => ({
+          locName: r.locName,
+          locColor: locations.find(l=>l.name===r.locName)?.color || '#A07840',
+          date: r.date,
+          time: r.time,
+          names: r.names,
+          tasks: r.tasks,
+          ts: r.ts
+        }));
+      }
+    } catch {}
+  }
+  // Fallback to localStorage
+  if (!data.length) {
+    data = JSON.parse(localStorage.getItem('svoi-local-log')||'[]');
+  }
+  const filtered = activeFilter==='all' ? data : data.filter(e => { const loc=locations.find(l=>l.id===activeFilter); return loc && e.locName===loc.name; });
+  if (!filtered.length) {
+    body.innerHTML=`<div class="log-empty">No shifts recorded yet.<br><br>Complete your first closing checklist<br>to start the log.</div>`;
+    return;
+  }
+  body.innerHTML = filtered.map(e=>`
+    <div class="log-row">
+      <div class="log-loc-dot" style="background:${e.locColor||'#A07840'}"></div>
+      <div class="log-content">
+        <div class="log-top"><div class="log-date">${e.date}</div><div class="log-time">${e.time}</div></div>
+        <div class="log-loc-name" style="color:${e.locColor||'#A07840'}">${e.locName||'—'}</div>
+        <div class="log-names">${e.names}</div>
+        <div class="log-tasks">${e.tasks} tasks completed</div>
+        <div class="log-badge">✓ Shift Closed</div>
+      </div>
+    </div>
+  `).join('') + `<button class="clear-btn" onclick="confirmClear()">Clear local history</button>`;
+}
+
+async function confirmClear() {
+  if (confirm('Clear local history?')) { localStorage.removeItem('svoi-local-log'); closeLog(); }
+}
+
+// ── CLOCK ─────────────────────────────────────────────────
+setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); },1000);
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+// ── INIT ──────────────────────────────────────────────────
+checkSetupBanner();
+initState();
+renderLocPicker();
+</script>
+</body>
+</html>
