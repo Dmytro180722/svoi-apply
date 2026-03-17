@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SVOi Closing Checklist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+    background: #F0F4F8;
+    color: #1a1a2e;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .header {
+    background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+    color: white;
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.3);
+  }
+  .header h1 { font-size: 22px; font-weight: 700; }
+  .header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+  .header .date { font-size: 14px; font-weight: 600; margin-top: 6px; background: rgba(255,255,255,0.15); display: inline-block; padding: 3px 12px; border-radius: 12px; }
+  .container { max-width: 600px; margin: 0 auto; padding: 16px 16px 100px; }
+  .section { background: white; border-radius: 16px; padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #2C3E50; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section-title .icon { font-size: 18px; }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px; }
+  select, input[type="number"], textarea {
+    width: 100%; padding: 12px 14px; border: 2px solid #E0E6ED; border-radius: 12px;
+    font-size: 16px; font-family: inherit; background: #FAFBFC; -webkit-appearance: none; transition: border-color 0.2s;
+  }
+  select:focus, input:focus, textarea:focus { outline: none; border-color: #2C3E50; background: white; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='2' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .temp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .temp-item { background: #F8FAFE; border: 2px solid #E0E6ED; border-radius: 12px; padding: 12px; text-align: center; transition: all 0.2s; }
+  .temp-item.kitchen { border-left: 4px solid #2980B9; }
+  .temp-item.hall { border-left: 4px solid #27AE60; }
+  .temp-item.freezer { border-left: 4px solid #8E44AD; }
+  .temp-item label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .temp-item input { text-align: center; font-size: 24px; font-weight: 700; padding: 8px; width: 100%; border: none; background: transparent; color: #1a1a2e; }
+  .temp-item input:focus { outline: none; }
+  .temp-item .unit { font-size: 12px; color: #888; }
+  .temp-item.warn { background: #FEF0F0; border-color: #E74C3C; }
+  .temp-item.ok { background: #F0FEF4; border-color: #27AE60; }
+  .toggle-group { display: flex; flex-direction: column; gap: 8px; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #FAFBFC; border-radius: 12px; border: 2px solid #E0E6ED; }
+  .toggle-row .label { font-size: 14px; font-weight: 500; flex: 1; }
+  .toggle-btn-group { display: flex; gap: 4px; }
+  .toggle-btn { padding: 6px 16px; border-radius: 8px; border: 2px solid #E0E6ED; background: white; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .toggle-btn.selected-yes { background: #27AE60; color: white; border-color: #27AE60; }
+  .toggle-btn.selected-no { background: #E74C3C; color: white; border-color: #E74C3C; }
+  .submit-area { position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 16px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-top: 1px solid #E0E6ED; z-index: 100; }
+  .submit-btn { width: 100%; max-width: 600px; margin: 0 auto; display: block; padding: 16px; background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%); color: white; border: none; border-radius: 14px; font-size: 18px; font-weight: 700; cursor: pointer; }
+  .submit-btn:active { transform: scale(0.97); }
+  .success-overlay { display: none; position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; }
+  .success-overlay.show { display: flex; }
+  .success-card { background: white; border-radius: 20px; padding: 40px 32px; text-align: center; max-width: 340px; margin: 20px; animation: popIn 0.3s ease; }
+  @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .success-card .checkmark { font-size: 64px; margin-bottom: 12px; }
+  .success-card h2 { font-size: 22px; color: #2C3E50; margin-bottom: 8px; }
+  .success-card p { font-size: 14px; color: #666; margin-bottom: 20px; }
+  .success-card button { padding: 12px 32px; background: #2C3E50; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .loading { display: none; position: fixed; top:0;left:0;right:0;bottom:0; background: rgba(255,255,255,0.8); z-index: 150; justify-content: center; align-items: center; }
+  .loading.show { display: flex; }
+  .spinner { width: 48px; height: 48px; border: 4px solid #E0E6ED; border-top-color: #2C3E50; border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌙 Closing Checklist</h1>
+  <p>Patisserie SVOi — 8 S Euclid Ave</p>
+  <div class="date" id="todayDate"></div>
+</div>
+
+<div class="container">
+
+  <div class="section">
+    <div class="section-title"><span class="icon">👤</span> Person Closing</div>
+    <div class="field">
+      <select id="who" required>
+        <option value="">Select name...</option>
+        <option value="Dmytro">Dmytro</option>
+        <option value="Taisiia">Taisiia</option>
+        <option value="Anastasiia">Anastasiia</option>
+        <option value="Renée">Renée</option>
+        <option value="Mariia">Mariia</option>
+        <option value="Hanna">Hanna</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🌡️</span> Final Temperature Check</div>
+    <div class="temp-grid">
+      <div class="temp-item kitchen" id="ti-kf1"><label>Kitchen Fridge 1</label><input type="number" id="kf1" inputmode="numeric" placeholder="—" oninput="checkTemp(this,41,'ti-kf1')"><div class="unit">°F (≤41)</div></div>
+      <div class="temp-item kitchen" id="ti-kf2"><label>Kitchen Fridge 2</label><input type="number" id="kf2" inputmode="numeric" placeholder="—" oninput="checkTemp(this,41,'ti-kf2')"><div class="unit">°F (≤41)</div></div>
+      <div class="temp-item freezer" id="ti-fz"><label>Kitchen Freezer</label><input type="number" id="fz" inputmode="numeric" placeholder="—" oninput="checkTemp(this,0,'ti-fz')"><div class="unit">°F (≤0)</div></div>
+      <div class="temp-item hall" id="ti-d1"><label>Display 1 (hall)</label><input type="number" id="d1" inputmode="numeric" placeholder="—" oninput="checkTemp(this,41,'ti-d1')"><div class="unit">°F (≤41)</div></div>
+      <div class="temp-item hall" id="ti-d2"><label>Display 2 (hall)</label><input type="number" id="d2" inputmode="numeric" placeholder="—" oninput="checkTemp(this,41,'ti-d2')"><div class="unit">°F (≤41)</div></div>
+      <div class="temp-item hall" id="ti-cd"><label>Cake Display</label><input type="number" id="cd" inputmode="numeric" placeholder="—" oninput="checkTemp(this,41,'ti-cd')"><div class="unit">°F (≤41)</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🍰</span> Food Storage</div>
+    <div class="toggle-group">
+      <div class="toggle-row"><span class="label">All TCS products in fridge, covered, labeled?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'tcs','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'tcs','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">All cooling items completed & in fridge?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'cooling','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'cooling','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">Display items stored or discarded?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'display','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'display','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">No food left at room temperature?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'roomtemp','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'roomtemp','No')">No</button></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🧹</span> Cleaning</div>
+    <div class="toggle-group">
+      <div class="toggle-row"><span class="label">Prep surfaces washed, rinsed, sanitized?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'surfaces','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'surfaces','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">3-comp sink cleaned?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'sink','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'sink','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">Equipment wiped down?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'equip','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'equip','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">Floors swept and mopped?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'floors','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'floors','No')">No</button></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">🗑️</span> Waste & Security</div>
+    <div class="toggle-group">
+      <div class="toggle-row"><span class="label">Trash emptied, new liners?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'trash','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'trash','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">Dumpster lid closed?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'dumpster','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'dumpster','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">Back door locked?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'door','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'door','No')">No</button></div></div>
+      <div class="toggle-row"><span class="label">All fridge/freezer doors fully closed?</span><div class="toggle-btn-group"><button type="button" class="toggle-btn" onclick="toggle(this,'doors','Yes')">Yes</button><button type="button" class="toggle-btn" onclick="toggle(this,'doors','No')">No</button></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span class="icon">📝</span> Notes</div>
+    <div class="field"><textarea id="notes" rows="3" placeholder="Issues, repairs needed, things for morning crew..."></textarea></div>
+  </div>
+
+</div>
+
+<div class="submit-area">
+  <button class="submit-btn" onclick="submitForm()">🌙 Submit Closing Checklist</button>
+</div>
+
+<div class="loading" id="loading"><div class="spinner"></div></div>
+<div class="success-overlay" id="success">
+  <div class="success-card">
+    <div class="checkmark">🌙</div>
+    <h2>Submitted!</h2>
+    <p>Closing checklist recorded.<br>Good night!</p>
+    <button onclick="resetForm()">New Checklist</button>
+  </div>
+</div>
+
+<script>
+const now = new Date();
+document.getElementById('todayDate').textContent = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+' · '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+const toggleValues = {};
+function toggle(btn,key,value) {
+  toggleValues[key] = value;
+  btn.parentElement.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected-yes','selected-no'));
+  btn.classList.add(value==='Yes'?'selected-yes':'selected-no');
+}
+function checkTemp(input,max,id) {
+  const c = document.getElementById(id); const v = parseFloat(input.value);
+  c.classList.remove('ok','warn');
+  if(!isNaN(v)) c.classList.add(v<=max?'ok':'warn');
+}
+
+function submitForm() {
+  if(!document.getElementById('who').value){alert('Select who is closing.');return;}
+  for(const id of ['kf1','kf2','fz','d1','d2','cd']) if(!document.getElementById(id).value){alert('Fill all temperatures.');return;}
+  const required=['tcs','cooling','display','roomtemp','surfaces','sink','equip','floors','trash','dumpster','door','doors'];
+  for(const k of required) if(!toggleValues[k]){alert('Answer all Yes/No questions.');return;}
+
+  const data = {
+    type: 'closing', timestamp: new Date().toISOString(),
+    date: now.toLocaleDateString('en-US'), time: now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+    who: document.getElementById('who').value,
+    kf1:document.getElementById('kf1').value, kf2:document.getElementById('kf2').value,
+    freezer:document.getElementById('fz').value, display1:document.getElementById('d1').value,
+    display2:document.getElementById('d2').value, cakeDisplay:document.getElementById('cd').value,
+    ...toggleValues, notes: document.getElementById('notes').value
+  };
+
+  document.getElementById('loading').classList.add('show');
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7On18TRBOj2eYqeCOwLNJCWgyPaDW22mnij5yrg714vWrfmsbVIwXD6N_d0WIG18eEA/exec';
+  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+  .then(()=>{document.getElementById('loading').classList.remove('show');document.getElementById('success').classList.add('show');})
+  .catch(()=>{document.getElementById('loading').classList.remove('show');alert('Error. Try again.');});
+}
+
+function resetForm() {
+  document.getElementById('success').classList.remove('show');
+  document.getElementById('who').value='';
+  ['kf1','kf2','fz','d1','d2','cd','notes'].forEach(id=>document.getElementById(id).value='');
+  ['ti-kf1','ti-kf2','ti-fz','ti-d1','ti-d2','ti-cd'].forEach(id=>document.getElementById(id).classList.remove('ok','warn'));
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected-yes','selected-no'));
+  Object.keys(toggleValues).forEach(k=>delete toggleValues[k]);
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
