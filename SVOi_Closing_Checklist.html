@@ -38,9 +38,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 .setup-save{flex:1;background:var(--dark);color:#F5EDD8;border:none;border-radius:12px;padding:14px;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;letter-spacing:1px;cursor:pointer}
 .setup-cancel{background:transparent;border:1px solid var(--border);border-radius:12px;padding:14px 18px;font-size:14px;cursor:pointer;color:var(--muted)}
 
+/* ── LANGUAGE TOGGLE ── */
+.lang-toggle{display:inline-flex;border:1px solid rgba(201,169,110,0.4);border-radius:8px;overflow:hidden}
+.lang-toggle.dark{border-color:rgba(201,169,110,0.5)}
+.lang-opt{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.5px;padding:5px 11px;cursor:pointer;background:transparent;border:none;color:var(--muted);transition:all 0.2s}
+.lang-toggle.dark .lang-opt{color:var(--gold-light)}
+.lang-opt.active{background:var(--gold);color:#fff}
+.lang-toggle.dark .lang-opt.active{background:var(--gold);color:#1C1612}
+
 /* ── LOCATION PICKER ── */
 .loc-screen{position:fixed;inset:0;background:var(--dark);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
 .loc-screen.hidden{display:none}
+.loc-lang{position:absolute;top:20px;right:20px}
 .loc-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#F5EDD8;letter-spacing:3px;margin-bottom:6px}
 .loc-sub{font-size:12px;color:var(--gold-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:44px}
 .loc-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-light);margin-bottom:22px;font-style:italic}
@@ -132,12 +141,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 .section-card.completed .section-complete-banner{display:block}
 
 /* DESSERTS */
-.dessert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px 15px 8px}
+.dessert-hint{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);padding:12px 15px 2px;font-weight:500}
+.dessert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:8px 15px 8px}
 .dessert-cell{background:var(--cream);border-radius:8px;border:1px solid var(--border);overflow:hidden}
-.dessert-cell label{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px 8px 1px}
-.dessert-cell input{display:block;width:100%;border:none;background:transparent;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--dark);padding:0 8px 6px;outline:none;text-align:center}
+.dessert-cell label{display:block;font-size:9px;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);padding:6px 6px 1px;line-height:1.2;min-height:26px}
+.dessert-cell input{display:block;width:100%;border:none;background:transparent;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--dark);padding:0 8px 4px;outline:none;text-align:center}
 .dessert-cell input::placeholder{color:var(--gold-pale)}
-.tomorrow-row{padding:0 15px 14px}
+.dessert-unit{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-light);text-align:center;padding:0 0 6px}
+.tomorrow-row{padding:2px 15px 14px}
 .tomorrow-row label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
 .tomorrow-row input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);background:transparent;font-size:14px;color:var(--dark);padding:4px 0 7px;outline:none;font-family:'DM Sans',sans-serif;transition:border-color 0.2s}
 .tomorrow-row input:focus{border-bottom-color:var(--gold)}
@@ -195,8 +206,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 <!-- SETUP BANNER -->
 <div class="setup-banner" id="setupBanner" onclick="openSetup()">
   <div class="setup-banner-text">
-    <strong>⚙️ Connect to Google Sheets</strong>
-    Tap to enter your Apps Script URL so shifts are saved automatically.
+    <strong data-i18n="connectTitle"></strong>
+    <span data-i18n="connectSub"></span>
   </div>
   <div class="setup-banner-arrow">›</div>
 </div>
@@ -204,48 +215,54 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 <!-- SETUP MODAL -->
 <div class="modal-overlay" id="setupModal">
   <div class="modal-sheet">
-    <h3>Google Sheets Setup</h3>
-    <p>После того как ты задеплоил Apps Script — вставь сюда URL. Все смены будут автоматически сохраняться в таблицу на patisseriesvoi@gmail.com</p>
+    <h3 data-i18n="setupTitle"></h3>
+    <p data-i18n="setupP"></p>
     <div class="setup-field">
-      <label>Apps Script Web App URL</label>
+      <label data-i18n="setupLabel"></label>
       <input type="url" id="scriptUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocorrect="off">
     </div>
-    <div class="setup-note">Этот URL вводится один раз на каждом планшете. После сохранения все смены идут в одну таблицу.</div>
+    <div class="setup-note" data-i18n="setupNote"></div>
     <div class="setup-actions">
-      <button class="setup-cancel" onclick="closeSetup()">Cancel</button>
-      <button class="setup-save" onclick="saveScriptUrl()">Save & Connect</button>
+      <button class="setup-cancel" onclick="closeSetup()" data-i18n="cancel"></button>
+      <button class="setup-save" onclick="saveScriptUrl()" data-i18n="saveConnect"></button>
     </div>
   </div>
 </div>
 
 <!-- LOCATION PICKER -->
 <div class="loc-screen" id="locScreen">
+  <div class="loc-lang">
+    <div class="lang-toggle dark" id="locLangToggle">
+      <button class="lang-opt" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-opt" data-lang="ru" onclick="setLang('ru')">RU</button>
+    </div>
+  </div>
   <div class="loc-logo">PATISSERIE SVOi</div>
-  <div class="loc-sub">Closing Checklist</div>
-  <div class="loc-title">Select your location</div>
+  <div class="loc-sub" data-i18n="closingChecklist"></div>
+  <div class="loc-title" data-i18n="selectLoc"></div>
   <div class="loc-list" id="locList"></div>
-  <button class="loc-add-btn" onclick="showAddLoc()">+ Add new location</button>
+  <button class="loc-add-btn" onclick="showAddLoc()" data-i18n="addNewLoc"></button>
 </div>
 
 <!-- ADD LOCATION -->
 <div class="modal-overlay" id="addLocModal">
   <div class="add-loc-sheet">
-    <h3>New Location</h3>
+    <h3 data-i18n="newLocation"></h3>
     <div class="add-field">
-      <label>Location Name</label>
-      <input type="text" id="newLocName" placeholder="e.g. Central West End" autocorrect="off">
+      <label data-i18n="locName"></label>
+      <input type="text" id="newLocName" data-i18n-ph="locNamePh" autocorrect="off">
     </div>
     <div class="add-field">
-      <label>Address (optional)</label>
-      <input type="text" id="newLocAddr" placeholder="e.g. 8 S Euclid Ave" autocorrect="off">
+      <label data-i18n="addr"></label>
+      <input type="text" id="newLocAddr" data-i18n-ph="addrPh" autocorrect="off">
     </div>
     <div class="add-field">
-      <label>Color</label>
+      <label data-i18n="color"></label>
       <div class="color-row" id="colorRow"></div>
     </div>
     <div class="add-loc-actions">
-      <button class="add-loc-cancel" onclick="hideAddLoc()">Cancel</button>
-      <button class="add-loc-save" onclick="saveNewLoc()">Save</button>
+      <button class="add-loc-cancel" onclick="hideAddLoc()" data-i18n="cancel"></button>
+      <button class="add-loc-save" onclick="saveNewLoc()" data-i18n="save"></button>
     </div>
   </div>
 </div>
@@ -257,38 +274,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
       <div class="loc-indicator" id="locIndicator"></div>
       <div>
         <h1 id="headerTitle">SVOi</h1>
-        <div class="subtitle">Closing Checklist
-          <span class="change-loc-btn" onclick="changeLoc()">change</span>
+        <div class="subtitle"><span data-i18n="closingChecklist"></span>
+          <span class="change-loc-btn" onclick="changeLoc()" data-i18n="change"></span>
         </div>
       </div>
     </div>
     <div class="header-right">
+      <div class="lang-toggle dark" id="headerLangToggle">
+        <button class="lang-opt" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-opt" data-lang="ru" onclick="setLang('ru')">RU</button>
+      </div>
       <div id="clock"></div>
-      <div class="log-btn" onclick="openLog()">📋 Shift Log</div>
+      <div class="log-btn" onclick="openLog()" data-i18n="shiftLogMini"></div>
     </div>
   </div>
   <div class="progress-bar-wrap"><div class="progress-bar-fill" id="globalFill"></div></div>
-  <div class="progress-text" id="progressText">0 of 0 tasks complete</div>
+  <div class="progress-text" id="progressText"></div>
 </div>
 
 <div class="barista-section">
   <div class="barista-row">
     <div class="barista-col">
-      <label>Closing Captain</label>
-      <input type="text" id="name1" placeholder="Your name" autocomplete="off" autocorrect="off" autocapitalize="words">
+      <label data-i18n="closingCaptain"></label>
+      <input type="text" id="name1" data-i18n-ph="yourName" autocomplete="off" autocorrect="off" autocapitalize="words">
     </div>
     <div class="barista-col">
-      <label>2nd Barista</label>
-      <input type="text" id="name2" placeholder="Optional" autocomplete="off" autocorrect="off" autocapitalize="words">
+      <label data-i18n="secondBarista"></label>
+      <input type="text" id="name2" data-i18n-ph="optional" autocomplete="off" autocorrect="off" autocapitalize="words">
     </div>
   </div>
-  <div class="barista-note" id="syncStatus">Shifts saved to Google Sheets → patisseriesvoi@gmail.com</div>
+  <div class="barista-note" id="syncStatus" data-i18n="syncNote"></div>
 </div>
 
 <div class="sections-wrap" id="sectionsWrap"></div>
 
 <div class="submit-footer">
-  <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Sign &amp; Close Shift</button>
+  <button class="submit-btn" id="submitBtn" onclick="handleSubmit()" data-i18n="signClose"></button>
 </div>
 
 <!-- DONE -->
@@ -296,14 +317,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
   <div class="done-check">
     <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
-  <h2>Shift Closed</h2>
+  <h2 data-i18n="shiftClosed"></h2>
   <div class="done-loc-badge" id="doneLocBadge"></div>
   <div class="done-name" id="doneName"></div>
   <div class="done-stamp" id="doneStamp"></div>
   <div class="saving-indicator" id="savingIndicator"></div>
   <div class="done-actions">
-    <button class="done-btn primary" onclick="openLogFromDone()">📋 View Shift Log</button>
-    <button class="done-btn secondary" onclick="resetAll()">Start New Checklist</button>
+    <button class="done-btn primary" onclick="openLogFromDone()" data-i18n="viewLog"></button>
+    <button class="done-btn secondary" onclick="resetAll()" data-i18n="startNew"></button>
   </div>
 </div>
 
@@ -311,7 +332,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 <div class="log-modal-overlay" id="logModal" onclick="closeLogOnOverlay(event)">
   <div class="log-sheet">
     <div class="log-header">
-      <h3>Shift Log</h3>
+      <h3 data-i18n="shiftLog"></h3>
       <button class="log-close" onclick="closeLog()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -322,68 +343,217 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 </div>
 
 <script>
-// ── CHECKLIST DATA ────────────────────────────────────────
+// ── TRANSLATIONS ──────────────────────────────────────────
+const T = {
+  en: {
+    connectTitle:"⚙️ Connect to Google Sheets",
+    connectSub:"Tap to enter your Apps Script URL so shifts are saved automatically.",
+    setupTitle:"Google Sheets Setup",
+    setupP:"After you deploy the Apps Script, paste the URL here. All shifts will be saved automatically to the sheet on patisseriesvoi@gmail.com",
+    setupLabel:"Apps Script Web App URL",
+    setupNote:"Enter this URL once per tablet. After saving, all shifts go to one sheet.",
+    cancel:"Cancel", saveConnect:"Save & Connect", save:"Save",
+    closingChecklist:"Closing Checklist",
+    selectLoc:"Select your location", addNewLoc:"+ Add new location",
+    newLocation:"New Location", locName:"Location Name", locNamePh:"e.g. Central West End",
+    addr:"Address (optional)", addrPh:"e.g. 8 S Euclid Ave", color:"Color",
+    change:"change", closingCaptain:"Closing Captain", yourName:"Your name",
+    secondBarista:"2nd Barista", optional:"Optional",
+    syncNote:"Shifts saved to Google Sheets → patisseriesvoi@gmail.com",
+    signClose:"Sign & Close Shift",
+    shiftLogMini:"📋 Shift Log",
+    complete:"✓ Complete",
+    shiftClosed:"Shift Closed", viewLog:"📋 View Shift Log", startNew:"Start New Checklist",
+    shiftLog:"Shift Log", allLocations:"All locations",
+    noShifts:"No shifts recorded yet.<br><br>Complete your first closing checklist<br>to start the log.",
+    loading:"Loading shifts...", shiftClosedBadge:"✓ Shift Closed", clearHistory:"Clear local history",
+    confirmClear:"Clear local history?",
+    savingSheets:"⏳ Saving to Google Sheets...", savedSheets:"✅ Saved to Google Sheets",
+    savedLocalSync:"⚠️ Saved locally — will sync when online",
+    savedLocal:"💾 Saved locally (connect Sheets to sync)",
+    connectedAlert:"Connected! Shifts will now save to Google Sheets automatically.",
+    dessertHint:"Count everything left on display",
+    dessertNotes:"Notes for kitchen — needed tomorrow",
+    dessertNotesPh:"e.g. more Napoleon, restock Medovik...",
+    slices:"slices",
+    tasksComplete:(a,b)=>`${a} of ${b} tasks complete`,
+    tasksCompletedN:(n)=>`${n} tasks completed`
+  },
+  ru: {
+    connectTitle:"⚙️ Подключить Google Таблицу",
+    connectSub:"Нажми, чтобы ввести URL Apps Script — смены будут сохраняться автоматически.",
+    setupTitle:"Настройка Google Таблицы",
+    setupP:"После деплоя Apps Script вставь сюда URL. Все смены будут автоматически сохраняться в таблицу на patisseriesvoi@gmail.com",
+    setupLabel:"URL веб-приложения Apps Script",
+    setupNote:"Этот URL вводится один раз на каждом планшете. После сохранения все смены идут в одну таблицу.",
+    cancel:"Отмена", saveConnect:"Сохранить и подключить", save:"Сохранить",
+    closingChecklist:"Чек-лист закрытия",
+    selectLoc:"Выбери локацию", addNewLoc:"+ Добавить локацию",
+    newLocation:"Новая локация", locName:"Название локации", locNamePh:"напр. Central West End",
+    addr:"Адрес (необязательно)", addrPh:"напр. 8 S Euclid Ave", color:"Цвет",
+    change:"сменить", closingCaptain:"Старший смены", yourName:"Твоё имя",
+    secondBarista:"2-й бариста", optional:"Необязательно",
+    syncNote:"Смены сохраняются в Google Таблицу → patisseriesvoi@gmail.com",
+    signClose:"Подписать и закрыть смену",
+    shiftLogMini:"📋 Журнал смен",
+    complete:"✓ Готово",
+    shiftClosed:"Смена закрыта", viewLog:"📋 Открыть журнал смен", startNew:"Новый чек-лист",
+    shiftLog:"Журнал смен", allLocations:"Все локации",
+    noShifts:"Пока нет закрытых смен.<br><br>Заполни первый чек-лист закрытия,<br>чтобы начать журнал.",
+    loading:"Загрузка смен...", shiftClosedBadge:"✓ Смена закрыта", clearHistory:"Очистить локальную историю",
+    confirmClear:"Очистить локальную историю?",
+    savingSheets:"⏳ Сохранение в Google Таблицу...", savedSheets:"✅ Сохранено в Google Таблицу",
+    savedLocalSync:"⚠️ Сохранено локально — синхронизируется онлайн",
+    savedLocal:"💾 Сохранено локально (подключи таблицу для синхронизации)",
+    connectedAlert:"Подключено! Смены теперь сохраняются в Google Таблицу автоматически.",
+    dessertHint:"Посчитай всё, что осталось на витрине",
+    dessertNotes:"Записка для кухни — что нужно на завтра",
+    dessertNotesPh:"напр. больше Наполеона, докрутить Медовик...",
+    slices:"кусков",
+    tasksComplete:(a,b)=>`${a} из ${b} задач выполнено`,
+    tasksCompletedN:(n)=>`${n} задач выполнено`
+  }
+};
+let LANG = localStorage.getItem('svoi-lang') || 'en';
+function t(k){ return T[LANG][k]; }
+
+// ── DISPLAY CASE — full active menu from Square (coffee excluded) ──
+// Grouped by Square category. unit = how it's counted at closing.
+const DISPLAY = [
+  { group:{en:"Cakes — by slice",ru:"Торты — по кускам"}, unit:{en:"slices",ru:"кусков"}, items:[
+    {en:"Napoleon Slice",ru:"Наполеон (кусок)"},
+    {en:"Honey Cake / Medovik Slice",ru:"Медовик (кусок)"},
+    {en:"Esterhazy",ru:"Эстерхази"},
+    {en:"Three Chocolates",ru:"Три шоколада"},
+    {en:"Tiramisu",ru:"Тирамису"},
+  ]},
+  { group:{en:"Basque Cheesecake",ru:"Баскский чизкейк"}, unit:{en:"slices",ru:"кусков"}, items:[
+    {en:"Vanilla",ru:"Ваниль"},
+    {en:"Chocolate-Nutella",ru:"Шоколад-Nutella"},
+    {en:"Vanilla-Pistachio",ru:"Ваниль-фисташка"},
+  ]},
+  { group:{en:"Mousse Desserts",ru:"Мусс-десерты"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Banana",ru:"Банан"},
+    {en:"Blueberry",ru:"Черника"},
+    {en:"Cherry",ru:"Вишня"},
+    {en:"Hazelnut",ru:"Фундук"},
+    {en:"Lemon",ru:"Лимон"},
+    {en:"Mango",ru:"Манго"},
+    {en:"Raspberry",ru:"Малина"},
+    {en:"Strawberry",ru:"Клубника"},
+    {en:"Bean (Coffee-Caramel)",ru:"«Зерно» кофе-карамель"},
+    {en:"Cube Pistachio-Raspberry",ru:"Куб фисташка-малина"},
+    {en:"Cube Chocolate-Mango-Passion",ru:"Куб шоколад-манго-маракуйя"},
+    {en:"Cube Three Chocolates",ru:"Куб три шоколада"},
+  ]},
+  { group:{en:"Tarts",ru:"Тарты"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Caramel-Coffee",ru:"Карамель-кофе"},
+    {en:"Mango-Passion Fruit",ru:"Манго-маракуйя"},
+    {en:"Pistachio-Chocolate",ru:"Фисташка-шоколад"},
+  ]},
+  { group:{en:"Pavlova",ru:"Павлова"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Raspberry",ru:"Малина"},
+    {en:"Mango-Passion Fruit",ru:"Манго-маракуйя"},
+  ]},
+  { group:{en:"Macarons",ru:"Макароны"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Pistachio Cream",ru:"Фисташковый крем"},
+    {en:"Vanilla-Raspberry",ru:"Ваниль-малина"},
+    {en:"Chocolate-Raspberry",ru:"Шоколад-малина"},
+    {en:"Coffee-Caramel",ru:"Кофе-карамель"},
+    {en:"Double Caramel",ru:"Двойная карамель"},
+    {en:"Milk Chocolate-Pistachio",ru:"Мол. шоколад-фисташка"},
+    {en:"Poppy Seed-Strawberry",ru:"Мак-клубника"},
+    {en:"Vanilla-Mango-Passion",ru:"Ваниль-манго-маракуйя"},
+    {en:"Hazelnut",ru:"Фундук"},
+    {en:"Bounty (Choc-Coconut)",ru:"Bounty (шоколад-кокос)"},
+  ]},
+  { group:{en:"Cookies",ru:"Печенье"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Nutella",ru:"Nutella"},
+    {en:"Toffee Caramel",ru:"Тоффи-карамель"},
+  ]},
+  { group:{en:"Croissants",ru:"Круассаны"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Classic",ru:"Классический"},
+    {en:"Almond",ru:"Миндальный"},
+    {en:"Chocolate",ru:"Шоколадный"},
+  ]},
+  { group:{en:"Vegan · Gluten-free",ru:"Веган · глютен-фри"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Date-Pistachio (vegan)",ru:"Финик-фисташка (веган)"},
+  ]},
+  { group:{en:"Savory",ru:"Солёное"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Quiche (Sun-dried Tomato & Mozzarella)",ru:"Киш (томаты-моцарелла)"},
+  ]},
+  { group:{en:"Bottled Drinks",ru:"Напитки в бутылках"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Coca-Cola Regular",ru:"Coca-Cola обычная"},
+    {en:"Coca-Cola Zero",ru:"Coca-Cola Zero"},
+    {en:"Fanta",ru:"Fanta"},
+    {en:"Sprite",ru:"Sprite"},
+    {en:"San Pellegrino",ru:"San Pellegrino"},
+    {en:"San Pellegrino Zero",ru:"San Pellegrino Zero"},
+  ]},
+];
+
+// ── CHECKLIST DATA (bilingual) ────────────────────────────
 const SECTIONS = [
-  { id:"prep", num:"1", title:"Preparation", time:"60 min before close",
+  { id:"prep", num:"1", title:{en:"Preparation",ru:"Подготовка"}, time:{en:"60 min before close",ru:"за 60 мин до закрытия"},
     groups:[
-      { label:null, items:["Begin closing prep if guest flow allows"] },
-      { label:"Guest area — restock", items:["Sugar","Sweetener","Napkins","Straws","Stirrers"] },
-      { label:"Bar — restock", items:["Cups (all sizes)","Lids","Syrups","Milk","Coffee in grinder"] },
-      { label:"Refrigerator", items:["Sufficient milk for morning","Products arranged by FIFO"] },
+      { label:null, items:[{en:"Begin closing prep if guest flow allows",ru:"Начни подготовку к закрытию, если поток гостей позволяет"}] },
+      { label:{en:"Guest area — restock",ru:"Зона гостей — пополнить"}, items:[{en:"Sugar",ru:"Сахар"},{en:"Sweetener",ru:"Сахарозаменитель"},{en:"Napkins",ru:"Салфетки"},{en:"Straws",ru:"Трубочки"},{en:"Stirrers",ru:"Размешиватели"}] },
+      { label:{en:"Bar — restock",ru:"Бар — пополнить"}, items:[{en:"Cups (all sizes)",ru:"Стаканы (все размеры)"},{en:"Lids",ru:"Крышки"},{en:"Syrups",ru:"Сиропы"},{en:"Milk",ru:"Молоко"},{en:"Coffee in grinder",ru:"Кофе в кофемолке"}] },
+      { label:{en:"Refrigerator",ru:"Холодильник"}, items:[{en:"Sufficient milk for morning",ru:"Достаточно молока на утро"},{en:"Products arranged by FIFO",ru:"Продукты разложены по FIFO"}] },
     ]
   },
-  { id:"display", num:"2", title:"Display Case & Pastries", time:"~45 min before close",
+  { id:"display", num:"2", title:{en:"Display Case & Pastries",ru:"Витрина и десерты"}, time:{en:"After close",ru:"после закрытия"},
     hasDessertsTable:true,
     groups:[
-      { label:null, items:["Count remaining desserts","Record dessert count"] },
-      { label:"Display case", items:["Remove crumbs inside display case","Wipe display case glass","Arrange remaining pastries neatly","Place macarons in container"] },
-      { label:"Packaging for morning", items:["Dessert boxes","Cake boxes","Bags"] },
+      { label:null, items:[{en:"Count remaining desserts",ru:"Посчитай остаток десертов"},{en:"Record dessert count above",ru:"Запиши количество десертов выше"}] },
+      { label:{en:"Display case",ru:"Витрина"}, items:[{en:"Remove crumbs inside display case",ru:"Убери крошки внутри витрины"},{en:"Wipe display case glass",ru:"Протри стекло витрины"},{en:"Arrange remaining pastries neatly",ru:"Аккуратно выложи оставшиеся десерты"},{en:"Place macarons in container",ru:"Убери макароны в контейнер"}] },
+      { label:{en:"Packaging for morning",ru:"Упаковка на утро"}, items:[{en:"Dessert boxes",ru:"Коробки для десертов"},{en:"Cake boxes",ru:"Коробки для тортов"},{en:"Bags",ru:"Пакеты"}] },
     ]
   },
-  { id:"machine", num:"3", title:"La Marzocco", time:"15–20 min before close",
+  { id:"machine", num:"3", title:{en:"La Marzocco",ru:"La Marzocco"}, time:{en:"15–20 min before close",ru:"за 15–20 мин до закрытия"},
     groups:[
-      { label:"Group flush", items:["Press flush × 2 — Group 1","Press flush × 2 — Group 2"], note:"If one group not used — flush active group only." },
-      { label:"Portafilters", items:["Remove portafilters","Knock out coffee pucks","Rinse portafilters with hot water","Clean baskets"] },
-      { label:"Steam wands", items:["Wipe steam wands","Purge steam"] },
-      { label:"Drip tray", items:["Clean drip tray","Rinse drip tray","Remove coffee residue"] },
+      { label:{en:"Group backflush — auto",ru:"Промывка групп — авто"}, items:[{en:"Insert blind filter + add cleaning powder",ru:"Вставь слепой фильтр + насыпь порошок"},{en:"Group 1: hold both outer buttons — let auto-cycle finish",ru:"Группа 1: зажми две крайние кнопки → дождись авто-цикла"},{en:"Group 2: hold both outer buttons — let auto-cycle finish",ru:"Группа 2: зажми две крайние кнопки → дождись авто-цикла"},{en:"Rinse: blind filter without powder — run auto-cycle again on each group",ru:"Промой без порошка: слепой фильтр без порошка → снова авто-цикл на каждой группе"}], note:{en:"Clean one group at a time — or the drain box overflows.",ru:"Мой по одной группе за раз — иначе перельётся дренаж."} },
+      { label:{en:"Portafilters & screens — soak",ru:"Рожки и сеточки — замачивание"}, items:[{en:"Remove portafilters, knock out coffee pucks",ru:"Сними рожки, выбей кофейные таблетки"},{en:"Remove dispersion screens",ru:"Сними сеточки-диффузоры"},{en:"Soak portafilters, baskets & screens in cleaning solution",ru:"Замочи рожки, корзины и сеточки в спец. средстве"},{en:"Rinse everything with water",ru:"Промой всё водой"},{en:"Reinstall screens",ru:"Установи сеточки назад"}] },
+      { label:{en:"Steam wands",ru:"Стимеры"}, items:[{en:"Wipe steam wands",ru:"Протри стимеры"},{en:"Pour steam-wand cleaner into a milk pitcher",ru:"Налей спец. средство в питчер"},{en:"Submerge wand & purge steam 2×",ru:"Опусти стимер и продуй паром 2 раза"},{en:"Empty the pitcher",ru:"Слей средство"},{en:"Rinse wands with cold water",ru:"Промой стимеры холодной водой"}] },
+      { label:{en:"Drip tray",ru:"Поддон"}, items:[{en:"Clean drip tray",ru:"Очисти поддон"},{en:"Rinse drip tray",ru:"Промой поддон"},{en:"Remove coffee residue",ru:"Убери кофейный осадок"}] },
     ]
   },
-  { id:"equipment", num:"4", title:"Bar Equipment", time:"After machine",
-    groups:[{ label:null, items:["Wash milk pitchers","Clean rinser","Clean grinders","Wipe tamper","Wipe puck press","Remove coffee dust from bar"] }]
+  { id:"equipment", num:"4", title:{en:"Bar Equipment",ru:"Оборудование бара"}, time:{en:"After machine",ru:"после кофемашины"},
+    groups:[{ label:null, items:[{en:"Wash milk pitchers",ru:"Вымой питчеры"},{en:"Clean rinser",ru:"Очисти ринсер"},{en:"Clean grinders",ru:"Очисти кофемолки"},{en:"Wipe tamper",ru:"Протри темпер"},{en:"Wipe puck press",ru:"Протри пресс для темпера"},{en:"Remove coffee dust from bar",ru:"Убери кофейную пыль с бара"}] }]
   },
-  { id:"bar", num:"5", title:"Bar Surface", time:"After equipment",
-    groups:[{ label:null, items:["Wipe down entire bar surface","Remove all coffee dust","Wipe all equipment","Sanitize bar surface"] }]
+  { id:"bar", num:"5", title:{en:"Bar Surface",ru:"Поверхность бара"}, time:{en:"After equipment",ru:"после оборудования"},
+    groups:[{ label:null, items:[{en:"Wipe down entire bar surface",ru:"Протри всю поверхность бара"},{en:"Remove all coffee dust",ru:"Убери всю кофейную пыль"},{en:"Wipe all equipment",ru:"Протри всё оборудование"},{en:"Sanitize bar surface",ru:"Продезинфицируй поверхность бара"}] }]
   },
-  { id:"dining", num:"6", title:"Dining Room", time:"After bar",
+  { id:"dining", num:"6", title:{en:"Dining Room",ru:"Зал"}, time:{en:"After bar",ru:"после бара"},
     groups:[
-      { label:null, items:["Collect all dishes from tables","Bring dishes to kitchen"] },
-      { label:"Each table", items:["Remove crumbs with dry cloth","Wipe with damp cloth","Sanitize surface","Arrange chairs neatly"] },
+      { label:null, items:[{en:"Collect all dishes from tables",ru:"Собери всю посуду со столов"},{en:"Bring dishes to kitchen",ru:"Отнеси посуду на кухню"}] },
+      { label:{en:"Each table",ru:"Каждый стол"}, items:[{en:"Remove crumbs with dry cloth",ru:"Убери крошки сухой тряпкой"},{en:"Wipe with damp cloth",ru:"Протри влажной тряпкой"},{en:"Sanitize surface",ru:"Продезинфицируй поверхность"},{en:"Arrange chairs neatly",ru:"Аккуратно расставь стулья"}] },
     ]
   },
-  { id:"floors", num:"7", title:"Floors", time:"After dining room",
-    groups:[{ label:null, items:["Move chairs aside","Sweep entire dining room","Sweep under tables","Sweep behind the bar","Mop entire floor"] }]
+  { id:"floors", num:"7", title:{en:"Floors",ru:"Полы"}, time:{en:"After dining room",ru:"после зала"},
+    groups:[{ label:null, items:[{en:"Move chairs aside",ru:"Отодвинь стулья"},{en:"Sweep entire dining room",ru:"Подмети весь зал"},{en:"Sweep under tables",ru:"Подмети под столами"},{en:"Sweep behind the bar",ru:"Подмети за баром"},{en:"Mop entire floor",ru:"Вымой весь пол"}] }]
   },
-  { id:"dishes", num:"8", title:"Dishes", time:"Ongoing",
-    groups:[{ label:null, items:["Finish washing all remaining dishes","Leave to dry","Bring dry cups to bar","Set up cups for morning"] }]
+  { id:"dishes", num:"8", title:{en:"Dishes",ru:"Посуда"}, time:{en:"Ongoing",ru:"в течение смены"},
+    groups:[{ label:null, items:[{en:"Finish washing all remaining dishes",ru:"Домой всю оставшуюся посуду"},{en:"Leave to dry",ru:"Оставь сушиться"},{en:"Bring dry cups to bar",ru:"Принеси сухие стаканы на бар"},{en:"Set up cups for morning",ru:"Расставь стаканы на утро"}] }]
   },
-  { id:"drain", num:"9", title:"Drain", time:"Before leaving",
+  { id:"drain", num:"9", title:{en:"Drain",ru:"Слив"}, time:{en:"Before leaving",ru:"перед уходом"},
     groups:[
-      { label:null, items:["Pour 2–3 kettles of hot water down the drain"] },
-      { label:"After full clean", items:["Add degreaser solution","Add odor eliminator"] },
+      { label:null, items:[{en:"Pour 2–3 kettles of hot water down the drain",ru:"Вылей 2–3 чайника горячей воды в слив"}] },
+      { label:{en:"After full clean",ru:"После полной уборки"}, items:[{en:"Add degreaser solution",ru:"Добавь обезжириватель"},{en:"Add odor eliminator",ru:"Добавь средство от запаха"}] },
     ]
   },
-  { id:"trash", num:"10", title:"Trash", time:"Before leaving",
-    groups:[{ label:null, items:["Collect all trash","Take trash out","Replace with new bags"] }]
+  { id:"trash", num:"10", title:{en:"Trash",ru:"Мусор"}, time:{en:"Before leaving",ru:"перед уходом"},
+    groups:[{ label:null, items:[{en:"Collect all trash",ru:"Собери весь мусор"},{en:"Take trash out",ru:"Вынеси мусор"},{en:"Replace with new bags",ru:"Поставь новые пакеты"}] }]
   },
-  { id:"precheck", num:"11", title:"Pre-Shutdown Check", time:"Almost done",
-    groups:[{ label:null, items:["Bar is clean","Display case is clean","Tables are clean","Floor is mopped","Dishes are ready","Bar prepared for morning shift"] }]
+  { id:"precheck", num:"11", title:{en:"Pre-Shutdown Check",ru:"Проверка перед закрытием"}, time:{en:"Almost done",ru:"почти готово"},
+    groups:[{ label:null, items:[{en:"Bar is clean",ru:"Бар чистый"},{en:"Display case is clean",ru:"Витрина чистая"},{en:"Tables are clean",ru:"Столы чистые"},{en:"Floor is mopped",ru:"Пол вымыт"},{en:"Dishes are ready",ru:"Посуда готова"},{en:"Bar prepared for morning shift",ru:"Бар готов к утренней смене"}] }]
   },
-  { id:"shutdown", num:"12", title:"Final Shutdown", time:"Last step",
+  { id:"shutdown", num:"12", title:{en:"Final Shutdown",ru:"Финальное закрытие"}, time:{en:"Last step",ru:"последний шаг"},
     groups:[
-      { label:"Display & refrigerators", items:["Turn off display case lighting","Confirm refrigerators running normally","Confirm all refrigerator doors closed"] },
-      { label:"Lighting", items:["Turn off dining room lights","Turn off bar lights","Leave night light on if required"] },
-      { label:"Temperature", items:["Check thermostat","Set to night mode if needed"], note:"Adjust dining room thermostat only." },
-      { label:"Final check", items:["Bar is clean","Display case is clean","Refrigerators closed","All lights off","Trash taken out","Door is locked","Alarm is set"] },
+      { label:{en:"Display & refrigerators",ru:"Витрина и холодильники"}, items:[{en:"Turn off display case lighting",ru:"Выключи подсветку витрины"},{en:"Confirm refrigerators running normally",ru:"Проверь, что холодильники работают нормально"},{en:"Confirm all refrigerator doors closed",ru:"Проверь, что все дверцы холодильников закрыты"}] },
+      { label:{en:"Lighting",ru:"Освещение"}, items:[{en:"Turn off dining room lights",ru:"Выключи свет в зале"},{en:"Turn off bar lights",ru:"Выключи свет на баре"},{en:"Leave night light on if required",ru:"Оставь ночник, если нужно"}] },
+      { label:{en:"Temperature",ru:"Температура"}, items:[{en:"Check thermostat",ru:"Проверь термостат"},{en:"Set to night mode if needed",ru:"Установи ночной режим при необходимости"}], note:{en:"Adjust dining room thermostat only.",ru:"Регулируй только термостат зала."} },
+      { label:{en:"Final check",ru:"Финальная проверка"}, items:[{en:"Bar is clean",ru:"Бар чистый"},{en:"Display case is clean",ru:"Витрина чистая"},{en:"Refrigerators closed",ru:"Холодильники закрыты"},{en:"All lights off",ru:"Весь свет выключен"},{en:"Trash taken out",ru:"Мусор вынесен"},{en:"Lock front door & back door",ru:"Закрой на замок входную дверь и чёрный ход"}] },
     ]
   },
 ];
@@ -398,6 +568,43 @@ let selectedColor = COLORS[0];
 let activeFilter = 'all';
 const checkState = {};
 
+// ── LANGUAGE ──────────────────────────────────────────────
+function applyStaticLang() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (T[LANG][k] !== undefined) el.innerHTML = T[LANG][k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const k = el.getAttribute('data-i18n-ph');
+    if (T[LANG][k] !== undefined) el.placeholder = T[LANG][k];
+  });
+  document.querySelectorAll('.lang-opt').forEach(b => b.classList.toggle('active', b.getAttribute('data-lang') === LANG));
+}
+function setLang(l) {
+  LANG = l;
+  localStorage.setItem('svoi-lang', l);
+  applyStaticLang();
+  renderLocPicker();
+  updateGlobalProgress();
+  if (currentLoc) rebuildKeepingState();
+}
+function rebuildKeepingState() {
+  const snapshot = JSON.parse(JSON.stringify(checkState));
+  buildUI();
+  Object.keys(snapshot).forEach(sid => {
+    Object.keys(snapshot[sid]).forEach(key => {
+      if (snapshot[sid][key]) {
+        checkState[sid][key] = true;
+        const el = document.getElementById(`ci--${sid}--${key}`);
+        if (el) el.classList.add('checked');
+      }
+    });
+    updateSectionUI(sid);
+  });
+  updateGlobalProgress();
+}
+
 // ── SCRIPT URL ────────────────────────────────────────────
 function getScriptUrl() { return localStorage.getItem('svoi-script-url') || ''; }
 function openSetup() { document.getElementById('scriptUrl').value = getScriptUrl(); document.getElementById('setupModal').classList.add('show'); }
@@ -408,7 +615,7 @@ function saveScriptUrl() {
   localStorage.setItem('svoi-script-url', url);
   document.getElementById('setupBanner').classList.add('hidden');
   closeSetup();
-  alert('Connected! Shifts will now save to Google Sheets automatically.');
+  alert(t('connectedAlert'));
 }
 function checkSetupBanner() {
   if (getScriptUrl()) document.getElementById('setupBanner').classList.add('hidden');
@@ -462,11 +669,12 @@ function saveNewLoc() {
   renderLocPicker();
 }
 
-// ── STATE ─────────────────────────────────────────────────
+// ── STATE (stable keys, language-independent) ─────────────
+function itemKey(gi, ii) { return gi + '-' + ii; }
 function initState() {
   SECTIONS.forEach(s => {
     checkState[s.id] = {};
-    s.groups.forEach(g => g.items.forEach(item => checkState[s.id][item] = false));
+    s.groups.forEach((g, gi) => g.items.forEach((item, ii) => checkState[s.id][itemKey(gi,ii)] = false));
   });
 }
 function totalItems() { let n=0; SECTIONS.forEach(s => n += Object.keys(checkState[s.id]).length); return n; }
@@ -479,16 +687,17 @@ function allDone() { return checkedItems() === totalItems(); }
 function updateGlobalProgress() {
   const pct = totalItems() ? (checkedItems()/totalItems()*100) : 0;
   document.getElementById('globalFill').style.width = pct+'%';
-  document.getElementById('progressText').textContent = `${checkedItems()} of ${totalItems()} tasks complete`;
-  document.getElementById('submitBtn').classList.toggle('ready', allDone());
+  document.getElementById('progressText').textContent = t('tasksComplete')(checkedItems(), totalItems());
+  document.getElementById('submitBtn').classList.toggle('ready', allDone() && totalItems()>0);
 }
 function updateSectionUI(secId) {
   const card = document.getElementById('card-'+secId);
+  if (!card) return;
   const wasDone = card.classList.contains('completed');
   const done = sectionDone(secId);
   card.classList.toggle('completed', done);
   const checked = sectionChecked(secId), total = sectionTotal(secId);
-  card.querySelector('.section-count').textContent = done ? '✓ Complete' : `${checked} / ${total}`;
+  card.querySelector('.section-count').textContent = done ? t('complete') : `${checked} / ${total}`;
   card.querySelector('.section-count').classList.toggle('all-done', done);
   card.querySelector('.mini-progress-fill').style.width = (checked/total*100)+'%';
   if (done && !wasDone) {
@@ -497,14 +706,14 @@ function updateSectionUI(secId) {
     if (idx < SECTIONS.length-1) {
       setTimeout(() => {
         const next = document.getElementById('card-'+SECTIONS[idx+1].id);
-        if (!next.classList.contains('completed')) { next.classList.add('open'); setTimeout(() => next.scrollIntoView({behavior:'smooth',block:'start'}), 50); }
+        if (next && !next.classList.contains('completed')) { next.classList.add('open'); setTimeout(() => next.scrollIntoView({behavior:'smooth',block:'start'}), 50); }
       }, 350);
     }
   }
 }
-function toggleItem(secId, item) {
-  checkState[secId][item] = !checkState[secId][item];
-  document.getElementById(`ci--${secId}--${item}`).classList.toggle('checked', checkState[secId][item]);
+function toggleItem(secId, key) {
+  checkState[secId][key] = !checkState[secId][key];
+  document.getElementById(`ci--${secId}--${key}`).classList.toggle('checked', checkState[secId][key]);
   updateSectionUI(secId);
   updateGlobalProgress();
 }
@@ -521,30 +730,36 @@ function buildUI() {
     const hdr = document.createElement('div');
     hdr.className = 'section-header';
     hdr.onclick = () => toggleSection(sec.id);
-    hdr.innerHTML = `<div class="section-num">${sec.num}</div><div class="section-title-wrap"><div class="section-title">${sec.title}</div><div class="section-time">${sec.time}</div><div class="mini-progress"><div class="mini-progress-fill" style="width:0%"></div></div></div><div class="section-meta"><span class="section-count">0 / ${sectionTotal(sec.id)}</span><div class="done-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>`;
+    hdr.innerHTML = `<div class="section-num">${sec.num}</div><div class="section-title-wrap"><div class="section-title">${sec.title[LANG]}</div><div class="section-time">${sec.time[LANG]}</div><div class="mini-progress"><div class="mini-progress-fill" style="width:0%"></div></div></div><div class="section-meta"><span class="section-count">0 / ${sectionTotal(sec.id)}</span><div class="done-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></div>`;
     card.appendChild(hdr);
     const body = document.createElement('div');
     body.className = 'section-body';
     if (sec.hasDessertsTable) {
-      const grid = document.createElement('div'); grid.className = 'dessert-grid';
-      ['Napoleon','Honey Cake','Eclair','Macaron','Tart','Other'].forEach(d => { const c=document.createElement('div'); c.className='dessert-cell'; c.innerHTML=`<label>${d}</label><input type="number" placeholder="0" min="0" inputmode="numeric">`; grid.appendChild(c); });
-      body.appendChild(grid);
+      const hint=document.createElement('div'); hint.className='dessert-hint'; hint.textContent=t('dessertHint');
+      body.appendChild(hint);
+      DISPLAY.forEach(grp => {
+        const gl=document.createElement('div'); gl.className='group-label'; gl.textContent=grp.group[LANG]+' · '+grp.unit[LANG]; body.appendChild(gl);
+        const grid = document.createElement('div'); grid.className = 'dessert-grid';
+        grp.items.forEach(d => { const c=document.createElement('div'); c.className='dessert-cell'; c.innerHTML=`<label>${d[LANG]}</label><input type="number" placeholder="0" min="0" inputmode="numeric"><div class="dessert-unit">${grp.unit[LANG]}</div>`; grid.appendChild(c); });
+        body.appendChild(grid);
+      });
       const tmr=document.createElement('div'); tmr.className='tomorrow-row';
-      tmr.innerHTML=`<label>Notes for kitchen — needed tomorrow</label><input type="text" placeholder="e.g. More eclairs, restock honey cake..." autocomplete="off">`;
+      tmr.innerHTML=`<label>${t('dessertNotes')}</label><input type="text" placeholder="${t('dessertNotesPh')}" autocomplete="off">`;
       body.appendChild(tmr);
     }
-    sec.groups.forEach(group => {
-      if (group.label) { const gl=document.createElement('div'); gl.className='group-label'; gl.textContent=group.label; body.appendChild(gl); }
-      group.items.forEach(item => {
-        const el=document.createElement('div'); el.className='check-item'; el.id=`ci--${sec.id}--${item}`;
-        el.innerHTML=`<div class="check-box"><svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">${item}</div>`;
-        el.addEventListener('click', () => toggleItem(sec.id, item));
+    sec.groups.forEach((group, gi) => {
+      if (group.label) { const gl=document.createElement('div'); gl.className='group-label'; gl.textContent=group.label[LANG]; body.appendChild(gl); }
+      group.items.forEach((item, ii) => {
+        const key = itemKey(gi, ii);
+        const el=document.createElement('div'); el.className='check-item'; el.id=`ci--${sec.id}--${key}`;
+        el.innerHTML=`<div class="check-box"><svg class="tick" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="check-text">${item[LANG]}</div>`;
+        el.addEventListener('click', () => toggleItem(sec.id, key));
         body.appendChild(el);
       });
-      if (group.note) { const nt=document.createElement('div'); nt.className='note-text'; nt.textContent='↳ '+group.note; body.appendChild(nt); }
+      if (group.note) { const nt=document.createElement('div'); nt.className='note-text'; nt.textContent='↳ '+group.note[LANG]; body.appendChild(nt); }
     });
     const banner=document.createElement('div'); banner.className='section-complete-banner';
-    banner.innerHTML=`<svg style="display:inline;vertical-align:middle;margin-right:6px" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Section complete`;
+    banner.innerHTML=`<svg style="display:inline;vertical-align:middle;margin-right:6px" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>${t('complete')}`;
     body.appendChild(banner);
     card.appendChild(body);
     wrap.appendChild(card);
@@ -571,36 +786,28 @@ async function handleSubmit() {
     ts:       now.getTime()
   };
 
-  // Save to localStorage always
   const local = JSON.parse(localStorage.getItem('svoi-local-log')||'[]');
   local.unshift(entry);
   localStorage.setItem('svoi-local-log', JSON.stringify(local.slice(0,200)));
 
-  // Update done screen
   document.getElementById('doneLocBadge').textContent = currentLoc.name;
   document.getElementById('doneLocBadge').style.background = currentLoc.color+'22';
   document.getElementById('doneLocBadge').style.color = currentLoc.color;
   document.getElementById('doneName').textContent = names;
   document.getElementById('doneStamp').textContent = `${entry.date}  ·  ${entry.time}`;
-  document.getElementById('savingIndicator').textContent = '⏳ Saving to Google Sheets...';
+  document.getElementById('savingIndicator').textContent = t('savingSheets');
   document.getElementById('doneScreen').classList.add('show');
 
-  // Send to Google Sheets
   const url = getScriptUrl();
   if (url) {
     try {
-      await fetch(url, {
-        method:'POST',
-        mode:'no-cors',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(entry)
-      });
-      document.getElementById('savingIndicator').textContent = '✅ Saved to Google Sheets';
+      await fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry) });
+      document.getElementById('savingIndicator').textContent = t('savedSheets');
     } catch(err) {
-      document.getElementById('savingIndicator').textContent = '⚠️ Saved locally — will sync when online';
+      document.getElementById('savingIndicator').textContent = t('savedLocalSync');
     }
   } else {
-    document.getElementById('savingIndicator').textContent = '💾 Saved locally (connect Sheets to sync)';
+    document.getElementById('savingIndicator').textContent = t('savedLocal');
   }
 }
 
@@ -627,17 +834,17 @@ function renderLogTabs() {
   const tabs = document.getElementById('filterTabs');
   tabs.innerHTML='';
   const addTab = (id, label) => {
-    const t=document.createElement('div'); t.className='filter-tab'+(activeFilter===id?' active':'');
-    t.innerHTML=label; t.onclick=async()=>{activeFilter=id; renderLogTabs(); await loadAndRenderLog();};
-    tabs.appendChild(t);
+    const el=document.createElement('div'); el.className='filter-tab'+(activeFilter===id?' active':'');
+    el.innerHTML=label; el.onclick=async()=>{activeFilter=id; renderLogTabs(); await loadAndRenderLog();};
+    tabs.appendChild(el);
   };
-  addTab('all','All locations');
+  addTab('all', t('allLocations'));
   locations.forEach(loc => addTab(loc.id, `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${loc.color};margin-right:5px;vertical-align:middle"></span>${loc.name}`));
 }
 
 async function loadAndRenderLog() {
   const body = document.getElementById('logBody');
-  body.innerHTML = '<div class="log-loading">Loading shifts...</div>';
+  body.innerHTML = `<div class="log-loading">${t('loading')}</div>`;
   let data = [];
   const url = getScriptUrl();
   if (url) {
@@ -645,27 +852,13 @@ async function loadAndRenderLog() {
       const res = await fetch(url+'?action=history');
       const json = await res.json();
       if (json.ok && json.data) {
-        data = json.data.map(r => ({
-          locName: r.locName,
-          locColor: locations.find(l=>l.name===r.locName)?.color || '#A07840',
-          date: r.date,
-          time: r.time,
-          names: r.names,
-          tasks: r.tasks,
-          ts: r.ts
-        }));
+        data = json.data.map(r => ({ locName:r.locName, locColor:locations.find(l=>l.name===r.locName)?.color || '#A07840', date:r.date, time:r.time, names:r.names, tasks:r.tasks, ts:r.ts }));
       }
     } catch {}
   }
-  // Fallback to localStorage
-  if (!data.length) {
-    data = JSON.parse(localStorage.getItem('svoi-local-log')||'[]');
-  }
+  if (!data.length) { data = JSON.parse(localStorage.getItem('svoi-local-log')||'[]'); }
   const filtered = activeFilter==='all' ? data : data.filter(e => { const loc=locations.find(l=>l.id===activeFilter); return loc && e.locName===loc.name; });
-  if (!filtered.length) {
-    body.innerHTML=`<div class="log-empty">No shifts recorded yet.<br><br>Complete your first closing checklist<br>to start the log.</div>`;
-    return;
-  }
+  if (!filtered.length) { body.innerHTML=`<div class="log-empty">${t('noShifts')}</div>`; return; }
   body.innerHTML = filtered.map(e=>`
     <div class="log-row">
       <div class="log-loc-dot" style="background:${e.locColor||'#A07840'}"></div>
@@ -673,15 +866,15 @@ async function loadAndRenderLog() {
         <div class="log-top"><div class="log-date">${e.date}</div><div class="log-time">${e.time}</div></div>
         <div class="log-loc-name" style="color:${e.locColor||'#A07840'}">${e.locName||'—'}</div>
         <div class="log-names">${e.names}</div>
-        <div class="log-tasks">${e.tasks} tasks completed</div>
-        <div class="log-badge">✓ Shift Closed</div>
+        <div class="log-tasks">${t('tasksCompletedN')(e.tasks)}</div>
+        <div class="log-badge">${t('shiftClosedBadge')}</div>
       </div>
     </div>
-  `).join('') + `<button class="clear-btn" onclick="confirmClear()">Clear local history</button>`;
+  `).join('') + `<button class="clear-btn" onclick="confirmClear()">${t('clearHistory')}</button>`;
 }
 
 async function confirmClear() {
-  if (confirm('Clear local history?')) { localStorage.removeItem('svoi-local-log'); closeLog(); }
+  if (confirm(t('confirmClear'))) { localStorage.removeItem('svoi-local-log'); closeLog(); }
 }
 
 // ── CLOCK ─────────────────────────────────────────────────
@@ -689,9 +882,11 @@ setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLoca
 document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
 
 // ── INIT ──────────────────────────────────────────────────
+applyStaticLang();
 checkSetupBanner();
 initState();
 renderLocPicker();
+updateGlobalProgress();
 </script>
 </body>
 </html>
