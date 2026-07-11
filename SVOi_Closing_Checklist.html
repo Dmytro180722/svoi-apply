@@ -606,7 +606,8 @@ function rebuildKeepingState() {
 }
 
 // ── SCRIPT URL ────────────────────────────────────────────
-function getScriptUrl() { return localStorage.getItem('svoi-script-url') || ''; }
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+function getScriptUrl() { return localStorage.getItem('svoi-script-url') || DEFAULT_SCRIPT_URL; }
 function openSetup() { document.getElementById('scriptUrl').value = getScriptUrl(); document.getElementById('setupModal').classList.add('show'); }
 function closeSetup() { document.getElementById('setupModal').classList.remove('show'); }
 function saveScriptUrl() {
@@ -740,11 +741,11 @@ function buildUI() {
       DISPLAY.forEach(grp => {
         const gl=document.createElement('div'); gl.className='group-label'; gl.textContent=grp.group[LANG]+' · '+grp.unit[LANG]; body.appendChild(gl);
         const grid = document.createElement('div'); grid.className = 'dessert-grid';
-        grp.items.forEach(d => { const c=document.createElement('div'); c.className='dessert-cell'; c.innerHTML=`<label>${d[LANG]}</label><input type="number" placeholder="0" min="0" inputmode="numeric"><div class="dessert-unit">${grp.unit[LANG]}</div>`; grid.appendChild(c); });
+        grp.items.forEach(d => { const c=document.createElement('div'); c.className='dessert-cell'; c.innerHTML=`<label>${d[LANG]}</label><input type="number" class="inv-input" data-group="${grp.group.en}" data-name="${d.en}" data-unit="${grp.unit.en}" placeholder="0" min="0" inputmode="numeric"><div class="dessert-unit">${grp.unit[LANG]}</div>`; grid.appendChild(c); });
         body.appendChild(grid);
       });
       const tmr=document.createElement('div'); tmr.className='tomorrow-row';
-      tmr.innerHTML=`<label>${t('dessertNotes')}</label><input type="text" placeholder="${t('dessertNotesPh')}" autocomplete="off">`;
+      tmr.innerHTML=`<label>${t('dessertNotes')}</label><input id="kitchenNotes" type="text" placeholder="${t('dessertNotesPh')}" autocomplete="off">`;
       body.appendChild(tmr);
     }
     sec.groups.forEach((group, gi) => {
@@ -774,6 +775,13 @@ async function handleSubmit() {
   const name2 = document.getElementById('name2').value.trim();
   const names = [name1,name2].filter(Boolean).join(' & ') || 'Team';
   const now = new Date();
+  // Collect display-case inventory counts
+  const inventory = [];
+  document.querySelectorAll('.inv-input').forEach(inp => {
+    const raw = (inp.value || '').trim();
+    inventory.push({ group: inp.dataset.group, name: inp.dataset.name, unit: inp.dataset.unit, count: raw==='' ? 0 : Number(raw) });
+  });
+  const kitchenNotes = (document.getElementById('kitchenNotes') && document.getElementById('kitchenNotes').value || '').trim();
   const entry = {
     locId:    currentLoc.id,
     locName:  currentLoc.name,
@@ -783,6 +791,8 @@ async function handleSubmit() {
     names,
     tasks:    checkedItems(),
     total:    totalItems(),
+    inventory: inventory,
+    notes:    kitchenNotes,
     ts:       now.getTime()
   };
 
