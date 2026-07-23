@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SVOi — Kitchen Production</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#FAF6EF; --dark:#1C1612; --gold:#A07840; --gold-light:#C9A96E;
+  --gold-pale:#F0E4CC; --warm-dark:#D4C4A8;
+  --muted:#8C7B6A; --green:#3A6B45; --green-bg:#EAF3EC;
+  --border:#D4C4A8;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh;padding-bottom:120px}
+.lang-toggle{display:inline-flex;border:1px solid rgba(201,169,110,0.4);border-radius:8px;overflow:hidden}
+.lang-opt{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:5px 11px;cursor:pointer;background:transparent;border:none;color:var(--gold-light);transition:all .2s}
+.lang-opt.active{background:var(--gold);color:#1C1612}
+.loc-screen{position:fixed;inset:0;background:var(--dark);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+.loc-screen.hidden{display:none}
+.loc-lang{position:absolute;top:20px;right:20px}
+.loc-logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#F5EDD8;letter-spacing:3px;margin-bottom:6px}
+.loc-sub{font-size:12px;color:var(--gold-light);letter-spacing:2px;text-transform:uppercase;margin-bottom:44px}
+.loc-title{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold-light);margin-bottom:22px;font-style:italic}
+.loc-list{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
+.loc-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(201,169,110,0.3);border-radius:14px;padding:16px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;text-align:left}
+.loc-btn:active{transform:scale(.97)}
+.loc-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.loc-btn-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:#F5EDD8;font-weight:600}
+.loc-btn-addr{font-size:12px;color:var(--muted);margin-top:2px}
+.app-header{background:var(--dark);padding:18px 20px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(28,22,18,.3)}
+.header-top{display:flex;justify-content:space-between;align-items:flex-start}
+.header-left{display:flex;align-items:center;gap:10px}
+.loc-indicator{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.app-header h1{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#F5EDD8;letter-spacing:2px;text-transform:uppercase}
+.app-header .subtitle{font-size:11px;color:var(--gold-light);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.change-loc-btn{font-size:10px;color:var(--gold-light);background:rgba(255,255,255,.08);border:1px solid rgba(201,169,110,.3);border-radius:5px;padding:2px 7px;cursor:pointer;margin-left:4px;display:inline-block}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+#clock{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--gold-light);font-weight:600}
+.baker-section{margin:14px 16px 0;background:#fff;border-radius:12px;padding:15px 18px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(28,22,18,.06)}
+.baker-section label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.baker-section input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);background:transparent;font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--dark);padding:3px 0 7px;outline:none;transition:border-color .2s}
+.baker-section input:focus{border-bottom-color:var(--gold)}
+.baker-section input::placeholder{color:var(--gold-pale);font-style:italic}
+.baker-note{margin-top:9px;font-size:12px;color:var(--muted);font-style:italic}
+.hint-card{margin:12px 16px 0;background:#FFF9EC;border:1px solid var(--gold-pale);border-radius:12px;padding:12px 15px;font-size:13px;color:#7A5010;line-height:1.5}
+.wrap{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.group-card{background:#fff;border-radius:14px;border:1.5px solid var(--border);overflow:hidden;box-shadow:0 1px 6px rgba(28,22,18,.05)}
+.group-head{font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--gold);padding:12px 15px 2px;font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:8px 15px 14px}
+.cell{background:var(--cream);border-radius:8px;border:1px solid var(--border);overflow:hidden;transition:border-color .2s,background .2s}
+.cell.filled{border-color:var(--green);background:var(--green-bg)}
+.cell label{display:block;font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);padding:6px 6px 1px;line-height:1.2;min-height:26px}
+.cell input{display:block;width:100%;border:none;background:transparent;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--dark);padding:0 8px 4px;outline:none;text-align:center}
+.cell input::placeholder{color:var(--gold-pale)}
+.unit{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-light);text-align:center;padding:0 0 6px}
+.notes-row{margin:0 16px;padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:12px}
+.notes-row label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:5px}
+.notes-row input{width:100%;border:none;border-bottom:2px solid var(--gold-pale);background:transparent;font-size:14px;color:var(--dark);padding:4px 0 7px;outline:none;font-family:'DM Sans',sans-serif}
+.notes-row input:focus{border-bottom-color:var(--gold)}
+.submit-footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px;box-shadow:0 -4px 20px rgba(28,22,18,.08);z-index:100}
+.total-line{font-size:12px;color:var(--muted);text-align:center;margin-bottom:8px}
+.submit-btn{width:100%;background:var(--dark);color:#F5EDD8;border:none;border-radius:12px;padding:15px;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;opacity:.4;pointer-events:none}
+.submit-btn.ready{opacity:1;background:var(--green);box-shadow:0 4px 16px rgba(58,107,69,.3);pointer-events:all}
+.submit-btn.ready:active{transform:scale(.98)}
+.done-screen{display:none;position:fixed;inset:0;background:var(--dark);z-index:200;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px}
+.done-screen.show{display:flex}
+.done-check{width:76px;height:76px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:22px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.done-screen h2{font-family:'Cormorant Garamond',serif;font-size:30px;color:#F5EDD8;margin-bottom:8px}
+.done-loc-badge{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border-radius:6px;padding:4px 12px;margin-bottom:10px;display:inline-block}
+.done-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--gold-light);font-style:italic;margin-bottom:4px}
+.done-stamp{font-size:13px;color:var(--muted);background:rgba(255,255,255,.05);border-radius:8px;padding:9px 18px;margin-top:6px}
+.saving-indicator{font-size:12px;color:var(--gold-light);margin-top:10px;min-height:18px}
+.done-actions{display:flex;flex-direction:column;gap:10px;margin-top:22px;width:100%;max-width:300px}
+.done-btn{border-radius:10px;padding:13px 20px;font-size:14px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.1);color:#F5EDD8}
+.done-btn:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+
+<div class="loc-screen" id="locScreen">
+  <div class="loc-lang"><div class="lang-toggle">
+    <button class="lang-opt" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="lang-opt" data-lang="ru" onclick="setLang('ru')">RU</button>
+  </div></div>
+  <div class="loc-logo">PATISSERIE SVOi</div>
+  <div class="loc-sub" data-i18n="kitchenTitle"></div>
+  <div class="loc-title" data-i18n="selectLoc"></div>
+  <div class="loc-list" id="locList"></div>
+</div>
+
+<div class="app-header">
+  <div class="header-top">
+    <div class="header-left">
+      <div class="loc-indicator" id="locIndicator"></div>
+      <div>
+        <h1 id="headerTitle">SVOi</h1>
+        <div class="subtitle"><span data-i18n="kitchenTitle"></span>
+          <span class="change-loc-btn" onclick="changeLoc()" data-i18n="change"></span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="lang-toggle">
+        <button class="lang-opt" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-opt" data-lang="ru" onclick="setLang('ru')">RU</button>
+      </div>
+      <div id="clock"></div>
+    </div>
+  </div>
+</div>
+
+<div class="baker-section">
+  <label data-i18n="bakerLabel"></label>
+  <input type="text" id="baker" data-i18n-ph="bakerPh" autocomplete="off" autocapitalize="words">
+  <div class="baker-note" data-i18n="syncNote"></div>
+</div>
+
+<div class="hint-card" data-i18n="hint"></div>
+
+<div class="wrap" id="wrap"></div>
+
+<div class="notes-row">
+  <label data-i18n="notesLabel"></label>
+  <input type="text" id="kitchenNotes" data-i18n-ph="notesPh" autocomplete="off">
+</div>
+
+<div class="submit-footer">
+  <div class="total-line" id="totalLine"></div>
+  <button class="submit-btn" id="submitBtn" onclick="handleSubmit()" data-i18n="submit"></button>
+</div>
+
+<div class="done-screen" id="doneScreen">
+  <div class="done-check">
+    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2 data-i18n="doneTitle"></h2>
+  <div class="done-loc-badge" id="doneLocBadge"></div>
+  <div class="done-name" id="doneName"></div>
+  <div class="done-stamp" id="doneStamp"></div>
+  <div class="saving-indicator" id="savingIndicator"></div>
+  <div class="done-actions">
+    <button class="done-btn" onclick="resetAll()" data-i18n="newBatch"></button>
+  </div>
+</div>
+
+<script>
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+function getScriptUrl(){ return localStorage.getItem('svoi-script-url') || DEFAULT_SCRIPT_URL; }
+
+const T = {
+  en: {
+    kitchenTitle:"Kitchen — Production", selectLoc:"Select your location", change:"change",
+    bakerLabel:"Who baked", bakerPh:"Your name",
+    syncNote:"Batches saved to Google Sheets → SVOi HQ",
+    hint:"Enter what you made — in the same units as the display case (slices / pcs). You can send several batches during the day, they add up.",
+    notesLabel:"Note (optional)", notesPh:"e.g. Napoleon ready by 3pm...",
+    submit:"Send Production", doneTitle:"Batch Sent", newBatch:"New Batch",
+    savingSheets:"⏳ Saving...", savedSheets:"✅ Saved & sent to Telegram", savedError:"⚠️ Saved locally — check connection",
+    totalLine:(n,i)=>`${n} pcs total · ${i} items`, nothing:"Enter at least one item"
+  },
+  ru: {
+    kitchenTitle:"Кухня — Производство", selectLoc:"Выбери локацию", change:"сменить",
+    bakerLabel:"Кто готовил", bakerPh:"Твоё имя",
+    syncNote:"Партии сохраняются в Google Таблицу → SVOi HQ",
+    hint:"Введи, что изготовила кухня — в тех же единицах, что и витрина (куски / шт). За день можно отправить несколько партий, они суммируются.",
+    notesLabel:"Заметка (необязательно)", notesPh:"напр. Наполеон будет готов к 15:00...",
+    submit:"Отправить производство", doneTitle:"Партия отправлена", newBatch:"Новая партия",
+    savingSheets:"⏳ Сохранение...", savedSheets:"✅ Сохранено и отправлено в Telegram", savedError:"⚠️ Сохранено локально — проверь связь",
+    totalLine:(n,i)=>`${n} шт всего · ${i} позиций`, nothing:"Введи хотя бы одну позицию"
+  }
+};
+let LANG = localStorage.getItem('svoi-lang') || 'ru';
+function t(k){ return T[LANG][k]; }
+
+const DISPLAY = [
+  { group:{en:"Cakes — by slice",ru:"Торты — по кускам"}, unit:{en:"slices",ru:"кусков"}, items:[
+    {en:"Napoleon Slice",ru:"Наполеон (кусок)"},
+    {en:"Honey Cake / Medovik Slice",ru:"Медовик (кусок)"},
+    {en:"Esterhazy",ru:"Эстерхази"},
+    {en:"Three Chocolates",ru:"Три шоколада"},
+    {en:"Tiramisu",ru:"Тирамису"},
+  ]},
+  { group:{en:"Basque Cheesecake",ru:"Баскский чизкейк"}, unit:{en:"slices",ru:"кусков"}, items:[
+    {en:"Vanilla",ru:"Ваниль"},
+    {en:"Chocolate-Nutella",ru:"Шоколад-Nutella"},
+    {en:"Vanilla-Pistachio",ru:"Ваниль-фисташка"},
+  ]},
+  { group:{en:"Mousse Desserts",ru:"Мусс-десерты"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Banana",ru:"Банан"},
+    {en:"Blueberry",ru:"Черника"},
+    {en:"Cherry",ru:"Вишня"},
+    {en:"Hazelnut",ru:"Фундук"},
+    {en:"Lemon",ru:"Лимон"},
+    {en:"Mango",ru:"Манго"},
+    {en:"Raspberry",ru:"Малина"},
+    {en:"Strawberry",ru:"Клубника"},
+    {en:"Bean (Coffee-Caramel)",ru:"«Зерно» кофе-карамель"},
+    {en:"Cube Pistachio-Raspberry",ru:"Куб фисташка-малина"},
+    {en:"Cube Chocolate-Mango-Passion",ru:"Куб шоколад-манго-маракуйя"},
+    {en:"Cube Three Chocolates",ru:"Куб три шоколада"},
+  ]},
+  { group:{en:"Tarts",ru:"Тарты"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Caramel-Coffee",ru:"Карамель-кофе"},
+    {en:"Mango-Passion Fruit",ru:"Манго-маракуйя"},
+    {en:"Pistachio-Chocolate",ru:"Фисташка-шоколад"},
+  ]},
+  { group:{en:"Pavlova",ru:"Павлова"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Raspberry",ru:"Малина"},
+    {en:"Mango-Passion Fruit",ru:"Манго-маракуйя"},
+  ]},
+  { group:{en:"Macarons",ru:"Макароны"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Pistachio Cream",ru:"Фисташковый крем"},
+    {en:"Vanilla-Raspberry",ru:"Ваниль-малина"},
+    {en:"Chocolate-Raspberry",ru:"Шоколад-малина"},
+    {en:"Coffee-Caramel",ru:"Кофе-карамель"},
+    {en:"Double Caramel",ru:"Двойная карамель"},
+    {en:"Milk Chocolate-Pistachio",ru:"Мол. шоколад-фисташка"},
+    {en:"Poppy Seed-Strawberry",ru:"Мак-клубника"},
+    {en:"Vanilla-Mango-Passion",ru:"Ваниль-манго-маракуйя"},
+    {en:"Hazelnut",ru:"Фундук"},
+    {en:"Bounty (Choc-Coconut)",ru:"Bounty (шоколад-кокос)"},
+  ]},
+  { group:{en:"Cookies",ru:"Печенье"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Nutella",ru:"Nutella"},
+    {en:"Toffee Caramel",ru:"Тоффи-карамель"},
+  ]},
+  { group:{en:"Croissants",ru:"Круассаны"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Classic",ru:"Классический"},
+    {en:"Almond",ru:"Миндальный"},
+    {en:"Chocolate",ru:"Шоколадный"},
+  ]},
+  { group:{en:"Vegan · Gluten-free",ru:"Веган · глютен-фри"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Date-Pistachio (vegan)",ru:"Финик-фисташка (веган)"},
+  ]},
+  { group:{en:"Savory",ru:"Солёное"}, unit:{en:"pcs",ru:"шт"}, items:[
+    {en:"Quiche (Sun-dried Tomato & Mozzarella)",ru:"Киш (томаты-моцарелла)"},
+    {en:"Syrniki (Cheese Pancakes)",ru:"Сырники"},
+  ]},
+];
+
+const COLORS = ["#4A6FA5","#A07840","#6B4A8C","#3A6B45","#8B4A3A","#4A7B6B"];
+let locations = JSON.parse(localStorage.getItem('svoi-locations') || 'null') || [
+  { id:"loc1", name:"Central West End", addr:"8 S Euclid Ave, St. Louis", color:"#4A6FA5" }
+];
+let currentLoc = null;
+
+function applyStaticLang(){
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if (T[LANG][k]!==undefined && typeof T[LANG][k]==='string') el.innerHTML=T[LANG][k];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const k=el.getAttribute('data-i18n-ph');
+    if (T[LANG][k]!==undefined) el.placeholder=T[LANG][k];
+  });
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active', b.getAttribute('data-lang')===LANG));
+}
+function setLang(l){
+  LANG=l; localStorage.setItem('svoi-lang',l);
+  applyStaticLang(); renderLocPicker();
+  if (currentLoc) rebuildKeepingValues();
+  updateTotal();
+}
+function rebuildKeepingValues(){
+  const vals={};
+  document.querySelectorAll('.inv-input').forEach(i=>{ if(i.value) vals[i.dataset.group+'|'+i.dataset.name]=i.value; });
+  buildUI();
+  document.querySelectorAll('.inv-input').forEach(i=>{
+    const key=i.dataset.group+'|'+i.dataset.name;
+    if (vals[key]) { i.value=vals[key]; i.closest('.cell').classList.add('filled'); }
+  });
+  updateTotal();
+}
+
+function renderLocPicker(){
+  const list=document.getElementById('locList'); list.innerHTML='';
+  locations.forEach(loc=>{
+    const b=document.createElement('div'); b.className='loc-btn';
+    b.innerHTML=`<div class="loc-dot" style="background:${loc.color}"></div><div><div class="loc-btn-name">${loc.name}</div>${loc.addr?`<div class="loc-btn-addr">${loc.addr}</div>`:''}</div>`;
+    b.onclick=()=>selectLocation(loc);
+    list.appendChild(b);
+  });
+}
+function selectLocation(loc){
+  currentLoc=loc;
+  document.getElementById('locScreen').classList.add('hidden');
+  document.getElementById('locIndicator').style.background=loc.color;
+  document.getElementById('headerTitle').textContent=loc.name;
+  buildUI(); updateTotal();
+}
+function changeLoc(){ document.getElementById('locScreen').classList.remove('hidden'); renderLocPicker(); }
+
+function buildUI(){
+  const wrap=document.getElementById('wrap'); wrap.innerHTML='';
+  DISPLAY.forEach(grp=>{
+    const card=document.createElement('div'); card.className='group-card';
+    const head=document.createElement('div'); head.className='group-head';
+    head.textContent=grp.group[LANG]+' · '+grp.unit[LANG];
+    card.appendChild(head);
+    const grid=document.createElement('div'); grid.className='grid';
+    grp.items.forEach(d=>{
+      const c=document.createElement('div'); c.className='cell';
+      c.innerHTML=`<label>${d[LANG]}</label><input type="number" class="inv-input" data-group="${grp.group.en}" data-name="${d.en}" data-unit="${grp.unit.en}" placeholder="0" min="0" inputmode="numeric"><div class="unit">${grp.unit[LANG]}</div>`;
+      const inp=c.querySelector('input');
+      inp.addEventListener('input',()=>{ c.classList.toggle('filled', Number(inp.value)>0); updateTotal(); });
+      grid.appendChild(c);
+    });
+    card.appendChild(grid);
+    wrap.appendChild(card);
+  });
+}
+
+function collectItems(){
+  const out=[];
+  document.querySelectorAll('.inv-input').forEach(inp=>{
+    const v=Number((inp.value||'').trim());
+    if (v>0) out.push({ group:inp.dataset.group, name:inp.dataset.name, unit:inp.dataset.unit, count:v });
+  });
+  return out;
+}
+function updateTotal(){
+  const items=collectItems();
+  const total=items.reduce((s,i)=>s+i.count,0);
+  const el=document.getElementById('totalLine');
+  el.textContent = items.length ? T[LANG].totalLine(total, items.length) : t('nothing');
+  document.getElementById('submitBtn').classList.toggle('ready', items.length>0);
+}
+
+async function handleSubmit(){
+  const items=collectItems();
+  if (!items.length) return;
+  const baker=document.getElementById('baker').value.trim() || 'Kitchen';
+  const notes=(document.getElementById('kitchenNotes').value||'').trim();
+  const now=new Date();
+  const entry={
+    type:'production', locId:currentLoc.id, locName:currentLoc.name, locColor:currentLoc.color,
+    date:now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}),
+    time:now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}),
+    baker, items, notes, ts:now.getTime()
+  };
+  document.getElementById('doneLocBadge').textContent=currentLoc.name;
+  document.getElementById('doneLocBadge').style.background=currentLoc.color+'22';
+  document.getElementById('doneLocBadge').style.color=currentLoc.color;
+  document.getElementById('doneName').textContent=baker;
+  document.getElementById('doneStamp').textContent=`${entry.date}  ·  ${entry.time}`;
+  document.getElementById('savingIndicator').textContent=t('savingSheets');
+  document.getElementById('doneScreen').classList.add('show');
+  try{
+    await fetch(getScriptUrl(), { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(entry) });
+    document.getElementById('savingIndicator').textContent=t('savedSheets');
+  }catch(e){
+    document.getElementById('savingIndicator').textContent=t('savedError');
+  }
+}
+function resetAll(){
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('kitchenNotes').value='';
+  buildUI(); updateTotal();
+}
+
+setInterval(()=>{ document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); },1000);
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+
+applyStaticLang();
+renderLocPicker();
+updateTotal();
+</script>
+</body>
+</html>
