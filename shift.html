@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1B4F72">
-<title>SVOi · Opening Shift</title>
+<title>SVOi · Бар — смена</title>
 <style>
 :root{
   --navy:#1B4F72;--blue:#2980B9;--sky:#E8F1F8;
@@ -101,6 +101,8 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
 .slogo{font-size:52px;margin-bottom:8px}
 .sin h1{font-size:27px;font-weight:800;letter-spacing:-.4px}
 .sin p{font-size:14.5px;opacity:.8;margin:6px 0 28px}
+.barlab{display:inline-block;font-size:11px;font-weight:900;letter-spacing:1.4px;
+  background:rgba(255,255,255,.18);padding:5px 13px;border-radius:7px;margin-top:9px}
 .smode{width:100%;display:flex;align-items:center;gap:15px;text-align:left;background:rgba(255,255,255,.12);
   border:2.5px solid rgba(255,255,255,.28);border-radius:17px;padding:19px 20px;margin-bottom:13px;
   color:#fff;cursor:pointer;transition:.15s}
@@ -225,6 +227,7 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
   <div class="sin">
     <div class="slogo">☀️</div>
     <h1>Patisserie SVOi</h1>
+    <div class="barlab" id="sBar">BAR · front of house</div>
     <p id="sSub">Which shift are you starting?</p>
     <button class="smode open" data-mode="open">
       <span class="i">🌅</span>
@@ -240,7 +243,7 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
 <div class="hdr">
   <div class="hdr-top">
     <div><h1 id="h-title">☀️ Opening Shift · Patisserie SVOi</h1>
-      <div class="sub">8 S Euclid Ave · St. Louis, MO</div></div>
+      <div class="sub">Bar &amp; front of house · 8 S Euclid Ave</div></div>
     <div class="rgt">
       <button class="swap" id="bSwap" title="Change shift">⇄</button>
       <div class="lang"><button data-l="en" class="on">EN</button><button data-l="ua">УКР</button></div>
@@ -1023,8 +1026,9 @@ function labels(){
   $('bCopy').textContent=T(UI.copy); $('bRetry').textContent=T(UI.retry); $('bNew').textContent=T(UI.newOne);
   $('kT').textContent=T(UI.kT); $('kD').textContent=T(UI.kD); $('kF').textContent=T(UI.kF);
   var mo=MODE==='open';
-  $('h-title').textContent=(mo?'🌅 ':'🔄 ')+(L?(mo?'Відкриття зміни':'Приймання зміни'):(mo?'Opening shift':'Shift handover'))+' · SVOi';
+  $('h-title').textContent=(mo?'🌅 ':'🔄 ')+'BAR · '+(L?(mo?'Відкриття зміни':'Приймання зміни'):(mo?'Opening shift':'Shift handover'));
   $('sSub').textContent=L?'Яку зміну ви починаєте?':'Which shift are you starting?';
+  $('sBar').textContent=L?'БАР · ЗАЛ':'BAR · FRONT OF HOUSE';
   $('sOpenT').textContent=L?'Ранок — відкриття':'Morning — opening';
   $('sOpenS').textContent=L?'Ви перші. Приймаєте кафе від вечірньої зміни.':'First person in. You accept the café from the closing shift.';
   $('sHandT').textContent=L?'День — приймання зміни':'Day — taking over';
