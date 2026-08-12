@@ -214,6 +214,33 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
 .acts button{padding:16px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer}
 .a1{background:var(--navy);color:#fff}
 .a2{background:#fff;color:var(--navy);border:2px solid var(--line)!important}
+/* блокировка отправки */
+.btn-f.blocked{background:var(--bad);color:#fff}
+.miss-scr{display:none;position:fixed;inset:0;z-index:250;background:rgba(10,16,22,.55);
+  backdrop-filter:blur(3px);align-items:flex-end;justify-content:center}
+.miss-scr.on{display:flex}
+.miss-box{background:var(--bg);width:100%;max-width:640px;border-radius:22px 22px 0 0;
+  max-height:86vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+.miss-hd{padding:22px 22px 14px;border-bottom:1px solid var(--line)}
+.miss-hd .ic{font-size:38px;line-height:1}
+.miss-hd h3{font-size:20px;font-weight:800;margin-top:8px}
+.miss-hd p{font-size:13.5px;color:var(--mid);margin-top:5px;line-height:1.45}
+.miss-list{overflow-y:auto;padding:8px 14px 14px}
+.miss-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:#fff;border:2px solid var(--badln);border-radius:13px;padding:14px 15px;
+  margin-top:8px;cursor:pointer;font:inherit;color:var(--ink)}
+.miss-item .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--bad);color:#fff;
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.miss-item .t{flex:1;font-size:14.5px;font-weight:600;line-height:1.35}
+.miss-item .go{font-size:12px;font-weight:800;color:var(--bad);white-space:nowrap}
+.miss-ft{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.miss-ft button{width:100%;padding:16px;border-radius:13px;border:none;background:var(--navy);
+  color:#fff;font:800 15.5px inherit;cursor:pointer}
+@keyframes flashRing{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}
+  20%,60%{box-shadow:0 0 0 5px rgba(192,57,43,.35)}}
+.flash{animation:flashRing 1.6s ease-out 2;border-radius:13px}
+.task.flash .box{border-color:var(--bad)!important}
+
 .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;
   background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:13.5px;font-weight:700;
   opacity:0;transition:.25s;pointer-events:none}
@@ -279,6 +306,16 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
     <button class="a2" id="bNew"></button>
   </div>
 </div></div>
+<div class="miss-scr" id="missScr"><div class="miss-box">
+  <div class="miss-hd">
+    <div class="ic">⛔️</div>
+    <h3 id="missTitle">Смену нельзя закрыть</h3>
+    <p id="missSub">Эти пункты обязательны. Нажмите на любой — перейдёте прямо к нему.</p>
+  </div>
+  <div class="miss-list" id="missList"></div>
+  <div class="miss-ft"><button id="missClose">Понятно</button></div>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -789,22 +826,52 @@ function issueList(){
 }
 function missing(){
   var m=[];
-  if(!S.who) m.push(T(['Your name','Ваше імʼя']));
+  function add(t,st,sel){ m.push({t:t, s:st, sel:sel}); }
+
+  var iFloor=idxOf('floor'), iSan=idxOf('san'), iCoffee=idxOf('coffee'), iStock=idxOf('stock');
+
+  if(!S.who) add(T(['Your name — who is opening','Ваше імʼя — хто відкриває']), 0, '[data-who]');
+
   document.querySelectorAll('[data-task][data-crit="1"]').forEach(function(el){
-    if(!S.tasks[el.getAttribute('data-task')]) m.push(el.querySelector('b').textContent);
+    if(!S.tasks[el.getAttribute('data-task')]){
+      var k=el.getAttribute('data-task');
+      add(el.querySelector('b').textContent, parseInt(k.split('_')[0],10), '[data-task="'+k+'"]');
+    }
   });
-  if(!S.issues.ok && issueList().length===0) m.push(T(['Accept the floor — tap what you found','Прийміть зал — натисніть, що знайшли']));
-  UNITS.forEach(function(u){ if(!S.clean[u.k]) m.push(T(['Clean/dirty: ','Чистий/брудний: '])+T(u.t)); });
-  MILKS.forEach(function(x){ if(!S.milk[x.k]) m.push(T(['Milk: ','Молоко: '])+T(x.t)); });
-  STOCK.forEach(function(g){ g.items.forEach(function(x){ if(!S.stock[x.k]) m.push(T(['Stock: ','Розхідники: '])+T(x.t)); }); });
-  DRINKS.forEach(function(x){ if(!S.stock[x.k]) m.push(T(['Drink: ','Напій: '])+T(x.t)); });
-  if(!S.san.ppm) m.push(T(['Sanitizer reading (ppm)','Показник санітайзера (ppm)']));
+
+  if(!S.issues.ok && issueList().length===0)
+    add(T(['Accept the floor — tap what you found','Прийміть зал — натисніть, що знайшли']), iFloor, '.chips');
+
+  UNITS.forEach(function(u){
+    if(!S.clean[u.k]) add(T(['Fridge: ','Холодильник: '])+T(u.t), iSan, '[data-cl="'+u.k+'"]');
+  });
+  if(!S.san.ppm) add(T(['Sanitizer — ppm not measured','Санітайзер — ppm не виміряно']), iSan, '[data-san="ppm"]');
+  else if(sanBad()) add(T(['Sanitizer out of range — remake it','Санітайзер поза нормою — переробіть']), iSan, '[data-san="ppm"]');
+
   ['reg','dec'].forEach(function(k){
     var b=brewOK(k), nm=T(k==='reg'?['Regular espresso','Звичайна кава']:['Decaf','Декаф']);
-    if(!b) m.push(nm+' — '+T(['not dialled in','не пролито']));
-    else if(!b.ok) m.push(nm+' — '+T(['out of spec','поза нормою']));
+    if(!b) add(nm+' — '+T(['not dialled in','не пролито']), iCoffee, '[data-brew="'+k+'.dose"]');
+    else if(!b.ok) add(nm+' — '+T(['out of spec, adjust and pull again','поза нормою, налаштуйте і пролийте ще']), iCoffee, '[data-brew="'+k+'.sec"]');
   });
+
+  MILKS.forEach(function(x){
+    if(!S.milk[x.k]) add(T(['Milk: ','Молоко: '])+T(x.t), iCoffee, '[data-mk="'+x.k+'"]');
+  });
+  STOCK.forEach(function(g){ g.items.forEach(function(x){
+    if(!S.stock[x.k]) add(T(['Stock: ','Розхідники: '])+T(x.t), iStock, '[data-sk="'+x.k+'"]');
+  }); });
+  DRINKS.forEach(function(x){
+    if(!S.stock[x.k]) add(T(['Drink: ','Напій: '])+T(x.t), iStock, '[data-sk="'+x.k+'"]');
+  });
+
   return m;
+}
+
+/* индекс шага по ключевому слову навигации */
+function idxOf(kind){
+  var map={floor:1, san:2, coffee:3, stock:4};
+  var i=map[kind];
+  return (i!==undefined && i<NS) ? i : 0;
 }
 
 function refresh(){
@@ -855,11 +922,15 @@ function refresh(){
     c.classList.toggle('done',ok);
   });
 
+  var m=missing();
   var fw=$('finalWarn');
-  if(fw){ var m=missing();
+  if(fw){
     fw.classList.toggle('show', step===NS-1 && m.length>0);
-    if(m.length) $('fwList').innerHTML='<ul><li>'+m.slice(0,10).map(esc).join('</li><li>')+'</li></ul>';
+    if(m.length) $('fwList').innerHTML='<ul><li>'+m.slice(0,10).map(function(x){return esc(x.t)}).join('</li><li>')+'</li></ul>';
   }
+  var bf=$('bFin');
+  if(m.length){ bf.classList.add('blocked'); bf.textContent=T(['⛔ Not ready · ','⛔ Не готово · '])+m.length; }
+  else { bf.classList.remove('blocked'); bf.textContent=T(UI.finish); }
   save();
 }
 
@@ -990,11 +1061,7 @@ function report(o){
 /* ══════════════ FINISH ══════════════ */
 function finish(){
   var m=missing();
-  if(m.length){
-    var msg=T(UI.confirmMiss).replace('{n}',m.length)
-      .replace('{list}',m.slice(0,6).join('\n• ')+(m.length>6?'\n• …+'+(m.length-6):''));
-    if(!confirm(msg)){refresh();return;}
-  }
+  if(m.length){ showMissing(m); return; }
   var o=collect(); lastPayload=o; lastRpt=report(o);
   $('sT').textContent=o.time; $('sD').textContent=o.tasksDone+'/'+o.tasksTotal; $('sF').textContent=o.flags.length;
   if(o.flags.length){ $('mark').className='mark warn'; $('mark').textContent='!';
@@ -1005,6 +1072,41 @@ function finish(){
   $('doneScr').classList.add('on'); window.scrollTo(0,0);
   send(o);
 }
+function showMissing(m){
+  $('missClose').textContent = L ? 'Зрозуміло' : 'Got it';
+  $('missTitle').textContent = L
+    ? 'Зміну не можна закрити'
+    : 'You cannot close the shift yet';
+  $('missSub').textContent = L
+    ? 'Залишилось ' + m.length + ' обовʼязкових пункт(ів). Натисніть на будь-який — перейдете прямо до нього.'
+    : m.length + ' required item(s) left. Tap any of them to jump straight there.';
+
+  var host=$('missList'); host.innerHTML='';
+  m.forEach(function(x,i){
+    var b=document.createElement('button');
+    b.type='button'; b.className='miss-item';
+    b.innerHTML='<span class="n">'+(i+1)+'</span><span class="t"></span><span class="go">'+
+                (L?'перейти →':'go →')+'</span>';
+    b.querySelector('.t').textContent=x.t;
+    b.onclick=function(){ $('missScr').classList.remove('on'); jumpTo(x); };
+    host.appendChild(b);
+  });
+  $('missScr').classList.add('on');
+}
+
+function jumpTo(x){
+  go(x.s);
+  setTimeout(function(){
+    var el=document.querySelector('.phase.on '+x.sel) || document.querySelector(x.sel);
+    if(!el) return;
+    var box = el.closest('.task') || el.closest('.yn') || el.closest('.f') || el.closest('.card') || el;
+    box.scrollIntoView({block:'center',behavior:'smooth'});
+    box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+    setTimeout(function(){ box.classList.remove('flash'); }, 3400);
+    if(el.tagName==='INPUT'||el.tagName==='SELECT') try{ el.focus(); }catch(e){}
+  }, 160);
+}
+
 function send(o){
   var b=$('sync'); b.className='sync pend'; b.textContent=T(UI.sending); $('bRetry').style.display='none';
   if(!navigator.onLine){ b.className='sync err'; b.textContent=T(UI.offline); $('bRetry').style.display='block'; return; }
@@ -1068,6 +1170,8 @@ function labels(){
   $('bCopy').onclick=copyRpt;
   $('bRetry').onclick=function(){send(lastPayload)};
   $('bNew').onclick=function(){clearDraft();location.reload()};
+  $('missClose').onclick=function(){ $('missScr').classList.remove('on'); };
+  $('missScr').onclick=function(e){ if(e.target===this) this.classList.remove('on'); };
   $('bSwap').onclick=function(){
     if(!confirm(T(UI.swapAsk))) return;
     clearDraft();
