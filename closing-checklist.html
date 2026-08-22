@@ -77,42 +77,63 @@
 </style>
 </head>
 <body>
-<!-- ═══════════ SVOi ACCESS GATE · added 2026-08-22 ═══════════
-     Чтобы поменять код доступа — измените PIN ниже (одна строка)
-     и такой же код впишите в Apps Script (проверка doPost).
-     Код должен быть одинаковым во ВСЕХ файлах.
+<!-- ═══════════ SVOi ACCESS GATE v2 · 2026-08-22 ═══════════
+     Персональные коды. Список людей и кодов — в таблице SVOi HQ,
+     лист "Staff". Удалили строку → код перестал работать.
+     Здесь ничего править не нужно.
 ════════════════════════════════════════════════════════════ -->
 <script>
 (function(){
 'use strict';
 
-/* ────────── КОД ДОСТУПА ────────── */
-var PIN = '6273';
-/* ──────────────────────────────── */
+/* Адрес скрипта, который проверяет коды (лист Staff) */
+var AUTH_URL = 'https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+var KEY = 'svoi_access_v2';
 
-var KEY = 'svoi_access_v1';
-
-/* --- к каждому отчёту в журнал добавляем код --- */
 var _fetch = window.fetch;
+
+/* ── что сохранено на этом устройстве ── */
+var saved = null;
+try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){}
+if (saved && (!saved.pin || !saved.name)) saved = null;
+
+window.SVOI_USER = saved ? saved.name : '';
+
+function remember(v){
+  saved = v;
+  window.SVOI_USER = v ? v.name : '';
+  try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch(e){}
+}
+
+/* ── к каждому запросу в журнал подставляем код ── */
 window.fetch = function(u, o){
   try{
     var url = (typeof u === 'string') ? u : ((u && u.url) || '');
-    if (url.indexOf('script.google.com') > -1){
+    var pin = saved ? saved.pin : '';
+    if (pin && url.indexOf('script.google.com') > -1){
       if (o && typeof o.body === 'string' && o.body.charAt(0) === '{'){
-        var d = JSON.parse(o.body); d.pin = PIN; o.body = JSON.stringify(d);
+        var d = JSON.parse(o.body); d.pin = pin; o.body = JSON.stringify(d);
       } else if (!o || !o.method || String(o.method).toUpperCase() === 'GET'){
-        u = url + (url.indexOf('?') > -1 ? '&' : '?') + 'pin=' + encodeURIComponent(PIN);
+        u = url + (url.indexOf('?') > -1 ? '&' : '?') + 'pin=' + encodeURIComponent(pin);
       }
     }
   }catch(e){}
   return _fetch.apply(this, [u, o]);
 };
 
-var unlocked = false;
-try { unlocked = (localStorage.getItem(KEY) === PIN); } catch(e){}
-if (unlocked) return;
+/* ── спросить у сервера, чей это код ──
+   имя      — код действителен
+   null     — кода нет в таблице или человек отключён
+   undefined— сеть не ответила                                   */
+function ask(code, cb){
+  _fetch(AUTH_URL + '?action=auth&pin=' + encodeURIComponent(code), { method: 'GET' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){ cb(j && j.ok ? String(j.name || '') : null); })
+    .catch(function(){ cb(undefined); });
+}
 
-/* --- экран ввода кода --- */
+/* ══════════════ экран ввода кода ══════════════ */
+
 var css = document.createElement('style');
 css.textContent =
 '#svoiGate{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(160deg,#1B4F72,#153E5C);'+
@@ -132,8 +153,10 @@ css.textContent =
 'transition:background .12s,transform .08s}'+
 '#svoiGate .gk button:active{background:rgba(255,255,255,.3);transform:scale(.95)}'+
 '#svoiGate .gk button.gx{background:transparent;font-size:21px;opacity:.75}'+
-'#svoiGate .ge{min-height:20px;margin-top:20px;font-size:13.5px;color:#FFC9C2;opacity:0;transition:opacity .2s}'+
+'#svoiGate.busy .gk{opacity:.4;pointer-events:none}'+
+'#svoiGate .ge{min-height:38px;margin-top:20px;font-size:13.5px;color:#FFC9C2;opacity:0;transition:opacity .2s}'+
 '#svoiGate .ge.on{opacity:1}'+
+'#svoiGate .ge.good{color:#B8F0C8;font-size:17px;font-weight:600}'+
 '#svoiGate.shake{animation:svoiShake .38s}'+
 '@keyframes svoiShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-11px)}'+
 '40%{transform:translateX(11px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}';
@@ -144,7 +167,7 @@ g.id = 'svoiGate';
 g.innerHTML =
 '<div class="gb">'+
   '<div class="gl">SVOi</div>'+
-  '<div class="gs">Enter the team code &middot; Введіть код команди</div>'+
+  '<div class="gs">Enter your personal code &middot; Введіть свій код</div>'+
   '<div class="gd"><i></i><i></i><i></i><i></i></div>'+
   '<div class="gk">'+
     '<button>1</button><button>2</button><button>3</button>'+
@@ -153,66 +176,100 @@ g.innerHTML =
     '<button class="gx" data-a="c">C</button><button>0</button>'+
     '<button class="gx" data-a="d">&#9003;</button>'+
   '</div>'+
-  '<div class="ge">Wrong code &middot; Невірний код</div>'+
+  '<div class="ge"></div>'+
 '</div>';
 
-function mount(){
+var dots = g.querySelectorAll('.gd i');
+var msg  = g.querySelector('.ge');
+var buf  = '';
+
+function paint(){
+  for (var i = 0; i < dots.length; i++) dots[i].className = (i < buf.length) ? 'f' : '';
+}
+function say(text, good){ msg.textContent = text; msg.className = 'ge on' + (good ? ' good' : ''); }
+function quiet(){ msg.className = 'ge'; }
+
+function fail(text){
+  say(text || 'Wrong code · Невірний код');
+  g.className = 'shake';
+  setTimeout(function(){ g.className = ''; }, 400);
+  buf = ''; paint();
+}
+
+function show(){
+  if (g.parentNode) return;
+  buf = ''; paint(); quiet();
+  g.className = '';
   document.body.appendChild(g);
   document.documentElement.style.overflow = 'hidden';
+}
 
-  var buf = '';
-  var dots = g.querySelectorAll('.gd i');
-  var err  = g.querySelector('.ge');
+function hide(){
+  document.documentElement.style.overflow = '';
+  if (g.parentNode) g.parentNode.removeChild(g);
+}
 
-  function paint(){
-    for (var i = 0; i < dots.length; i++){
-      dots[i].className = (i < buf.length) ? 'f' : '';
-    }
-  }
-  function fail(){
-    err.className = 'ge on';
-    g.className = 'shake';
-    setTimeout(function(){ g.className = ''; }, 400);
-    buf = ''; paint();
-  }
-  function open(){
-    try { localStorage.setItem(KEY, PIN); } catch(e){}
-    document.documentElement.style.overflow = '';
-    g.parentNode && g.parentNode.removeChild(g);
-  }
-
-  g.addEventListener('click', function(ev){
-    var b = ev.target.closest ? ev.target.closest('button') : null;
-    if (!b) return;
-    var a = b.getAttribute('data-a');
-    if (a === 'c'){ buf = ''; err.className = 'ge'; paint(); return; }
-    if (a === 'd'){ buf = buf.slice(0, -1); err.className = 'ge'; paint(); return; }
-    if (buf.length >= 4) return;
-    err.className = 'ge';
-    buf += b.textContent.trim();
-    paint();
-    if (buf.length === 4){
-      setTimeout(function(){ (buf === PIN) ? open() : fail(); }, 170);
-    }
-  });
-
-  document.addEventListener('keydown', function(ev){
-    if (!g.parentNode) return;
-    if (ev.key >= '0' && ev.key <= '9' && buf.length < 4){
-      err.className = 'ge'; buf += ev.key; paint();
-      if (buf.length === 4) setTimeout(function(){ (buf === PIN) ? open() : fail(); }, 170);
-    } else if (ev.key === 'Backspace'){
-      buf = buf.slice(0, -1); paint();
-    }
+function submit(code){
+  g.className = 'busy';
+  say('…');
+  ask(code, function(name){
+    g.className = '';
+    if (name === undefined){ fail('No internet · Немає інтернету'); return; }
+    if (name === null){ fail(); return; }
+    remember({ pin: code, name: name });
+    say('Hi, ' + name, true);
+    setTimeout(hide, 750);
   });
 }
 
-if (document.body) mount();
-else document.addEventListener('DOMContentLoaded', mount);
+function type(ch){
+  if (buf.length >= 4) return;
+  quiet();
+  buf += ch;
+  paint();
+  if (buf.length === 4){ var code = buf; setTimeout(function(){ submit(code); }, 160); }
+}
+
+g.addEventListener('click', function(ev){
+  var b = ev.target.closest ? ev.target.closest('button') : null;
+  if (!b) return;
+  var a = b.getAttribute('data-a');
+  if (a === 'c'){ buf = ''; quiet(); paint(); return; }
+  if (a === 'd'){ buf = buf.slice(0, -1); quiet(); paint(); return; }
+  type(b.textContent.trim());
+});
+
+document.addEventListener('keydown', function(ev){
+  if (!g.parentNode) return;
+  if (ev.key >= '0' && ev.key <= '9') type(ev.key);
+  else if (ev.key === 'Backspace'){ buf = buf.slice(0, -1); paint(); }
+});
+
+/* ══════════════ запуск ══════════════ */
+
+/* Код уже есть — открываем сразу, не заставляя ждать сеть.
+   Параллельно спрашиваем сервер: если человека убрали из таблицы,
+   экран кода появляется прямо сейчас. Заполненное на странице
+   остаётся на месте — отправить его без действующего кода нельзя. */
+function revalidate(){
+  if (!saved || !navigator.onLine) return;
+  ask(saved.pin, function(name){
+    if (name === null){ remember(null); show(); }
+    else if (name && saved){ remember({ pin: saved.pin, name: name }); }
+  });
+}
+
+function start(){
+  if (saved) revalidate();
+  else show();
+}
+
+if (document.body) start();
+else document.addEventListener('DOMContentLoaded', start);
 
 })();
 </script>
-<!-- ═════════ END SVOi ACCESS GATE ═════════ -->
+<!-- ═════════ END SVOi ACCESS GATE v2 ═════════ -->
 
 
 <div class="header">
