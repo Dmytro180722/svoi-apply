@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>SVOi — Closing Checklist</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -202,6 +204,143 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);
 </style>
 </head>
 <body>
+<!-- ═══════════ SVOi ACCESS GATE · added 2026-08-22 ═══════════
+     Чтобы поменять код доступа — измените PIN ниже (одна строка)
+     и такой же код впишите в Apps Script (проверка doPost).
+     Код должен быть одинаковым во ВСЕХ файлах.
+════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ────────── КОД ДОСТУПА ────────── */
+var PIN = '6273';
+/* ──────────────────────────────── */
+
+var KEY = 'svoi_access_v1';
+
+/* --- к каждому отчёту в журнал добавляем код --- */
+var _fetch = window.fetch;
+window.fetch = function(u, o){
+  try{
+    var url = (typeof u === 'string') ? u : ((u && u.url) || '');
+    if (url.indexOf('script.google.com') > -1){
+      if (o && typeof o.body === 'string' && o.body.charAt(0) === '{'){
+        var d = JSON.parse(o.body); d.pin = PIN; o.body = JSON.stringify(d);
+      } else if (!o || !o.method || String(o.method).toUpperCase() === 'GET'){
+        u = url + (url.indexOf('?') > -1 ? '&' : '?') + 'pin=' + encodeURIComponent(PIN);
+      }
+    }
+  }catch(e){}
+  return _fetch.apply(this, [u, o]);
+};
+
+var unlocked = false;
+try { unlocked = (localStorage.getItem(KEY) === PIN); } catch(e){}
+if (unlocked) return;
+
+/* --- экран ввода кода --- */
+var css = document.createElement('style');
+css.textContent =
+'#svoiGate{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(160deg,#1B4F72,#153E5C);'+
+'display:flex;align-items:center;justify-content:center;padding:24px;'+
+'font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;'+
+'-webkit-tap-highlight-color:transparent}'+
+'#svoiGate .gb{width:100%;max-width:320px;text-align:center;color:#fff}'+
+'#svoiGate .gl{font-size:30px;font-weight:700;letter-spacing:2px;margin-bottom:6px}'+
+'#svoiGate .gs{font-size:13.5px;opacity:.75;margin-bottom:26px}'+
+'#svoiGate .gd{display:flex;gap:13px;justify-content:center;margin-bottom:26px}'+
+'#svoiGate .gd i{width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.22);'+
+'transition:background .15s,transform .15s}'+
+'#svoiGate .gd i.f{background:#fff;transform:scale(1.12)}'+
+'#svoiGate .gk{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}'+
+'#svoiGate .gk button{height:66px;border:0;border-radius:16px;background:rgba(255,255,255,.13);'+
+'color:#fff;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;'+
+'transition:background .12s,transform .08s}'+
+'#svoiGate .gk button:active{background:rgba(255,255,255,.3);transform:scale(.95)}'+
+'#svoiGate .gk button.gx{background:transparent;font-size:21px;opacity:.75}'+
+'#svoiGate .ge{min-height:20px;margin-top:20px;font-size:13.5px;color:#FFC9C2;opacity:0;transition:opacity .2s}'+
+'#svoiGate .ge.on{opacity:1}'+
+'#svoiGate.shake{animation:svoiShake .38s}'+
+'@keyframes svoiShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-11px)}'+
+'40%{transform:translateX(11px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}';
+document.head.appendChild(css);
+
+var g = document.createElement('div');
+g.id = 'svoiGate';
+g.innerHTML =
+'<div class="gb">'+
+  '<div class="gl">SVOi</div>'+
+  '<div class="gs">Enter the team code &middot; Введіть код команди</div>'+
+  '<div class="gd"><i></i><i></i><i></i><i></i></div>'+
+  '<div class="gk">'+
+    '<button>1</button><button>2</button><button>3</button>'+
+    '<button>4</button><button>5</button><button>6</button>'+
+    '<button>7</button><button>8</button><button>9</button>'+
+    '<button class="gx" data-a="c">C</button><button>0</button>'+
+    '<button class="gx" data-a="d">&#9003;</button>'+
+  '</div>'+
+  '<div class="ge">Wrong code &middot; Невірний код</div>'+
+'</div>';
+
+function mount(){
+  document.body.appendChild(g);
+  document.documentElement.style.overflow = 'hidden';
+
+  var buf = '';
+  var dots = g.querySelectorAll('.gd i');
+  var err  = g.querySelector('.ge');
+
+  function paint(){
+    for (var i = 0; i < dots.length; i++){
+      dots[i].className = (i < buf.length) ? 'f' : '';
+    }
+  }
+  function fail(){
+    err.className = 'ge on';
+    g.className = 'shake';
+    setTimeout(function(){ g.className = ''; }, 400);
+    buf = ''; paint();
+  }
+  function open(){
+    try { localStorage.setItem(KEY, PIN); } catch(e){}
+    document.documentElement.style.overflow = '';
+    g.parentNode && g.parentNode.removeChild(g);
+  }
+
+  g.addEventListener('click', function(ev){
+    var b = ev.target.closest ? ev.target.closest('button') : null;
+    if (!b) return;
+    var a = b.getAttribute('data-a');
+    if (a === 'c'){ buf = ''; err.className = 'ge'; paint(); return; }
+    if (a === 'd'){ buf = buf.slice(0, -1); err.className = 'ge'; paint(); return; }
+    if (buf.length >= 4) return;
+    err.className = 'ge';
+    buf += b.textContent.trim();
+    paint();
+    if (buf.length === 4){
+      setTimeout(function(){ (buf === PIN) ? open() : fail(); }, 170);
+    }
+  });
+
+  document.addEventListener('keydown', function(ev){
+    if (!g.parentNode) return;
+    if (ev.key >= '0' && ev.key <= '9' && buf.length < 4){
+      err.className = 'ge'; buf += ev.key; paint();
+      if (buf.length === 4) setTimeout(function(){ (buf === PIN) ? open() : fail(); }, 170);
+    } else if (ev.key === 'Backspace'){
+      buf = buf.slice(0, -1); paint();
+    }
+  });
+}
+
+if (document.body) mount();
+else document.addEventListener('DOMContentLoaded', mount);
+
+})();
+</script>
+<!-- ═════════ END SVOi ACCESS GATE ═════════ -->
+
 
 <!-- SETUP BANNER -->
 <div class="setup-banner" id="setupBanner" onclick="openSetup()">
