@@ -139,6 +139,9 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
   font-size:13.5px;font-weight:800;color:var(--mid);cursor:pointer;min-width:74px}
 .seg button.y.on{background:var(--ok);border-color:var(--ok);color:#fff}
 .seg button.n.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.seg input.cnt{width:66px;text-align:center;font-size:17px;font-weight:800;border:2.5px solid var(--line);border-radius:11px;padding:9px 4px;background:#fff}
+.seg input.cnt.on{border-color:#E0A21B;background:#FFF6DD}
+.yn .low{display:block;font-size:11.5px;font-weight:800;color:#B7791F;margin-top:3px}
 
 /* temps */
 .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
@@ -268,7 +271,7 @@ var _fetch = window.fetch;
 
 /* ── что сохранено на этом устройстве ── */
 var saved = null;
-try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){}
+try { localStorage.removeItem(KEY); } catch(e){}  /* общий планшет: старый сохранённый код стираем */
 if (saved && (!saved.pin || !saved.name)) saved = null;
 
 window.SVOI_USER = saved ? saved.name : '';
@@ -276,7 +279,8 @@ window.SVOI_USER = saved ? saved.name : '';
 function remember(v){
   saved = v;
   window.SVOI_USER = v ? v.name : '';
-  try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch(e){}
+  try { localStorage.removeItem(KEY); } catch(e){}
+  if (v) poke();
 }
 
 /* ── к каждому запросу в журнал подставляем код ── */
@@ -438,6 +442,23 @@ function start(){
   else show();
 }
 
+/* Общий планшет: код спрашивается при каждом открытии страницы
+   и после 10 минут без касаний. На устройстве код не запоминается. */
+var IDLE_MIN = 10, idleT = null, lastAct = Date.now();
+function lock(){ remember(null); show(); }
+window.svoiLock = lock;
+function poke(){
+  lastAct = Date.now();
+  if (!saved) return;
+  clearTimeout(idleT); idleT = setTimeout(lock, IDLE_MIN * 60 * 1000);
+}
+['touchstart','mousedown','keydown','scroll'].forEach(function(ev){
+  document.addEventListener(ev, poke, { passive: true, capture: true });
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && saved && Date.now() - lastAct > IDLE_MIN * 60 * 1000) lock();
+});
+
 if (document.body) start();
 else document.addEventListener('DOMContentLoaded', start);
 
@@ -526,11 +547,41 @@ var T_MIN=26, T_MAX=33;                 /* seconds */
 
 var STAFF=['Bianca','Caroline','Renée','Ryley','Mariia','Sofiia','Hanna','Eric','Vadym','Jaylen','Taisiya','Dmytro'];
 
-var UNITS=[
-  {k:'bar', t:['Under-counter fridge — milk storage','Холодильник під столом — для зберігання молока'],
-            s:['Whole · 2% · oat · almond. Must be plain clean — no leftovers, nothing from yesterday.',
-               'Whole · 2% · вівсяне · мигдальне. Має бути просто чистий — без залишків, нічого вчорашнього.']}
+/* Холодильники и морозилки. Главный список — лист "Fridges" в таблице SVOi HQ.
+   Здесь — запасной список на случай, если нет интернета. */
+var UNITS_DEFAULT=[
+  ['Under-counter fridge — milk storage','fridge','bar',41,'Холодильник під столом — для молока'],
+  ['Kitchen Fridge 1','fridge','kitchen',41,'Кухонний холодильник 1'],
+  ['Kitchen Fridge 2','fridge','kitchen',41,'Кухонний холодильник 2'],
+  ['Display 1','fridge','hall',41,'Вітрина 1'],
+  ['Display 2','fridge','hall',41,'Вітрина 2'],
+  ['Cake Display','fridge','hall',41,'Вітрина для тортів'],
+  ['Kitchen Freezer','freezer','kitchen',0,'Кухонна морозилка'],
+  ['Freezer 2','freezer','hall',0,'Морозилка 2']
 ];
+var UNITS=[];
+function setUnits(rows){
+  var used={};
+  UNITS=rows.map(function(r){
+    var name=String(r[0]).trim(), type=String(r[1]||'fridge').toLowerCase()==='freezer'?'freezer':'fridge';
+    var max=parseFloat(r[3]); if(isNaN(max)) max=(type==='freezer'?0:41);
+    var k=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'u';
+    while(used[k]) k+='x'; used[k]=1;
+    return {k:k, name:name, type:type, where:String(r[2]||''), max:max, t:[name, String(r[4]||'').trim()||name]};
+  }).filter(function(u){return u.name;});
+}
+setUnits(UNITS_DEFAULT);
+function loadUnits(){
+  try{
+    fetch(SCRIPT_URL+'?action=config',{method:'GET'}).then(function(r){return r.json()}).then(function(j){
+      if(!j||!j.ok) return;
+      var ch=false;
+      if(j.units&&j.units.length){ setUnits(j.units.map(function(u){return [u.name,u.type,u.where,u.max,u.nameUa]})); ch=true; }
+      if(j.supplies&&j.supplies.length){ setSupplies(j.supplies); ch=true; }
+      if(ch&&$('startScr')&&$('startScr').classList.contains('off')){ render(); }
+    }).catch(function(){});
+  }catch(e){}
+}
 
 
 /* issues you can tap — multiple at once */
@@ -583,6 +634,37 @@ var DRINKS=[
   {k:'sanp',   t:['San Pellegrino','San Pellegrino']},
   {k:'sanpz',  t:['San Pellegrino Zero','San Pellegrino Zero']}
 ];
+
+/* Расходники и напитки. Главный список — лист "Supplies" в таблице SVOi HQ
+   (название EN, название UA, группа, единица, минимум, активен).
+   Здесь — запасной список (STOCK и DRINKS выше), если нет интернета. */
+function setSupplies(list){
+  var used={}, groups=[], byG={}, drinks=[];
+  list.forEach(function(r){
+    var en=String(r.name||'').trim(); if(!en) return;
+    var ua=String(r.nameUa||'').trim()||en, g=String(r.group||'').trim()||'Other';
+    var k=en.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'s';
+    while(used[k]) k+='x'; used[k]=1;
+    var min=parseFloat(r.min);
+    var it={k:k, t:[en,ua], u:String(r.unit||'').trim(), min:isNaN(min)?null:min};
+    if(/drink|напо|напи/i.test(g)) drinks.push(it);
+    else { if(!byG[g]){ byG[g]=[]; groups.push(g); } byG[g].push(it); }
+  });
+  STOCK=groups.map(function(g){ return {g:[g,g], items:byG[g]}; });
+  DRINKS=drinks;
+}
+function supplyLow(it){ return S.stock[it.k]==='cnt' && it.min!=null && parseFloat(S.cnt[it.k])<it.min; }
+function supplyHTML(it){
+  var v=S.stock[it.k], c=(v==='cnt'&&S.cnt[it.k]!=null)?S.cnt[it.k]:'';
+  var sub=(it.s?esc(T(it.s)):'')+(it.min!=null?(it.s?' · ':'')+T(['min ','мін. '])+it.min+(it.u?' '+esc(it.u):''):'');
+  return '<div class="yn"><div class="l">'+esc(T(it.t))+(sub?'<small>'+sub+'</small>':'')+
+     '<span class="low" data-low="'+it.k+'" style="display:'+(supplyLow(it)?'block':'none')+'">'+T(['Low — goes to the order list','Мало — піде в список замовлення'])+'</span></div><div class="seg">'+
+     '<button type="button" class="y'+(v==='yes'?' on':'')+'" data-sk="'+it.k+'" data-v="yes">'+T(['Have it','Є'])+'</button>'+
+     '<input class="cnt'+(v==='cnt'?' on':'')+'" type="number" inputmode="numeric" min="0" step="1" data-ck="'+it.k+'" value="'+esc(String(c))+'" placeholder="'+esc(it.u||T(['qty','к-сть']))+'">'+
+     '<button type="button" class="n'+(v==='no'?' on':'')+'" data-sk="'+it.k+'" data-v="no">'+T(['Out','Немає'])+'</button>'+
+     '</div></div>';
+}
+function allSupplies(){ var a=[]; STOCK.forEach(function(g){ g.items.forEach(function(x){a.push(x)}) }); return a.concat(DRINKS); }
 
 /* milk that must be in the fridge every morning */
 var MILKS=[
@@ -683,9 +765,9 @@ var STEPS=[
       {t:['Ice bin filled and clean','Бункер льоду наповнений і чистий'],c:1},
       {t:['Scoop clean and stored outside the ice','Совок чистий і зберігається поза льодом']}
     ]},
-    {h:['🧊 4 · Fridges — clean or dirty?','🧊 4 · Холодильники — чисті чи брудні?'],
-     why:['Open each one and look inside. Mark it honestly — if it is dirty it gets logged and cleaned, not ignored.',
-          'Відкрийте кожен і подивіться всередину. Позначте чесно — якщо брудний, це записується і миється, а не ігнорується.'],
+    {h:['🌡️ 4 · Fridges & freezers — temperature and cleanliness','🌡️ 4 · Холодильники і морозилки — температура і чистота'],
+     why:['Read the thermometer inside each unit (°F), then open it and look. Fridge must be 41°F or colder, freezer 0°F or colder. If it is out of range — write what you did.',
+          'Подивіться на термометр у кожному (°F), потім відкрийте і подивіться всередину. Холодильник — 41°F або холодніше, морозилка — 0°F або холодніше. Якщо поза нормою — напишіть, що зробили.'],
      clean:1},
     {h:['🧼 5 · Hand sink','🧼 5 · Раковина для рук'], tasks:[
       {t:['Hot water reaches 100°F','Гаряча вода доходить до 100°F'],c:1},
@@ -796,7 +878,7 @@ var STEPS=[
 /* ══════════════ STATE ══════════════ */
 var MODE='open';
 var ST=[];
-var S={tasks:{},clean:{},stock:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+var S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
 var step=0, NS=0, lastRpt='', lastPayload=null;
 function buildST(){ ST=STEPS.filter(function(x){return !x.only||x.only===MODE}); NS=ST.length; }
 
@@ -844,6 +926,8 @@ function render(){
 }
 
 function whoHTML(){
+  if(window.SVOI_USER){ S.who=window.SVOI_USER;
+    return '<div class="f"><select data-who="1" disabled style="font-weight:800"><option selected>'+esc(S.who)+'</option></select></div>'; }
   var o='<option value="">'+T(['Select your name…','Оберіть своє імʼя…'])+'</option>';
   STAFF.forEach(function(n){o+='<option'+(S.who===n?' selected':'')+'>'+esc(n)+'</option>'});
   return '<div class="f"><select data-who="1">'+o+'</select></div>';
@@ -878,14 +962,23 @@ function sanHTML(){
     T(['Must be 200–400 ppm. Dump it, mix fresh, test again before you write the number.',
        'Має бути 200–400 ppm. Вилийте, змішайте свіже, перевірте ще раз перед записом.'])+'</div>';
 }
+function tempBad(u){ var v=parseFloat(S.temp[u.k]); return !isNaN(v)&&v>u.max; }
 function cleanHTML(){
   var h='';
   UNITS.forEach(function(u){
-    var v=S.clean[u.k];
-    h+='<div class="yn"><div class="l">'+esc(T(u.t))+(u.s?'<small>'+esc(T(u.s))+'</small>':'')+'</div><div class="seg">'+
+    var v=S.clean[u.k], tv=S.temp[u.k]||'', bad=tempBad(u), has=tv!=='';
+    var lim=(u.type==='freezer'?'≤ 0°F':'≤ '+u.max+'°F')+(u.where?' · '+u.where:'');
+    h+='<div style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px">'+
+       '<div class="tcell'+(has?(bad?' bad':' ok'):'')+'" data-tc="'+u.k+'" style="margin-bottom:8px">'+
+         '<label>'+(u.type==='freezer'?'❄️ ':'🧊 ')+esc(T(u.t))+'</label><div class="lim">'+esc(lim)+'</div>'+
+         '<input type="number" inputmode="decimal" step="0.1" placeholder="°F" data-tp="'+u.k+'" value="'+esc(tv)+'">'+
+         '<span class="flag" style="display:'+(bad?'block':'none')+'">'+T(['OUT OF RANGE','ПОЗА НОРМОЮ'])+'</span></div>'+
+       '<div class="f" data-fxw="'+u.k+'" style="display:'+(bad?'block':'none')+'"><input type="text" data-fx="'+u.k+'" value="'+esc(S.fix[u.k]||'')+'" placeholder="'+
+         esc(T(['What did you do? (closed the door, moved food, told Dmytro…)','Що зробили? (закрили двері, переклали продукти, сказали Дмитру…)']))+'"></div>'+
+       '<div class="yn"><div class="l">'+esc(T(['Inside is clean?','Всередині чисто?']))+'</div><div class="seg">'+
        '<button type="button" class="y'+(v==='clean'?' on':'')+'" data-cl="'+u.k+'" data-v="clean">'+T(['Clean','Чистий'])+'</button>'+
        '<button type="button" class="n'+(v==='dirty'?' on':'')+'" data-cl="'+u.k+'" data-v="dirty">'+T(['Dirty','Брудний'])+'</button>'+
-       '</div></div>';
+       '</div></div></div>';
   });
   return h;
 }
@@ -894,25 +987,13 @@ function stockHTML(){
   STOCK.forEach(function(gr,gi){
     h+='<div style="font-size:11.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--mid);'+
        'margin:'+(gi?'18px':'0')+' 0 6px">'+esc(T(gr.g))+'</div>';
-    gr.items.forEach(function(it){
-      var v=S.stock[it.k];
-      h+='<div class="yn"><div class="l">'+esc(T(it.t))+(it.s?'<small>'+esc(T(it.s))+'</small>':'')+'</div><div class="seg">'+
-         '<button type="button" class="y'+(v==='yes'?' on':'')+'" data-sk="'+it.k+'" data-v="yes">'+T(['Have it','Є'])+'</button>'+
-         '<button type="button" class="n'+(v==='no'?' on':'')+'" data-sk="'+it.k+'" data-v="no">'+T(['Out','Немає'])+'</button>'+
-         '</div></div>';
-    });
+    gr.items.forEach(function(it){ h+=supplyHTML(it); });
   });
   return h;
 }
 function drinksHTML(){
   var h='';
-  DRINKS.forEach(function(it){
-    var v=S.stock[it.k];
-    h+='<div class="yn"><div class="l">'+esc(T(it.t))+'</div><div class="seg">'+
-       '<button type="button" class="y'+(v==='yes'?' on':'')+'" data-sk="'+it.k+'" data-v="yes">'+T(['Have it','Є'])+'</button>'+
-       '<button type="button" class="n'+(v==='no'?' on':'')+'" data-sk="'+it.k+'" data-v="no">'+T(['Out','Немає'])+'</button>'+
-       '</div></div>';
-  });
+  DRINKS.forEach(function(it){ h+=supplyHTML(it); });
   return h;
 }
 function milkHTML(){
@@ -968,6 +1049,20 @@ function bind(){
   w.querySelectorAll('[data-san]').forEach(function(el){
     el.oninput=el.onchange=function(){ S.san[this.getAttribute('data-san')]=this.value; refresh(); };
   });
+  w.querySelectorAll('[data-tp]').forEach(function(el){
+    el.oninput=el.onchange=function(){
+      var k=this.getAttribute('data-tp'); S.temp[k]=this.value;
+      var u=UNITS.filter(function(x){return x.k===k})[0]; if(!u) return;
+      var bad=tempBad(u), c=w.querySelector('[data-tc="'+k+'"]');
+      if(c){ c.classList.toggle('ok',this.value!==''&&!bad); c.classList.toggle('bad',bad);
+        var f=c.querySelector('.flag'); if(f) f.style.display=bad?'block':'none'; }
+      var fw=w.querySelector('[data-fxw="'+k+'"]'); if(fw) fw.style.display=bad?'block':'none';
+      refresh();
+    };
+  });
+  w.querySelectorAll('[data-fx]').forEach(function(el){
+    el.oninput=el.onchange=function(){ S.fix[this.getAttribute('data-fx')]=this.value; refresh(); };
+  });
   w.querySelectorAll('[data-cl]').forEach(function(b){
     b.onclick=function(){
       var k=this.getAttribute('data-cl'); S.clean[k]=this.getAttribute('data-v');
@@ -976,12 +1071,25 @@ function bind(){
       refresh();
     };
   });
+  function supSync(k){
+    w.querySelectorAll('[data-sk="'+k+'"]').forEach(function(x){ x.classList.toggle('on',x.getAttribute('data-v')===S.stock[k]); });
+    var ci=w.querySelector('[data-ck="'+k+'"]'); if(ci) ci.classList.toggle('on',S.stock[k]==='cnt');
+    var it=allSupplies().filter(function(x){return x.k===k})[0], lw=w.querySelector('[data-low="'+k+'"]');
+    if(lw&&it) lw.style.display=supplyLow(it)?'block':'none';
+  }
   w.querySelectorAll('[data-sk]').forEach(function(b){
     b.onclick=function(){
-      var k=this.getAttribute('data-sk'); S.stock[k]=this.getAttribute('data-v');
-      w.querySelectorAll('[data-sk="'+k+'"]').forEach(function(x){
-        x.classList.toggle('on',x.getAttribute('data-v')===S.stock[k]); });
-      refresh();
+      var k=this.getAttribute('data-sk'); S.stock[k]=this.getAttribute('data-v'); delete S.cnt[k];
+      var ci=w.querySelector('[data-ck="'+k+'"]'); if(ci) ci.value='';
+      supSync(k); refresh();
+    };
+  });
+  w.querySelectorAll('[data-ck]').forEach(function(el){
+    el.oninput=el.onchange=function(){
+      var k=this.getAttribute('data-ck');
+      if(this.value===''){ delete S.cnt[k]; if(S.stock[k]==='cnt') delete S.stock[k]; }
+      else { S.cnt[k]=this.value; S.stock[k]='cnt'; }
+      supSync(k); refresh();
     };
   });
   w.querySelectorAll('[data-mk]').forEach(function(b){
@@ -1038,7 +1146,9 @@ function missing(){
     add(T(['Accept the floor — tap what you found','Прийміть зал — натисніть, що знайшли']), iFloor, '.chips');
 
   UNITS.forEach(function(u){
-    if(!S.clean[u.k]) add(T(['Fridge: ','Холодильник: '])+T(u.t), iSan, '[data-cl="'+u.k+'"]');
+    if(!S.temp[u.k]&&S.temp[u.k]!==0) add(T(['Temperature: ','Температура: '])+T(u.t), iSan, '[data-tp="'+u.k+'"]');
+    else if(tempBad(u)&&!(S.fix[u.k]||'').trim()) add(T(u.t)+' — '+T(['out of range, write what you did','поза нормою, напишіть що зробили']), iSan, '[data-fx="'+u.k+'"]');
+    if(!S.clean[u.k]) add(T(['Clean or dirty: ','Чистий чи брудний: '])+T(u.t), iSan, '[data-cl="'+u.k+'"]');
   });
   if(!S.san.ppm) add(T(['Sanitizer — ppm not measured','Санітайзер — ppm не виміряно']), iSan, '[data-san="ppm"]');
   else if(sanBad()) add(T(['Sanitizer out of range — remake it','Санітайзер поза нормою — переробіть']), iSan, '[data-san="ppm"]');
@@ -1098,8 +1208,8 @@ function refresh(){
   var allT=document.querySelectorAll('[data-task]').length, doneT=0;
   document.querySelectorAll('[data-task]').forEach(function(e){ if(S.tasks[e.getAttribute('data-task')]) doneT++; });
   var nStock=DRINKS.length; STOCK.forEach(function(g){nStock+=g.items.length});
-  var extra=UNITS.length+MILKS.length+nStock+2;
-  var got=Object.keys(S.clean).length+Object.keys(S.milk).length+Object.keys(S.stock).length+
+  var extra=UNITS.length*2+MILKS.length+nStock+2;
+  var got=Object.keys(S.clean).length+UNITS.filter(function(u){return S.temp[u.k]!==undefined&&S.temp[u.k]!==''}).length+Object.keys(S.milk).length+Object.keys(S.stock).length+
           (brewOK('reg')?1:0)+(brewOK('dec')?1:0);
   $('prog').style.width=Math.min(Math.round(((doneT+got)/(allT+extra))*100),100)+'%';
 
@@ -1110,7 +1220,7 @@ function refresh(){
     var ok=true;
     ph.querySelectorAll('[data-task]').forEach(function(e){ if(!S.tasks[e.getAttribute('data-task')]) ok=false; });
     if(i===1) ok=ok&&(S.issues.ok||issueList().length>0);
-    if(i===2) ok=ok&&Object.keys(S.clean).length===UNITS.length&&!!S.san.ppm&&!sanBad();
+    if(i===2) ok=ok&&UNITS.every(function(u){return S.clean[u.k]&&S.temp[u.k]!==undefined&&S.temp[u.k]!==''&&(!tempBad(u)||(S.fix[u.k]||'').trim())})&&!!S.san.ppm&&!sanBad();
     if(i===3){ var a=brewOK('reg'),b2=brewOK('dec');
       ok=ok&&!!(a&&a.ok)&&!!(b2&&b2.ok)&&Object.keys(S.milk).length===MILKS.length; }
     if(i===4) ok=ok&&Object.keys(S.stock).length===nStock;
@@ -1169,7 +1279,7 @@ function tick(){
 function collect(){
   var d=new Date(), o={
     form:'shift_check', shift:MODE, locName:'Central West End', ts:Date.now(), date:today(), time:p2(d.getHours())+':'+p2(d.getMinutes()),
-    weekday:d.toLocaleDateString('en-US',{weekday:'long'}), person:S.who,
+    weekday:d.toLocaleDateString('en-US',{weekday:'long'}), person:(window.SVOI_USER||S.who),
     floorStatus:S.issues.ok?'ALL CLEAN':'ISSUES', floorIssues:issueList(), floorExtra:(S.txt.extra||'').trim(),
     fridgeClean:{}, milk:{}, stock:{}, stockOut:[],
     sanitizerPpm:S.san.ppm||'',
@@ -1178,23 +1288,33 @@ function collect(){
     tasksDone:0, tasksTotal:document.querySelectorAll('[data-task]').length,
     flags:[], incomplete:missing()
   };
+  o.fridgeTemps=[];
   UNITS.forEach(function(u){
     o.fridgeClean[u.t[0]]=S.clean[u.k]||'';
     if(S.clean[u.k]==='dirty') o.flags.push('DIRTY FRIDGE: '+u.t[0]);
+    var tv=S.temp[u.k], bad=tempBad(u);
+    o.fridgeTemps.push({unit:u.name, type:u.type, where:u.where, max:u.max, temp:(tv===undefined?'':tv),
+      status:(tv===undefined||tv==='')?'':(bad?'OUT':'OK'), clean:S.clean[u.k]||'', fix:(S.fix[u.k]||'').trim()});
+    if(bad) o.flags.push('TEMP OUT OF RANGE: '+u.name+' '+tv+'°F (max '+u.max+'°F)'+(S.fix[u.k]?' — '+S.fix[u.k]:''));
   });
   MILKS.forEach(function(x){
     o.milk[x.t[0]]=S.milk[x.k]||'';
     if(S.milk[x.k]==='no') o.flags.push('MILK MISSING: '+x.t[0]);
   });
-  STOCK.forEach(function(g){ g.items.forEach(function(x){
-    o.stock[x.t[0]]=S.stock[x.k]||'';
-    if(S.stock[x.k]==='no'){ o.stockOut.push(x.t[0]); o.flags.push('OUT OF STOCK: '+x.t[0]); }
-  }); });
-  o.drinks={};
-  DRINKS.forEach(function(x){
-    o.drinks[x.t[0]]=S.stock[x.k]||'';
-    if(S.stock[x.k]==='no'){ o.stockOut.push(x.t[0]); o.flags.push('OUT OF STOCK: '+x.t[0]); }
-  });
+  o.drinks={}; o.supplyLog=[]; o.lowStock=[];
+  function sup(x,group,isDrink){
+    var st=S.stock[x.k]||'', cnt=(st==='cnt')?Number(S.cnt[x.k]):'';
+    var val=st==='cnt'?String(cnt):st;
+    if(isDrink) o.drinks[x.t[0]]=val; else o.stock[x.t[0]]=val;
+    if(st==='no'){ o.stockOut.push(x.t[0]); o.flags.push('OUT OF STOCK: '+x.t[0]); }
+    var low=supplyLow(x);
+    if(low){ o.lowStock.push({item:x.t[0], count:cnt, min:x.min, unit:x.u||''});
+      o.flags.push('LOW STOCK: '+x.t[0]+' — '+cnt+(x.u?' '+x.u:'')+' (min '+x.min+')'); }
+    o.supplyLog.push({item:x.t[0], group:group, unit:x.u||'', min:(x.min==null?'':x.min),
+      state:(st==='cnt'?'count':st), count:cnt, low:low});
+  }
+  STOCK.forEach(function(g){ g.items.forEach(function(x){ sup(x,g.g[0],false); }); });
+  DRINKS.forEach(function(x){ sup(x,'Drinks',true); });
   o.shortages=(S.txt.shortages||'').trim();
   o.leftoverFromPreviousShift=(S.txt.leftover||'').trim();
   if(o.shortages) o.flags.push('SHORTAGES: '+o.shortages);
@@ -1231,7 +1351,8 @@ function report(o){
   R.push('');
   R.push('— STOCK —');
   R.push('  Out of: '+(o.stockOut.length?o.stockOut.join(', '):'nothing'));
-  R.push('  Drinks: '+DRINKS.map(function(x){return x.t[0]+' '+(o.drinks[x.t[0]]==='yes'?'ok':o.drinks[x.t[0]]==='no'?'OUT':'—')}).join(' · '));
+  R.push('  Drinks: '+DRINKS.map(function(x){var v=o.drinks[x.t[0]];return x.t[0]+' '+(v==='yes'?'ok':v==='no'?'OUT':v?v+' left':'—')}).join(' · '));
+  if(o.lowStock.length) R.push('  Low (order): '+o.lowStock.map(function(x){return x.item+' '+x.count+(x.unit?' '+x.unit:'')+' / min '+x.min}).join(', '));
   if(o.shortages) R.push('  Note: '+o.shortages);
   R.push('');
   R.push('— MILK —');
@@ -1243,7 +1364,9 @@ function report(o){
   R.push('— FRIDGES —');
   UNITS.forEach(function(u){
     var c=o.fridgeClean[u.t[0]];
-    R.push('  '+u.t[0]+': '+(c==='clean'?'clean':c==='dirty'?'** DIRTY **':'—'));
+    var ft=(o.fridgeTemps||[]).filter(function(x){return x.unit===u.name})[0]||{};
+    R.push('  '+u.t[0]+': '+(ft.temp!==''&&ft.temp!==undefined?ft.temp+'°F'+(ft.status==='OUT'?' ** OUT (max '+u.max+') **':''):'—°F')+
+           ' · '+(c==='clean'?'clean':c==='dirty'?'** DIRTY **':'—')+(ft.fix?' · fix: '+ft.fix:''));
   });
   R.push('');
   if(o.leftoverFromPreviousShift){R.push('');R.push('— LEFT BY PREVIOUS SHIFT —');R.push('  '+o.leftoverFromPreviousShift)}
@@ -1334,7 +1457,7 @@ function labels(){
 
 /* ══════════════ INIT ══════════════ */
 (function(){
-  function boot(){ buildST(); labels(); buildNav(); render(); go(0); tick(); }
+  function boot(){ buildST(); labels(); buildNav(); render(); go(0); tick(); loadUnits(); }
 
   var resumed=false;
   try{
@@ -1342,7 +1465,7 @@ function labels(){
       var raw=localStorage.getItem(KEY);
       if(raw){ var d=JSON.parse(raw);
         if(d&&d.date===today()&&d.mode){
-          if(confirm(T(UI.restore))){ S=d.S||S; L=d.L||0; MODE=d.mode; resumed=true; }
+          if(confirm(T(UI.restore))){ S=d.S||S; S.temp=S.temp||{}; S.fix=S.fix||{}; S.cnt=S.cnt||{}; L=d.L||0; MODE=d.mode; resumed=true; }
           else clearDraft();
         } else clearDraft(); }
     }
@@ -1370,10 +1493,11 @@ function labels(){
   $('bSwap').onclick=function(){
     if(!confirm(T(UI.swapAsk))) return;
     clearDraft();
-    S={tasks:{},clean:{},stock:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+    S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
     step=0; $('startScr').classList.remove('off');
   };
 
+  loadUnits();
   labels();
   if(resumed){ $('startScr').classList.add('off'); boot(); }
   else { document.querySelectorAll('.lang button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-l')===(L?'ua':'en'))}); }

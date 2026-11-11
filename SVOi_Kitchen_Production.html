@@ -118,7 +118,7 @@ var _fetch = window.fetch;
 
 /* ── что сохранено на этом устройстве ── */
 var saved = null;
-try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){}
+try { localStorage.removeItem(KEY); } catch(e){}  /* общий планшет: старый сохранённый код стираем */
 if (saved && (!saved.pin || !saved.name)) saved = null;
 
 window.SVOI_USER = saved ? saved.name : '';
@@ -126,7 +126,8 @@ window.SVOI_USER = saved ? saved.name : '';
 function remember(v){
   saved = v;
   window.SVOI_USER = v ? v.name : '';
-  try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch(e){}
+  try { localStorage.removeItem(KEY); } catch(e){}
+  if (v) poke();
 }
 
 /* ── к каждому запросу в журнал подставляем код ── */
@@ -287,6 +288,23 @@ function start(){
   if (saved) revalidate();
   else show();
 }
+
+/* Общий планшет: код спрашивается при каждом открытии страницы
+   и после 10 минут без касаний. На устройстве код не запоминается. */
+var IDLE_MIN = 10, idleT = null, lastAct = Date.now();
+function lock(){ remember(null); show(); }
+window.svoiLock = lock;
+function poke(){
+  lastAct = Date.now();
+  if (!saved) return;
+  clearTimeout(idleT); idleT = setTimeout(lock, IDLE_MIN * 60 * 1000);
+}
+['touchstart','mousedown','keydown','scroll'].forEach(function(ev){
+  document.addEventListener(ev, poke, { passive: true, capture: true });
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && saved && Date.now() - lastAct > IDLE_MIN * 60 * 1000) lock();
+});
 
 if (document.body) start();
 else document.addEventListener('DOMContentLoaded', start);

@@ -94,7 +94,7 @@ var _fetch = window.fetch;
 
 /* ── что сохранено на этом устройстве ── */
 var saved = null;
-try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){}
+try { localStorage.removeItem(KEY); } catch(e){}  /* общий планшет: старый сохранённый код стираем */
 if (saved && (!saved.pin || !saved.name)) saved = null;
 
 window.SVOI_USER = saved ? saved.name : '';
@@ -102,7 +102,9 @@ window.SVOI_USER = saved ? saved.name : '';
 function remember(v){
   saved = v;
   window.SVOI_USER = v ? v.name : '';
-  try { v ? localStorage.setItem(KEY, JSON.stringify(v)) : localStorage.removeItem(KEY); } catch(e){}
+  if (window.svoiSyncWho) window.svoiSyncWho();
+  try { localStorage.removeItem(KEY); } catch(e){}
+  if (v) poke();
 }
 
 /* ── к каждому запросу в журнал подставляем код ── */
@@ -264,6 +266,23 @@ function start(){
   else show();
 }
 
+/* Общий планшет: код спрашивается при каждом открытии страницы
+   и после 10 минут без касаний. На устройстве код не запоминается. */
+var IDLE_MIN = 10, idleT = null, lastAct = Date.now();
+function lock(){ remember(null); show(); }
+window.svoiLock = lock;
+function poke(){
+  lastAct = Date.now();
+  if (!saved) return;
+  clearTimeout(idleT); idleT = setTimeout(lock, IDLE_MIN * 60 * 1000);
+}
+['touchstart','mousedown','keydown','scroll'].forEach(function(ev){
+  document.addEventListener(ev, poke, { passive: true, capture: true });
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && saved && Date.now() - lastAct > IDLE_MIN * 60 * 1000) lock();
+});
+
 if (document.body) start();
 else document.addEventListener('DOMContentLoaded', start);
 
@@ -283,16 +302,18 @@ else document.addEventListener('DOMContentLoaded', start);
   <div class="section">
     <div class="section-title"><span class="icon">👤</span> Person Closing</div>
     <div class="field">
-      <select id="who" required>
-        <option value="">Select name...</option>
-        <option value="Dmytro">Dmytro</option>
-        <option value="Taisiia">Taisiia</option>
-        <option value="Anastasiia">Anastasiia</option>
-        <option value="Renée">Renée</option>
-        <option value="Mariia">Mariia</option>
-        <option value="Hanna">Hanna</option>
-        <option value="Other">Other</option>
-      </select>
+      <select id="who" required disabled style="font-weight:700"></select>
+<script>
+/* Имя берётся из кода (лист Staff в SVOi HQ). Список имён в коде больше не нужен. */
+window.svoiSyncWho = function(){
+  var s = document.getElementById('who'); if (!s) return;
+  var n = window.SVOI_USER || '';
+  var e = String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  s.innerHTML = n ? '<option value="' + e + '">' + e + '</option>' : '<option value="">Enter your code · Введіть код</option>';
+  s.value = n;
+};
+window.svoiSyncWho();
+</script>
     </div>
   </div>
 
@@ -400,7 +421,7 @@ function submitForm() {
 
 function resetForm() {
   document.getElementById('success').classList.remove('show');
-  document.getElementById('who').value='';
+  window.svoiSyncWho();
   ['kf1','kf2','fz','d1','d2','cd','notes'].forEach(id=>document.getElementById(id).value='');
   ['ti-kf1','ti-kf2','ti-fz','ti-d1','ti-d2','ti-cd'].forEach(id=>document.getElementById(id).classList.remove('ok','warn'));
   document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('selected-yes','selected-no'));
