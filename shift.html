@@ -281,6 +281,7 @@ function remember(v){
   window.SVOI_USER = v ? v.name : '';
   try { localStorage.removeItem(KEY); } catch(e){}
   if (v) poke();
+  if (v && window.svoiOnLogin) try{ window.svoiOnLogin(); }catch(e){}
 }
 
 /* ── к каждому запросу в журнал подставляем код ── */
@@ -1459,6 +1460,14 @@ function labels(){
   $('sHandT').textContent=L?'День — приймання зміни':'Day — taking over';
   $('sHandS').textContent=L?'Приймаєте кафе від ранкової зміни.':'You accept the café from the morning shift.';
 }
+
+/* После ввода кода — подставить имя в уже открытую форму (например, при продолжении черновика) */
+window.svoiOnLogin=function(){
+  var el=document.querySelector('[data-who]'); if(!el) return;
+  var f=el.closest('.f'), tmp=document.createElement('div'); tmp.innerHTML=whoHTML();
+  if(f&&tmp.firstChild) f.parentNode.replaceChild(tmp.firstChild,f);
+  refresh(); save();
+};
 
 /* ══════════════ INIT ══════════════ */
 (function(){

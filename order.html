@@ -252,6 +252,7 @@ window.SVOI_USER = saved ? saved.name : '';
 function remember(v){
   saved = v;
   window.SVOI_USER = v ? v.name : '';
+  if (window.svoiSyncTaken) window.svoiSyncTaken();
   try { localStorage.removeItem(KEY); } catch(e){}
   if (v) poke();
 }
@@ -261,7 +262,7 @@ window.fetch = function(u, o){
   try{
     var url = (typeof u === 'string') ? u : ((u && u.url) || '');
     var pin = saved ? saved.pin : '';
-    if (pin && url.indexOf('script.google.com') > -1){
+    if (pin && url.indexOf(AUTH_URL.split('/exec')[0]) > -1){   /* код уходит только в SVOi HQ, не в таблицу заказов */
       if (o && typeof o.body === 'string' && o.body.charAt(0) === '{'){
         var d = JSON.parse(o.body); d.pin = pin; o.body = JSON.stringify(d);
       } else if (!o || !o.method || String(o.method).toUpperCase() === 'GET'){
@@ -534,6 +535,33 @@ else document.addEventListener('DOMContentLoaded', start);
         <input type="text" id="tableInfo" placeholder="e.g., Table 4 / 6 guests">
       </div>
     </div>
+    <div class="hidden" id="deliveryExtraWrap">
+      <div class="two-col">
+        <div class="q">
+          <label class="q-label">Delivery Fee <span class="required">*</span></label>
+          <input type="text" id="deliveryFee" placeholder="$0.00 — write 0 if free">
+        </div>
+        <div class="q">
+          <label class="q-label">Expected Arrival</label>
+          <select id="deliveryWindow">
+            <option value="0">Exactly at the time above</option>
+            <option value="15">± 15 min</option>
+            <option value="30" selected>± 30 min</option>
+            <option value="60">± 1 hour</option>
+          </select>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="q">
+          <label class="q-label">Contact On Site <span style="font-weight:400;color:#888">(required for catering)</span></label>
+          <input type="text" id="deliveryContact" placeholder="Name + phone of who receives the order">
+        </div>
+        <div class="q">
+          <label class="q-label">Delivery Instructions</label>
+          <input type="text" id="deliveryNotes" placeholder="Entrance, parking, floor, door code…">
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- CUSTOM CAKE DETAILS -->
@@ -692,7 +720,7 @@ else document.addEventListener('DOMContentLoaded', start);
   <div class="section">
     <h2>Allergies & Preferences</h2>
     <div class="q">
-      <label class="q-label">Allergens</label>
+      <label class="q-label">Allergens <span class="required">*</span> <span style="font-weight:400;color:#888">(ask the customer — tap ✅ None if none)</span></label>
       <p class="helper">Tap all that apply</p>
       <div class="chip-group" id="allergenGroup">
         <label class="chip" onclick="toggleChip(this, event)"><input type="checkbox" value="Nuts"> 🥜 Nuts</label>
@@ -715,7 +743,7 @@ else document.addEventListener('DOMContentLoaded', start);
     <p class="section-desc">A deposit is required to confirm the order. Remaining balance must be paid before pickup or delivery.</p>
     <div class="two-col">
       <div class="q">
-        <label class="q-label">Quoted Price</label>
+        <label class="q-label">Quoted Price <span class="required" title="required for Custom Cake and Catering">*</span></label>
         <input type="text" id="quotedPrice" placeholder="$0.00">
       </div>
       <div class="q">
@@ -729,7 +757,7 @@ else document.addEventListener('DOMContentLoaded', start);
     </div>
     <div class="two-col">
       <div class="q">
-        <label class="q-label">Deposit Amount</label>
+        <label class="q-label">Deposit Amount <span class="required" title="required when Deposit is selected">*</span></label>
         <input type="text" id="depositAmount" placeholder="$0.00">
       </div>
       <div class="q">
@@ -754,13 +782,18 @@ else document.addEventListener('DOMContentLoaded', start);
     </div>
     <div class="q">
       <label class="q-label">Taken By</label>
-      <select id="takenBy">
-        <option value="" disabled selected>Select…</option>
-        <option>Dmytro</option>
-        <option>Taisiia</option>
-        <option>Staff</option>
-        <option>Online</option>
-      </select>
+      <select id="takenBy" disabled style="font-weight:700"></select>
+      <script>
+      /* Имя — по коду с листа Staff (SVOi HQ). Выбрать чужое имя нельзя. */
+      window.svoiSyncTaken = function(){
+        var s = document.getElementById('takenBy'); if (!s) return;
+        var n = window.SVOI_USER || '';
+        var e = String(n).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+        s.innerHTML = n ? '<option value="' + e + '">' + e + '</option>' : '<option value="">Enter your code</option>';
+        s.value = n;
+      };
+      window.svoiSyncTaken();
+      </script>
     </div>
   </div>
 
@@ -828,6 +861,7 @@ function setToggle(el, group) {
   if (group === 'fulfillment') {
     var val = el.querySelector('input').value;
     document.getElementById('deliveryAddressWrap').classList.toggle('hidden', val !== 'Delivery');
+    document.getElementById('deliveryExtraWrap').classList.toggle('hidden', val !== 'Delivery');
     document.getElementById('tableInfoWrap').classList.toggle('hidden', val !== 'Dine-in');
   }
 }
@@ -902,21 +936,31 @@ function generateOrderId() {
 
 function validateOrder() {
   var types = getCheckedValues('orderTypeGroup');
-  if (types.length === 0) return false;
-  if (!gv('custName') || !gv('custPhone')) return false;
-  if (!gv('dateNeeded') || !gv('timeNeeded')) return false;
-  if (!gr('fulfillment') || !gr('payment')) return false;
-  if (gr('fulfillment') === 'Delivery' && !gv('deliveryAddress')) return false;
-  if (types.includes('Custom Cake') && (!gv('cakeSize') || !gv('cakeFlavor') || !document.getElementById('cakeDecorNotes').value)) return false;
-  if (types.includes('Pastry Box') && !gv('pastryBoxSize')) return false;
-  if (types.includes('Catering') && !gv('cateringGuests')) return false;
-  if (types.includes('Individual Items') && !document.getElementById('individualItems').value) return false;
-  return true;
+  if (types.length === 0) return 'Choose the order type.';
+  if (!gv('custName') || !gv('custPhone')) return 'Customer name and phone are required.';
+  if (!gv('dateNeeded') || !gv('timeNeeded')) return 'Date and time are required.';
+  if (!gr('fulfillment') || !gr('payment')) return 'Choose fulfillment and payment status.';
+  if (gr('fulfillment') === 'Delivery' && !gv('deliveryAddress')) return 'Delivery address is required.';
+  if (gr('fulfillment') === 'Delivery' && !gv('deliveryFee')) return 'Delivery fee is required — write 0 if delivery is free.';
+  if (gr('fulfillment') === 'Delivery' && types.includes('Catering') && !gv('deliveryContact')) return 'Catering delivery: contact on site (name + phone) is required.';
+  if (types.includes('Custom Cake') && (!gv('cakeSize') || !gv('cakeFlavor') || !document.getElementById('cakeDecorNotes').value)) return 'Cake: size, flavor and decoration are required.';
+  if (types.includes('Pastry Box') && !gv('pastryBoxSize')) return 'Pastry box size is required.';
+  if (types.includes('Catering') && !gv('cateringGuests')) return 'Catering: number of guests is required.';
+  if (types.includes('Individual Items') && !document.getElementById('individualItems').value) return 'List the individual items.';
+  var al = getCheckedValues('allergenGroup');
+  if (al.length === 0) return 'Allergens: ask the customer and tap at least one — or ✅ None.';
+  if (al.indexOf('None') > -1 && al.length > 1) return 'Allergens: “None” cannot be combined with other allergens.';
+  if ((types.includes('Custom Cake') || types.includes('Catering')) && !gv('quotedPrice')) return 'Quoted price is required for cakes and catering.';
+  if (gr('payment') === 'Deposit' && !gv('depositAmount')) return 'Deposit selected — enter the deposit amount.';
+  return '';
 }
 
 function submitOrder() {
-  if (!validateOrder()) {
-    document.getElementById('formError').style.display = 'block';
+  var vErr = validateOrder();
+  if (vErr) {
+    var fe = document.getElementById('formError');
+    fe.textContent = vErr; fe.style.display = 'block';
+    fe.scrollIntoView({block:'center', behavior:'smooth'});
     return;
   }
   if (!validateTime()) return;
@@ -975,6 +1019,16 @@ function submitOrder() {
     takenBy: gv('takenBy'),
     status: "📋 New"
   };
+  if (payload.fulfillment === 'Delivery') {
+    payload.deliveryFee = gv('deliveryFee');
+    payload.deliveryWindow = gv('deliveryWindow');
+    payload.deliveryContact = gv('deliveryContact');
+    payload.deliveryNotes = gv('deliveryNotes');
+    var dn = ['Delivery fee ' + payload.deliveryFee, 'Arrival ' + windowText_(payload.timeNeeded, payload.deliveryWindow)];
+    if (payload.deliveryContact) dn.push('On site: ' + payload.deliveryContact);
+    if (payload.deliveryNotes) dn.push(payload.deliveryNotes);
+    payload.staffNotes = '[' + dn.join(' · ') + ']' + (payload.staffNotes ? '\n' + payload.staffNotes : '');
+  }
 
   fetch("https://script.google.com/macros/s/AKfycby0EzEUllNrfi2TuW74QzgLpWoMI9tzkX2k402LocoNmuunyY-kqpOXmwsa5qz1cFtHLA/exec", {
     method: "POST",
@@ -983,6 +1037,7 @@ function submitOrder() {
     body: JSON.stringify(payload)
   })
   .then(function() {
+    try { notifyOrder_(payload); } catch (e) {}
     document.getElementById('orderForm').style.display = 'none';
     document.getElementById('orderIdDisplay').textContent = orderId;
     document.getElementById('successScreen').classList.remove('hidden');
@@ -994,6 +1049,125 @@ function submitOrder() {
     btn.disabled = false;
     btn.textContent = '📋 Submit Order';
   });
+}
+
+/* Окно доставки: «1:30 PM – 2:30 PM» */
+function fmtT_(d) { return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+function windowText_(time, mins) {
+  if (!time) return '';
+  var t = new Date('2000-01-01T' + time), m = parseInt(mins, 10) || 0;
+  if (!m) return fmtT_(t);
+  return fmtT_(new Date(t.getTime() - m * 60000)) + ' – ' + fmtT_(new Date(t.getTime() + m * 60000));
+}
+
+/* ── Уведомление о заказе: Telegram + email через SVOi HQ ── */
+function orderMsg_(p) {
+  function e(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var L = [];
+  L.push('🎂 <b>Новый заказ</b> ' + e(p.orderId));
+  L.push('Тип: ' + e(p.orderTypes));
+  var when = p.dateNeeded ? new Date(p.dateNeeded + 'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : '';
+  var ful = p.fulfillment + (p.fulfillment === 'Delivery' && p.deliveryAddress ? ': ' + p.deliveryAddress : '') +
+            (p.fulfillment === 'Dine-in' && p.tableInfo ? ': ' + p.tableInfo : '');
+  L.push('📅 <b>' + e(when) + ' · ' + e(p.timeNeeded) + '</b> · ' + e(ful));
+  if (p.fulfillment === 'Delivery') {
+    L.push('🚗 Доставка: прибытие ' + e(windowText_(p.timeNeeded, p.deliveryWindow)) + ' · ' + e(p.deliveryFee || '—'));
+    if (p.deliveryContact) L.push('   На месте: ' + e(p.deliveryContact));
+    if (p.deliveryNotes) L.push('   Как найти: ' + e(p.deliveryNotes));
+  }
+  L.push('👤 ' + e(p.custName) + ' · ' + e(p.custPhone) + (p.custEmail ? ' · ' + e(p.custEmail) : ''));
+  var t = p.orderTypes || '';
+  if (t.indexOf('Custom Cake') > -1) {
+    L.push('🎂 Торт: ' + e([p.cakeSize, p.cakeFlavor].filter(Boolean).join(' · ')));
+    if (p.cakeInscription) L.push('   Надпись: «' + e(p.cakeInscription) + '»');
+    if (p.cakeColors || p.cakeColorsAvoid) L.push('   Цвета: ' + e(p.cakeColors) + (p.cakeColorsAvoid ? ' · не использовать: ' + e(p.cakeColorsAvoid) : ''));
+    if (p.cakeAddons) L.push('   Доп.: ' + e(p.cakeAddons));
+    if (p.cakeDecorNotes) L.push('   Декор: ' + e(p.cakeDecorNotes));
+  }
+  if (t.indexOf('Pastry Box') > -1) L.push('📦 Бокс: ' + e(p.pastryBoxSize) + ' × ' + e(p.pastryBoxQty) + (p.pastryBoxItems ? ' — ' + e(p.pastryBoxItems) : '') + (p.pastryBoxNotes ? ' · ' + e(p.pastryBoxNotes) : ''));
+  if (t.indexOf('Catering') > -1) L.push('🍽 Кейтеринг: ' + e(p.cateringGuests) + ' гостей' + (p.cateringEventType ? ' · ' + e(p.cateringEventType) : '') + (p.cateringVenue ? ' · ' + e(p.cateringVenue) : '') + (p.cateringMenu ? '\n   Меню: ' + e(p.cateringMenu) : ''));
+  if (t.indexOf('Individual Items') > -1) L.push('🧁 Поштучно: ' + e(p.individualItems) + (p.individualNotes ? ' · ' + e(p.individualNotes) : ''));
+  var al = (p.allergens || '') + (p.allergyNotes ? ' — ' + p.allergyNotes : '');
+  L.push((p.allergens && p.allergens !== 'None' ? '⚠️ <b>Аллергены: ' + e(al) + '</b>' : '✅ Аллергены: ' + e(al || '—')));
+  L.push('💵 ' + e(p.quotedPrice || '—') + ' · ' + e(p.paymentStatus) + (p.paymentStatus === 'Deposit' && p.depositAmount ? ' ' + e(p.depositAmount) : '') + (p.paymentMethod ? ' · ' + e(p.paymentMethod) : ''));
+  if (p.staffNotes) L.push('📝 ' + e(p.staffNotes));
+  L.push('Принял(а): ' + e(p.takenBy || '—') + ' · источник: ' + e(p.orderSource || '—'));
+  return L.join('\n');
+}
+var HQ_URL = 'https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+/* ── Письмо клиенту: подтверждение заказа и оплаты (только если указан email) ── */
+/* Аллергены кухни — правьте текст здесь при необходимости */
+var ALLERGEN_LINE_ = 'Our products are prepared in a kitchen that handles tree nuts, wheat (gluten), milk and eggs.';
+function money_(s) { var n = parseFloat(String(s || '').replace(/[^0-9.]/g, '')); return isNaN(n) ? null : n; }
+function usd_(n) { return '$' + n.toFixed(2).replace(/\.00$/, ''); }
+function customerEmail_(p) {
+  var to = String(p.custEmail || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) return null;
+  function e(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var when = p.dateNeeded ? new Date(p.dateNeeded + 'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) : '';
+  var tm = p.timeNeeded ? new Date('2000-01-01T' + p.timeNeeded).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}) : '';
+  var isDel = p.fulfillment === 'Delivery';
+  var how = isDel ? 'Delivery to ' + (p.deliveryAddress || 'your address')
+          : p.fulfillment === 'Dine-in' ? 'Dine-in' + (p.tableInfo ? ' (' + p.tableInfo + ')' : '')
+          : 'Pick-up at Patisserie SVOi, 8 S Euclid Ave, St. Louis, MO 63108';
+  var rows = [];
+  var t = p.orderTypes || '';
+  if (t.indexOf('Custom Cake') > -1) {
+    rows.push(['Custom cake', [p.cakeSize, p.cakeFlavor].filter(Boolean).join(' · ')]);
+    if (p.cakeInscription) rows.push(['Inscription', '“' + p.cakeInscription + '”']);
+    if (p.cakeColors) rows.push(['Colors', p.cakeColors + (p.cakeColorsAvoid ? ' (avoid: ' + p.cakeColorsAvoid + ')' : '')]);
+    if (p.cakeAddons) rows.push(['Add-ons', p.cakeAddons]);
+    if (p.cakeDecorNotes) rows.push(['Decoration', p.cakeDecorNotes]);
+  }
+  if (t.indexOf('Pastry Box') > -1) rows.push(['Pastry box', p.pastryBoxSize + ' × ' + p.pastryBoxQty + (p.pastryBoxItems ? ' — ' + p.pastryBoxItems : '')]);
+  if (t.indexOf('Catering') > -1) rows.push(['Catering', p.cateringGuests + ' guests' + (p.cateringEventType ? ' · ' + p.cateringEventType : '') + (p.cateringMenu ? ' — ' + p.cateringMenu : '')]);
+  if (t.indexOf('Individual Items') > -1) rows.push(['Items', p.individualItems]);
+  rows.push(['Allergies noted', (p.allergens || '—') + (p.allergyNotes ? ' — ' + p.allergyNotes : '')]);
+
+  var price = money_(p.quotedPrice), fee = isDel ? (money_(p.deliveryFee) || 0) : 0, dep = money_(p.depositAmount), method = p.paymentMethod ? ' (' + p.paymentMethod + ')' : '';
+  var total = price != null ? price + fee : null;
+  if (price != null) rows.push(['Order', usd_(price)]);
+  if (isDel) rows.push(['Delivery', fee ? usd_(fee) : 'Free']);
+  if (isDel && price != null) rows.push(['Total', usd_(total)]);
+  var pay;
+  if (p.paymentStatus === 'Paid') pay = 'Paid in full' + (total != null ? ': <b>' + usd_(total) + '</b>' : '') + method + '. Thank you!';
+  else if (p.paymentStatus === 'Deposit') pay = 'Deposit received' + (dep != null ? ': <b>' + usd_(dep) + '</b>' : '') + method + '.' +
+       (total != null && dep != null ? ' Balance due at ' + (p.fulfillment === 'Delivery' ? 'delivery' : 'pick-up') + ': <b>' + usd_(Math.max(total - dep, 0)) + '</b>.' : '');
+  else pay = (total != null ? 'Total: <b>' + usd_(total) + '</b>. ' : '') + 'Payment is due at ' + (p.fulfillment === 'Delivery' ? 'delivery' : 'pick-up') + '.';
+
+  var tr = rows.map(function (r) { return '<tr><td style="padding:6px 12px 6px 0;color:#6B7280;vertical-align:top;white-space:nowrap">' + e(r[0]) +
+    '</td><td style="padding:6px 0;color:#111827">' + e(r[1]) + '</td></tr>'; }).join('');
+  var first = String(p.custName || '').split(' ')[0];
+  var html =
+    '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#111827;font-size:15px;line-height:1.5">' +
+    '<h2 style="margin:0 0 4px;font-size:20px">Thank you for your order' + (first ? ', ' + e(first) : '') + '!</h2>' +
+    '<p style="margin:0 0 16px;color:#6B7280">Patisserie SVOi · Order <b>' + e(p.orderId) + '</b></p>' +
+    '<div style="background:#F5F1EA;border-radius:12px;padding:14px 16px;margin-bottom:16px">' +
+      '<div style="font-size:17px;font-weight:bold">' + e(when) + ' · ' + (isDel ? 'expected arrival ' + e(windowText_(p.timeNeeded, p.deliveryWindow)) : e(tm)) + '</div>' +
+      '<div style="color:#374151">' + e(how) + '</div>' +
+      (isDel && p.deliveryContact ? '<div style="color:#6B7280;font-size:13px;margin-top:4px">On-site contact: ' + e(p.deliveryContact) + '</div>' : '') +
+      '</div>' +
+    '<table style="border-collapse:collapse;width:100%;font-size:14px">' + tr + '</table>' +
+    '<div style="border-top:1px solid #E5E7EB;margin-top:14px;padding-top:12px">' + pay + '</div>' +
+    '<p style="margin-top:18px;color:#374151">If anything above is not correct — especially allergies — please reply to this email or call us at (314) 666-0033.</p>' +
+    '<div style="margin-top:22px;padding-top:12px;border-top:1px solid #E5E7EB;color:#6B7280;font-size:11.5px;line-height:1.55">' +
+      '<p style="margin:0 0 6px"><b>Care for your desserts.</b> Our desserts are handmade from natural ingredients. Please keep them refrigerated at or below 39°F (4°C) ' +
+      'and enjoy them slightly chilled — this keeps the texture and flavor exactly as intended. Do not leave desserts at room temperature for extended periods.</p>' +
+      '<p style="margin:0 0 6px"><b>Allergen notice.</b> ' + ALLERGEN_LINE_ + ' ' +
+      'Cross-contact is possible, and we cannot guarantee that any item is free of allergens. Please make sure everyone who will enjoy this order is aware of the ingredients ' +
+      'and of any allergies or dietary restrictions. If you have questions about ingredients, please contact us before your order date.</p>' +
+      '<p style="margin:0">Patisserie SVOi · 8 S Euclid Ave, St. Louis, MO 63108 · (314) 666-0033</p></div></div>';
+  return { to: to, subject: 'Your order ' + p.orderId + ' — ' + when + ', ' + tm + ' · Patisserie SVOi', html: html };
+}
+
+function notifyOrder_(p) {
+  var text = orderMsg_(p);
+  var subject = 'Новый заказ ' + p.orderId + ' — ' + p.custName + ' — ' + p.dateNeeded + ' ' + p.timeNeeded;
+  var cust = customerEmail_(p);
+  window.__lastOrderMsg = { text: text, subject: subject, customer: cust };
+  fetch(HQ_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ type: 'order_notify', orderId: p.orderId, text: text, subject: subject,
+                           custEmail: cust ? cust.to : '', customer: cust }) }).catch(function(){});
 }
 
 function resetForm() {
@@ -1008,6 +1182,8 @@ function resetForm() {
     el.selectedIndex = 0;
   });
   
+  if (window.svoiSyncTaken) window.svoiSyncTaken();
+
   // Reset all chips
   document.querySelectorAll('.chip.selected').forEach(function(el) { el.classList.remove('selected'); el.querySelector('input').checked = false; });
   
@@ -1017,6 +1193,7 @@ function resetForm() {
     document.getElementById(id).classList.remove('visible');
   });
   document.getElementById('deliveryAddressWrap').classList.add('hidden');
+  document.getElementById('deliveryExtraWrap').classList.add('hidden');
   document.getElementById('tableInfoWrap').classList.add('hidden');
 
   // Reset toggles to defaults
