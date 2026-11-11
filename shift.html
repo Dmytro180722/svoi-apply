@@ -296,7 +296,12 @@ window.fetch = function(u, o){
       }
     }
   }catch(e){}
-  return _fetch.apply(this, [u, o]);
+  var isSend = false;
+  try{ isSend = !!(o && o.body && String(o.method||'').toUpperCase()==='POST' && String(url||u).indexOf('script.google.com') > -1); }catch(e){}
+  var pr = _fetch.apply(this, [u, o]);
+  /* после отправки (закрытие, открытие, партия, заказ) — через 5 сек снова просим код */
+  if (isSend && pr && pr.then) pr.then(function(){ setTimeout(function(){ if (window.svoiLock) window.svoiLock(); }, 5000); }, function(){});
+  return pr;
 };
 
 /* ── спросить у сервера, чей это код ──
@@ -443,7 +448,7 @@ function start(){
 }
 
 /* Общий планшет: код спрашивается при каждом открытии страницы
-   и после 10 минут без касаний. На устройстве код не запоминается. */
+   после каждой отправки и после 10 минут без касаний. На устройстве код не запоминается. */
 var IDLE_MIN = 10, idleT = null, lastAct = Date.now();
 function lock(){ remember(null); show(); }
 window.svoiLock = lock;

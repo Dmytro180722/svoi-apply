@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1B4F72">
+<title>SVOi · Бар — закриття</title>
+<style>
+:root{
+  --navy:#1B4F72;--blue:#2980B9;--sky:#E8F1F8;
+  --ink:#16202B;--mid:#5A6C7D;--line:#DDE5EC;--bg:#EEF3F7;
+  --ok:#1E8E4E;--okbg:#E9F7EF;--okln:#A9DFBF;
+  --warn:#B9770E;--warnbg:#FEF5E7;--warnln:#F5CBA7;
+  --bad:#C0392B;--badbg:#FDEDEC;--badln:#F5B7B1;
+  --r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior-y:contain}
+body{font:400 16px/1.45 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font-family:inherit}
+
+.hdr{position:sticky;top:0;z-index:60;background:linear-gradient(135deg,#153E5C,#2980B9);color:#fff;
+  padding:calc(11px + env(safe-area-inset-top)) 16px 0;box-shadow:0 2px 14px rgba(21,62,92,.28)}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.hdr h1{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.hdr .sub{font-size:11.5px;opacity:.8;margin-top:1px}
+.rgt{display:flex;align-items:center;gap:10px}
+.clk{text-align:right;line-height:1.1}
+.clk .t{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums}
+.clk .d{font-size:10.5px;opacity:.8}
+.lang{display:flex;gap:3px;background:rgba(255,255,255,.16);border-radius:9px;padding:3px}
+.lang button{border:none;background:transparent;color:#fff;font-size:11.5px;font-weight:800;
+  padding:5px 8px;border-radius:6px;cursor:pointer;opacity:.65}
+.lang button.on{background:#fff;color:var(--navy);opacity:1}
+.swap{border:none;background:rgba(255,255,255,.16);color:#fff;font-size:16px;font-weight:800;
+  width:34px;height:34px;border-radius:9px;cursor:pointer;line-height:1}
+.swap:active{background:rgba(255,255,255,.3)}
+.cd{margin-top:7px;font-size:12px;font-weight:700;background:rgba(255,255,255,.16);
+  display:inline-block;padding:4px 12px;border-radius:20px}
+.cd.late{background:#E74C3C}
+.bar{height:5px;background:rgba(255,255,255,.2);margin:9px -16px 0}
+.bar>i{display:block;height:100%;background:#5DD39E;width:0;transition:width .35s}
+
+.pnav{display:flex;gap:6px;overflow-x:auto;padding:9px 12px;background:#fff;
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:55;scrollbar-width:none}
+.pnav::-webkit-scrollbar{display:none}
+.pchip{flex:0 0 auto;padding:8px 14px;border-radius:20px;border:1.5px solid var(--line);background:#fff;
+  font-size:13px;font-weight:700;color:var(--mid);cursor:pointer;white-space:nowrap}
+.pchip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.pchip.done{border-color:var(--ok);color:var(--ok);background:var(--okbg)}
+.pchip.done.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.pchip .n{opacity:.6;margin-right:5px}
+
+.wrap{max-width:780px;margin:0 auto;padding:14px 14px 155px}
+.phase{display:none}.phase.on{display:block}
+.phead{background:linear-gradient(135deg,#fff,#F4F9FD);border-left:5px solid var(--blue);
+  border-radius:var(--r);padding:15px 18px;margin-bottom:12px}
+.phead .st{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--blue);text-transform:uppercase}
+.phead .ti{font-size:20px;font-weight:700;margin-top:2px;line-height:1.25}
+.phead .ds{font-size:13.5px;color:var(--mid);margin-top:5px;line-height:1.45}
+
+.card{background:#fff;border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:0 1px 3px rgba(22,32,43,.07)}
+.card>h2{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:var(--navy);
+  display:flex;align-items:center;gap:8px}
+.card>.why{font-size:12.5px;color:var(--mid);margin:7px 0 14px;line-height:1.45}
+.card>h2+.tasks,.card>h2+.f,.card>h2+div:not(.why){margin-top:14px}
+
+.task{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.task:last-child{border-bottom:none;padding-bottom:0}
+.task:first-child{padding-top:0}
+.box{flex:0 0 32px;height:32px;border:2.5px solid var(--line);border-radius:10px;background:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:18px;color:transparent;transition:.15s;margin-top:1px}
+.task.done .box{background:var(--ok);border-color:var(--ok);color:#fff}
+.task .tx{flex:1;min-width:0;padding-top:4px}
+.task .tx b{display:block;font-size:15.5px;font-weight:600;line-height:1.35}
+.task .tx small{display:block;font-size:12.5px;color:var(--mid);margin-top:4px;line-height:1.45}
+.howb{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#2B5A84;background:#EAF1F8;border:none;border-radius:8px;padding:4px 9px;cursor:pointer}
+.howt{display:none;margin-top:8px;font-size:12.8px;line-height:1.5;color:var(--mid);background:#F6F8FA;border-radius:10px;padding:9px 11px}
+.howt.on{display:block}
+.howt li{margin:2px 0 2px 16px}
+.task.done .tx b{color:var(--mid);text-decoration:line-through;text-decoration-color:#B8C4CE}
+.task.crit .tx b::after{content:'!';font-size:10px;font-weight:900;background:var(--badbg);color:var(--bad);
+  padding:1px 7px;border-radius:5px;margin-left:8px;vertical-align:middle;text-decoration:none}
+.task.done.crit .tx b::after{background:var(--okbg);color:var(--ok);content:'✓'}
+
+.f{margin-bottom:16px}.f:last-child{margin-bottom:0}
+.f>label{display:block;font-size:14.5px;font-weight:700;margin-bottom:6px}
+.f .hint{font-size:12.5px;color:var(--mid);margin:-2px 0 8px;line-height:1.45}
+input[type=text],input[type=number],select,textarea{width:100%;padding:14px;border:2px solid var(--line);
+  border-radius:12px;font-size:16px;background:#FBFCFD;color:var(--ink);-webkit-appearance:none;appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23667' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:38px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+textarea{min-height:84px;resize:vertical;line-height:1.5}
+
+/* start screen */
+.start{position:fixed;inset:0;z-index:400;background:linear-gradient(160deg,#153E5C,#2980B9);
+  display:flex;align-items:center;justify-content:center;padding:24px}
+.start.off{display:none}
+.sin{max-width:460px;width:100%;text-align:center;color:#fff}
+.slogo{font-size:52px;margin-bottom:8px}
+.sin h1{font-size:27px;font-weight:800;letter-spacing:-.4px}
+.sin p{font-size:14.5px;opacity:.8;margin:6px 0 28px}
+.barlab{display:inline-block;font-size:11px;font-weight:900;letter-spacing:1.4px;
+  background:rgba(255,255,255,.18);padding:5px 13px;border-radius:7px;margin-top:9px}
+.smode{width:100%;display:flex;align-items:center;gap:15px;text-align:left;background:rgba(255,255,255,.12);
+  border:2.5px solid rgba(255,255,255,.28);border-radius:17px;padding:19px 20px;margin-bottom:13px;
+  color:#fff;cursor:pointer;transition:.15s}
+.smode:active{transform:scale(.985)}
+.smode .i{font-size:31px;line-height:1;flex:0 0 auto}
+.smode .tt{flex:1;min-width:0}
+.smode b{display:block;font-size:17.5px;font-weight:800}
+.smode small{display:block;font-size:12.5px;opacity:.78;margin-top:4px;line-height:1.42}
+.smode.open{background:rgba(255,214,102,.2);border-color:rgba(255,214,102,.55)}
+.smode.hand{background:rgba(93,211,158,.18);border-color:rgba(93,211,158,.5)}
+.mbadge{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.7px;text-transform:uppercase;
+  background:rgba(255,255,255,.22);padding:3px 9px;border-radius:6px;margin-left:8px;vertical-align:2px}
+
+/* multi-select chips */
+.chips{display:flex;flex-wrap:wrap;gap:9px}
+.chip{padding:13px 16px;border-radius:13px;border:2.5px solid var(--line);background:#FBFCFD;
+  font-size:14.5px;font-weight:600;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:9px;
+  text-align:left;line-height:1.3}
+.chip .ic{font-size:17px;line-height:1}
+.chip.on{background:var(--badbg);border-color:var(--bad);color:#7E241A}
+.chip.allok{border-color:var(--okln)}
+.chip.allok.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* clean / dirty + milk rows */
+.yn{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.yn:last-child{border-bottom:none;padding-bottom:0}
+.yn:first-child{padding-top:0}
+.yn .l{font-size:15px;font-weight:600;flex:1;min-width:0}
+.yn .l small{display:block;font-size:12px;color:var(--mid);font-weight:400;margin-top:2px}
+.seg{display:flex;gap:6px;flex:0 0 auto}
+.seg button{padding:11px 16px;border-radius:11px;border:2.5px solid var(--line);background:#fff;
+  font-size:13.5px;font-weight:800;color:var(--mid);cursor:pointer;min-width:74px}
+.seg button.y.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.seg button.n.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.seg input.cnt{width:66px;text-align:center;font-size:17px;font-weight:800;border:2.5px solid var(--line);border-radius:11px;padding:9px 4px;background:#fff}
+.seg input.cnt.on{border-color:#E0A21B;background:#FFF6DD}
+.yn .low{display:block;font-size:11.5px;font-weight:800;color:#B7791F;margin-top:3px}
+
+/* temps */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px}
+.tcell{border:2px solid var(--line);border-radius:13px;padding:11px 12px;background:#FBFCFD}
+.tcell label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--mid)}
+.tcell .lim{font-size:11px;color:#93A1AE;margin-top:1px}
+.tcell input{border:none;background:transparent;text-align:center;font-size:29px;font-weight:700;padding:5px 0 0;width:100%}
+.tcell.ok{background:var(--okbg);border-color:var(--ok)}
+.tcell.bad{background:var(--badbg);border-color:var(--bad)}
+.tcell.bad .flag{display:block;font-size:10.5px;font-weight:900;color:var(--bad);text-align:center;letter-spacing:.4px}
+.flag{display:none}
+
+/* counts */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.crow{display:flex;align-items:center;gap:8px;background:#FBFCFD;border:2px solid var(--line);border-radius:12px;padding:7px 8px 7px 13px}
+.crow .nm{flex:1;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow button{width:36px;height:36px;border-radius:9px;border:none;background:var(--sky);color:var(--navy);font-size:20px;font-weight:700;cursor:pointer;line-height:1}
+.crow input{width:48px;border:none;background:transparent;text-align:center;font-size:18px;font-weight:700;padding:0}
+
+/* espresso */
+.brew{border:2.5px solid var(--line);border-radius:15px;padding:16px;margin-bottom:12px;background:#FBFCFD}
+.brew.reg{border-left:6px solid #6E4B3A}
+.brew.dec{border-left:6px solid #2E8B57}
+.brew h3{font-size:15px;font-weight:800;margin-bottom:3px}
+.brew .tag{font-size:11.5px;color:var(--mid);margin-bottom:13px}
+.shot{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shot .s{background:#fff;border:2px solid var(--line);border-radius:13px;padding:11px;text-align:center}
+.shot .s.ok{border-color:var(--ok);background:var(--okbg)}
+.shot .s.bad{border-color:var(--bad);background:var(--badbg)}
+.shot .s label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid);display:block}
+.shot .s input{border:none;background:transparent;text-align:center;font-size:31px;font-weight:700;padding:4px 0 0;width:100%}
+.shot .s .u{font-size:11px;color:#93A1AE}
+.verdict{border-radius:12px;padding:13px 15px;font-size:14px;font-weight:700;line-height:1.45;margin-top:11px;display:none}
+.verdict.show{display:block}
+.verdict.ok{background:var(--okbg);color:#146C3A;border:1.5px solid var(--okln)}
+.verdict.no{background:var(--warnbg);color:#8B4A0B;border:1.5px solid var(--warnln)}
+
+.alert{border-radius:12px;padding:13px 15px;font-size:13.5px;line-height:1.5;margin-bottom:12px;display:none}
+.alert.show{display:block}
+.alert.bad{background:var(--badbg);border-left:5px solid var(--bad);color:#7E241A}
+.alert.warn{background:var(--warnbg);border-left:5px solid var(--warn);color:#7E5109}
+.alert b{display:block;margin-bottom:4px;font-size:14px}
+.alert ul{margin:6px 0 0 18px}.alert li{margin-bottom:3px}
+.ref{background:var(--sky);border-radius:12px;padding:13px 15px;font-size:12.5px;color:#20465F;line-height:1.6;margin-top:13px}
+.ref b{color:var(--navy)}
+
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
+  backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;gap:10px;max-width:780px;margin:0 auto}
+.foot button{flex:1;padding:16px;border-radius:13px;border:none;font-size:15.5px;font-weight:800;cursor:pointer}
+.btn-b{background:#E6ECF1;color:var(--mid);flex:0 0 92px}
+.btn-n{background:var(--navy);color:#fff}
+.btn-f{background:var(--ok);color:#fff}
+
+.done-scr{display:none;position:fixed;inset:0;z-index:200;background:var(--bg);overflow-y:auto;
+  padding:calc(30px + env(safe-area-inset-top)) 18px 40px}
+.done-scr.on{display:block}
+.din{max-width:640px;margin:0 auto;text-align:center}
+.mark{width:80px;height:80px;border-radius:50%;background:var(--ok);color:#fff;font-size:42px;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.mark.warn{background:var(--warn)}
+.din h2{font-size:25px;font-weight:800}
+.din .p{color:var(--mid);font-size:14.5px;margin-top:6px}
+.score{display:flex;gap:10px;margin:20px 0}
+.score div{flex:1;background:#fff;border-radius:14px;padding:14px 8px}
+.score div .v{font-size:25px;font-weight:800;color:var(--navy)}
+.score div .k{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--mid);margin-top:3px}
+.rpt{background:#fff;border-radius:14px;padding:15px;text-align:left;font:12.5px/1.6 ui-monospace,Menlo,monospace;
+  white-space:pre-wrap;word-break:break-word;max-height:330px;overflow-y:auto;margin-bottom:14px}
+.sync{font-size:12.5px;padding:10px 14px;border-radius:10px;margin-bottom:14px;font-weight:700}
+.sync.pend{background:var(--warnbg);color:#7E5109}
+.sync.ok{background:var(--okbg);color:#146C3A}
+.sync.err{background:var(--badbg);color:#7E241A}
+.acts{display:flex;flex-direction:column;gap:9px}
+.acts button{padding:16px;border-radius:13px;border:none;font-size:15px;font-weight:800;cursor:pointer}
+.a1{background:var(--navy);color:#fff}
+.a2{background:#fff;color:var(--navy);border:2px solid var(--line)!important}
+/* блокировка отправки */
+.btn-f.blocked{background:var(--bad);color:#fff}
+.miss-scr{display:none;position:fixed;inset:0;z-index:250;background:rgba(10,16,22,.55);
+  backdrop-filter:blur(3px);align-items:flex-end;justify-content:center}
+.miss-scr.on{display:flex}
+.miss-box{background:var(--bg);width:100%;max-width:640px;border-radius:22px 22px 0 0;
+  max-height:86vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+.miss-hd{padding:22px 22px 14px;border-bottom:1px solid var(--line)}
+.miss-hd .ic{font-size:38px;line-height:1}
+.miss-hd h3{font-size:20px;font-weight:800;margin-top:8px}
+.miss-hd p{font-size:13.5px;color:var(--mid);margin-top:5px;line-height:1.45}
+.miss-list{overflow-y:auto;padding:8px 14px 14px}
+.miss-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:#fff;border:2px solid var(--badln);border-radius:13px;padding:14px 15px;
+  margin-top:8px;cursor:pointer;font:inherit;color:var(--ink)}
+.miss-item .n{flex:0 0 26px;height:26px;border-radius:50%;background:var(--bad);color:#fff;
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.miss-item .t{flex:1;font-size:14.5px;font-weight:600;line-height:1.35}
+.miss-item .go{font-size:12px;font-weight:800;color:var(--bad);white-space:nowrap}
+.miss-ft{padding:12px 16px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.miss-ft button{width:100%;padding:16px;border-radius:13px;border:none;background:var(--navy);
+  color:#fff;font:800 15.5px inherit;cursor:pointer}
+@keyframes flashRing{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,0)}
+  20%,60%{box-shadow:0 0 0 5px rgba(192,57,43,.35)}}
+.flash{animation:flashRing 1.6s ease-out 2;border-radius:13px}
+.task.flash .box{border-color:var(--bad)!important}
+
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:24px;font-size:13.5px;font-weight:700;
+  opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:700px){.wrap{padding:18px 18px 155px}.card{padding:22px}.shot{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<!-- ═══════════ SVOi ACCESS GATE v2 · 2026-08-22 ═══════════
+     Персональные коды. Список людей и кодов — в таблице SVOi HQ,
+     лист "Staff". Удалили строку → код перестал работать.
+     Здесь ничего править не нужно.
+════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* Адрес скрипта, который проверяет коды (лист Staff) */
+var AUTH_URL = 'https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+var KEY = 'svoi_access_v2';
+
+var _fetch = window.fetch;
+
+/* ── что сохранено на этом устройстве ── */
+var saved = null;
+try { localStorage.removeItem(KEY); } catch(e){}  /* общий планшет: старый сохранённый код стираем */
+if (saved && (!saved.pin || !saved.name)) saved = null;
+
+window.SVOI_USER = saved ? saved.name : '';
+
+function remember(v){
+  saved = v;
+  window.SVOI_USER = v ? v.name : '';
+  try { localStorage.removeItem(KEY); } catch(e){}
+  if (v) poke();
+}
+
+/* ── к каждому запросу в журнал подставляем код ── */
+window.fetch = function(u, o){
+  try{
+    var url = (typeof u === 'string') ? u : ((u && u.url) || '');
+    var pin = saved ? saved.pin : '';
+    if (pin && url.indexOf('script.google.com') > -1){
+      if (o && typeof o.body === 'string' && o.body.charAt(0) === '{'){
+        var d = JSON.parse(o.body); d.pin = pin; o.body = JSON.stringify(d);
+      } else if (!o || !o.method || String(o.method).toUpperCase() === 'GET'){
+        u = url + (url.indexOf('?') > -1 ? '&' : '?') + 'pin=' + encodeURIComponent(pin);
+      }
+    }
+  }catch(e){}
+  var isSend = false;
+  try{ isSend = !!(o && o.body && String(o.method||'').toUpperCase()==='POST' && String(url||u).indexOf('script.google.com') > -1); }catch(e){}
+  var pr = _fetch.apply(this, [u, o]);
+  /* после отправки (закрытие, открытие, партия, заказ) — через 5 сек снова просим код */
+  if (isSend && pr && pr.then) pr.then(function(){ setTimeout(function(){ if (window.svoiLock) window.svoiLock(); }, 5000); }, function(){});
+  return pr;
+};
+
+/* ── спросить у сервера, чей это код ──
+   имя      — код действителен
+   null     — кода нет в таблице или человек отключён
+   undefined— сеть не ответила                                   */
+function ask(code, cb){
+  _fetch(AUTH_URL + '?action=auth&pin=' + encodeURIComponent(code), { method: 'GET' })
+    .then(function(r){ return r.json(); })
+    .then(function(j){ cb(j && j.ok ? String(j.name || '') : null); })
+    .catch(function(){ cb(undefined); });
+}
+
+/* ══════════════ экран ввода кода ══════════════ */
+
+var css = document.createElement('style');
+css.textContent =
+'#svoiGate{position:fixed;inset:0;z-index:2147483647;background:linear-gradient(160deg,#1B4F72,#153E5C);'+
+'display:flex;align-items:center;justify-content:center;padding:24px;'+
+'font:400 16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;'+
+'-webkit-tap-highlight-color:transparent}'+
+'#svoiGate .gb{width:100%;max-width:320px;text-align:center;color:#fff}'+
+'#svoiGate .gl{font-size:30px;font-weight:700;letter-spacing:2px;margin-bottom:6px}'+
+'#svoiGate .gs{font-size:13.5px;opacity:.75;margin-bottom:26px}'+
+'#svoiGate .gd{display:flex;gap:13px;justify-content:center;margin-bottom:26px}'+
+'#svoiGate .gd i{width:15px;height:15px;border-radius:50%;background:rgba(255,255,255,.22);'+
+'transition:background .15s,transform .15s}'+
+'#svoiGate .gd i.f{background:#fff;transform:scale(1.12)}'+
+'#svoiGate .gk{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}'+
+'#svoiGate .gk button{height:66px;border:0;border-radius:16px;background:rgba(255,255,255,.13);'+
+'color:#fff;font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;'+
+'transition:background .12s,transform .08s}'+
+'#svoiGate .gk button:active{background:rgba(255,255,255,.3);transform:scale(.95)}'+
+'#svoiGate .gk button.gx{background:transparent;font-size:21px;opacity:.75}'+
+'#svoiGate.busy .gk{opacity:.4;pointer-events:none}'+
+'#svoiGate .ge{min-height:38px;margin-top:20px;font-size:13.5px;color:#FFC9C2;opacity:0;transition:opacity .2s}'+
+'#svoiGate .ge.on{opacity:1}'+
+'#svoiGate .ge.good{color:#B8F0C8;font-size:17px;font-weight:600}'+
+'#svoiGate.shake{animation:svoiShake .38s}'+
+'@keyframes svoiShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-11px)}'+
+'40%{transform:translateX(11px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}';
+document.head.appendChild(css);
+
+var g = document.createElement('div');
+g.id = 'svoiGate';
+g.innerHTML =
+'<div class="gb">'+
+  '<div class="gl">SVOi</div>'+
+  '<div class="gs">Enter your personal code &middot; Введіть свій код</div>'+
+  '<div class="gd"><i></i><i></i><i></i><i></i></div>'+
+  '<div class="gk">'+
+    '<button>1</button><button>2</button><button>3</button>'+
+    '<button>4</button><button>5</button><button>6</button>'+
+    '<button>7</button><button>8</button><button>9</button>'+
+    '<button class="gx" data-a="c">C</button><button>0</button>'+
+    '<button class="gx" data-a="d">&#9003;</button>'+
+  '</div>'+
+  '<div class="ge"></div>'+
+'</div>';
+
+var dots = g.querySelectorAll('.gd i');
+var msg  = g.querySelector('.ge');
+var buf  = '';
+
+function paint(){
+  for (var i = 0; i < dots.length; i++) dots[i].className = (i < buf.length) ? 'f' : '';
+}
+function say(text, good){ msg.textContent = text; msg.className = 'ge on' + (good ? ' good' : ''); }
+function quiet(){ msg.className = 'ge'; }
+
+function fail(text){
+  say(text || 'Wrong code · Невірний код');
+  g.className = 'shake';
+  setTimeout(function(){ g.className = ''; }, 400);
+  buf = ''; paint();
+}
+
+function show(){
+  if (g.parentNode) return;
+  buf = ''; paint(); quiet();
+  g.className = '';
+  document.body.appendChild(g);
+  document.documentElement.style.overflow = 'hidden';
+}
+
+function hide(){
+  document.documentElement.style.overflow = '';
+  if (g.parentNode) g.parentNode.removeChild(g);
+}
+
+function submit(code){
+  g.className = 'busy';
+  say('…');
+  ask(code, function(name){
+    g.className = '';
+    if (name === undefined){ fail('No internet · Немає інтернету'); return; }
+    if (name === null){ fail(); return; }
+    remember({ pin: code, name: name });
+    say('Hi, ' + name, true);
+    setTimeout(hide, 750);
+  });
+}
+
+function type(ch){
+  if (buf.length >= 4) return;
+  quiet();
+  buf += ch;
+  paint();
+  if (buf.length === 4){ var code = buf; setTimeout(function(){ submit(code); }, 160); }
+}
+
+g.addEventListener('click', function(ev){
+  var b = ev.target.closest ? ev.target.closest('button') : null;
+  if (!b) return;
+  var a = b.getAttribute('data-a');
+  if (a === 'c'){ buf = ''; quiet(); paint(); return; }
+  if (a === 'd'){ buf = buf.slice(0, -1); quiet(); paint(); return; }
+  type(b.textContent.trim());
+});
+
+document.addEventListener('keydown', function(ev){
+  if (!g.parentNode) return;
+  if (ev.key >= '0' && ev.key <= '9') type(ev.key);
+  else if (ev.key === 'Backspace'){ buf = buf.slice(0, -1); paint(); }
+});
+
+/* ══════════════ запуск ══════════════ */
+
+/* Код уже есть — открываем сразу, не заставляя ждать сеть.
+   Параллельно спрашиваем сервер: если человека убрали из таблицы,
+   экран кода появляется прямо сейчас. Заполненное на странице
+   остаётся на месте — отправить его без действующего кода нельзя. */
+function revalidate(){
+  if (!saved || !navigator.onLine) return;
+  ask(saved.pin, function(name){
+    if (name === null){ remember(null); show(); }
+    else if (name && saved){ remember({ pin: saved.pin, name: name }); }
+  });
+}
+
+function start(){
+  if (saved) revalidate();
+  else show();
+}
+
+/* Общий планшет: код спрашивается при каждом открытии страницы
+   после каждой отправки и после 10 минут без касаний. На устройстве код не запоминается. */
+var IDLE_MIN = 10, idleT = null, lastAct = Date.now();
+function lock(){ remember(null); show(); }
+window.svoiLock = lock;
+function poke(){
+  lastAct = Date.now();
+  if (!saved) return;
+  clearTimeout(idleT); idleT = setTimeout(lock, IDLE_MIN * 60 * 1000);
+}
+['touchstart','mousedown','keydown','scroll'].forEach(function(ev){
+  document.addEventListener(ev, poke, { passive: true, capture: true });
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && saved && Date.now() - lastAct > IDLE_MIN * 60 * 1000) lock();
+});
+
+if (document.body) start();
+else document.addEventListener('DOMContentLoaded', start);
+
+})();
+</script>
+<!-- ═════════ END SVOi ACCESS GATE v2 ═════════ -->
+
+
+<div class="start" id="startScr">
+  <div class="sin">
+    <div class="slogo">☀️</div>
+    <h1>Patisserie SVOi</h1>
+    <div class="barlab" id="sBar">BAR · front of house</div>
+    <p id="sSub">Which shift are you starting?</p>
+    <button class="smode open" data-mode="close">
+      <span class="i">🌙</span>
+      <span class="tt"><b id="sOpenT">Evening — closing</b><small id="sOpenS">Last person out. Leave the café clean and ready for the morning.</small></span>
+    </button>
+    <button class="smode hand" data-mode="handover" style="display:none">
+      <span class="i">🔄</span>
+      <span class="tt"><b id="sHandT">Day — taking over</b><small id="sHandS">You accept the café from the morning shift.</small></span>
+    </button>
+  </div>
+</div>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div><h1 id="h-title">🌙 Closing Shift · Patisserie SVOi</h1>
+      <div class="sub">Bar &amp; front of house · 8 S Euclid Ave</div></div>
+    <div class="rgt">
+      <button class="swap" id="bSwap" title="Change shift">⇄</button>
+      <div class="lang"><button data-l="en" class="on">EN</button><button data-l="ua">УКР</button></div>
+      <div class="clk"><div class="t" id="clk">--:--</div><div class="d" id="dat"></div></div>
+    </div>
+  </div>
+  <div><span class="cd" id="cd">—</span></div>
+  <div class="bar"><i id="prog"></i></div>
+</div>
+
+<div class="pnav" id="pnav"></div>
+<div class="wrap" id="wrap"></div>
+
+<div class="foot">
+  <button class="btn-b" id="bBack"></button>
+  <button class="btn-n" id="bNext"></button>
+  <button class="btn-f" id="bFin" style="display:none"></button>
+</div>
+
+<div class="done-scr" id="doneScr"><div class="din">
+  <div class="mark" id="mark">✓</div>
+  <h2 id="dTitle"></h2><div class="p" id="dSub"></div>
+  <div class="score">
+    <div><div class="v" id="sT">—</div><div class="k" id="kT"></div></div>
+    <div><div class="v" id="sD">—</div><div class="k" id="kD"></div></div>
+    <div><div class="v" id="sF">—</div><div class="k" id="kF"></div></div>
+  </div>
+  <div class="sync" id="sync"></div>
+  <div class="rpt" id="rpt"></div>
+  <div class="acts">
+    <button class="a1" id="bCopy"></button>
+    <button class="a1" id="bRetry" style="display:none"></button>
+    <button class="a2" id="bNew"></button>
+  </div>
+</div></div>
+<div class="miss-scr" id="missScr"><div class="miss-box">
+  <div class="miss-hd">
+    <div class="ic">⛔️</div>
+    <h3 id="missTitle">Смену нельзя закрыть</h3>
+    <p id="missSub">Эти пункты обязательны. Нажмите на любой — перейдёте прямо к нему.</p>
+  </div>
+  <div class="miss-list" id="missList"></div>
+  <div class="miss-ft"><button id="missClose">Понятно</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+/* ══════════════ CONFIG ══════════════ */
+var SCRIPT_URL='https://script.google.com/macros/s/AKfycbzloq27LS71H__5cR3_EqkMCvXYA05Zbdq93paVGekd8Vk91jtN3AK2oIE5ZchYSMSG/exec';
+var KEY='svoi_close_v1';
+var OPEN_H=[10,7,7,7,7,7,10];          /* Sun..Sat opening hour */
+var DOSE=18, DOSE_TOL=0.5;              /* grams */
+var T_MIN=26, T_MAX=33;                 /* seconds */
+
+var STAFF=['Bianca','Caroline','Renée','Ryley','Mariia','Sofiia','Hanna','Eric','Vadym','Jaylen','Taisiya','Dmytro'];
+
+/* Холодильники и морозилки. Главный список — лист "Fridges" в таблице SVOi HQ.
+   Здесь — запасной список на случай, если нет интернета. */
+var UNITS_DEFAULT=[
+  ['Under-counter fridge — milk storage','fridge','bar',41,'Холодильник під столом — для молока'],
+  ['Kitchen Fridge 1','fridge','kitchen',41,'Кухонний холодильник 1'],
+  ['Kitchen Fridge 2','fridge','kitchen',41,'Кухонний холодильник 2'],
+  ['Display 1','fridge','hall',41,'Вітрина 1'],
+  ['Display 2','fridge','hall',41,'Вітрина 2'],
+  ['Cake Display','fridge','hall',41,'Вітрина для тортів'],
+  ['Kitchen Freezer','freezer','kitchen',0,'Кухонна морозилка'],
+  ['Freezer 2','freezer','hall',0,'Морозилка 2']
+];
+var UNITS=[];
+function setUnits(rows){
+  var used={};
+  UNITS=rows.map(function(r){
+    var name=String(r[0]).trim(), type=String(r[1]||'fridge').toLowerCase()==='freezer'?'freezer':'fridge';
+    var max=parseFloat(r[3]); if(isNaN(max)) max=(type==='freezer'?0:41);
+    var k=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'u';
+    while(used[k]) k+='x'; used[k]=1;
+    return {k:k, name:name, type:type, where:String(r[2]||''), max:max, t:[name, String(r[4]||'').trim()||name]};
+  }).filter(function(u){return u.name;});
+}
+setUnits(UNITS_DEFAULT);
+function loadUnits(){
+  try{
+    fetch(SCRIPT_URL+'?action=config',{method:'GET'}).then(function(r){return r.json()}).then(function(j){
+      if(!j||!j.ok) return;
+      var ch=false;
+      if(j.units&&j.units.length){ setUnits(j.units.map(function(u){return [u.name,u.type,u.where,u.max,u.nameUa]})); ch=true; }
+      if(j.supplies&&j.supplies.length){ setSupplies(j.supplies); ch=true; }
+      if(ch&&$('startScr')&&$('startScr').classList.contains('off')){ render(); }
+    }).catch(function(){});
+  }catch(e){}
+}
+
+
+/* issues you can tap — multiple at once */
+var ISSUES=[
+  {k:'ok',    ic:'✅', ok:1, t:['Everything is clean — all good','Все чисто — все гаразд']},
+  {k:'floor', ic:'🧹', t:['Dirty floor','Брудна підлога']},
+  {k:'tables',ic:'🪑', t:['Dirty tables','Брудні столи']},
+  {k:'chairs',ic:'💺', t:['Dirty chairs','Брудні стільці']},
+  {k:'seats', ic:'🛋️', t:['Dirty seats / benches','Брудні сидіння / дивани']},
+  {k:'mirror',ic:'🪞', t:['Dirty mirrors','Брудні дзеркала']},
+  {k:'under', ic:'🔍', t:['Dirty under / behind tables','Брудно під / за столами']},
+  {k:'fridge',ic:'🍰', t:['Dirty display fridges (desserts, croissants)','Брудні вітрини-холодильники (десерти, круасани)']},
+  {k:'bar',   ic:'☕', t:['Dirty barista station','Брудне робоче місце бариста']},
+  {k:'machine',ic:'⚙️',t:['Coffee machine badly washed','Погано вимита кавомашина']},
+  {k:'dishes',ic:'🍽️', t:['Dirty dishes left','Залишений брудний посуд']},
+  {k:'trash', ic:'🗑️', t:['Trash not taken out','Сміття не винесене']},
+  {k:'glass', ic:'🪟', t:['Dirty windows / door glass','Брудні вікна / скло дверей']}
+];
+
+/* stock the bar must never run out of */
+var STOCK=[
+  {g:['Cups & lids','Стакани і кришки'], items:[
+    {k:'c8',  t:['Cup 8 oz','Стакан 8 oz']},
+    {k:'c12', t:['Cup 12 oz','Стакан 12 oz']},
+    {k:'c16', t:['Cup 16 oz','Стакан 16 oz']},
+    {k:'lids',t:['Lids — all three sizes','Кришки — всі три розміри']}
+  ]},
+  {g:['Bags & boxes','Пакети і коробки'], items:[
+    {k:'bs', t:['Small bag','Маленький пакет']},
+    {k:'bl', t:['Large bag','Великий пакет']},
+    {k:'bc', t:['Cake / order box','Коробка для тортів і замовлень']}
+  ]},
+  {g:['Bar','Бар'], items:[
+    {k:'syv',  t:['Vanilla syrup','Ванільний сироп']},
+    {k:'syo',  t:['Other syrups','Інші сиропи']},
+    {k:'sugar',t:['Sugar','Цукор']},
+    {k:'stir', t:['Stirrers','Палички']},
+    {k:'nap',  t:['Napkins','Серветки']},
+    {k:'cut',  t:['Forks, spoons, knives','Виделки, ложки, ножі'],
+               s:['Clean, standing on the bar','Чисті, стоять на барі']},
+    {k:'cloth', t:['Clean cloths','Чисті ганчірки']}
+  ]}
+];
+
+/* bottled drinks in the fridge */
+var DRINKS=[
+  {k:'coke',   t:['Coca-Cola Regular','Coca-Cola Regular']},
+  {k:'cokez',  t:['Coca-Cola Zero','Coca-Cola Zero']},
+  {k:'fanta',  t:['Fanta','Fanta']},
+  {k:'sprite', t:['Sprite','Sprite']},
+  {k:'sanp',   t:['San Pellegrino','San Pellegrino']},
+  {k:'sanpz',  t:['San Pellegrino Zero','San Pellegrino Zero']}
+];
+
+/* Расходники и напитки. Главный список — лист "Supplies" в таблице SVOi HQ
+   (название EN, название UA, группа, единица, минимум, активен).
+   Здесь — запасной список (STOCK и DRINKS выше), если нет интернета. */
+function setSupplies(list){
+  var used={}, groups=[], byG={}, drinks=[];
+  list.forEach(function(r){
+    var en=String(r.name||'').trim(); if(!en) return;
+    var ua=String(r.nameUa||'').trim()||en, g=String(r.group||'').trim()||'Other';
+    var k=en.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'s';
+    while(used[k]) k+='x'; used[k]=1;
+    var min=parseFloat(r.min);
+    var it={k:k, t:[en,ua], u:String(r.unit||'').trim(), min:isNaN(min)?null:min};
+    if(/drink|напо|напи/i.test(g)) drinks.push(it);
+    else { if(!byG[g]){ byG[g]=[]; groups.push(g); } byG[g].push(it); }
+  });
+  STOCK=groups.map(function(g){ return {g:[g,g], items:byG[g]}; });
+  DRINKS=drinks;
+}
+function supplyLow(it){ return S.stock[it.k]==='cnt' && it.min!=null && parseFloat(S.cnt[it.k])<it.min; }
+function supplyHTML(it){
+  var v=S.stock[it.k], c=(v==='cnt'&&S.cnt[it.k]!=null)?S.cnt[it.k]:'';
+  var sub=(it.s?esc(T(it.s)):'')+(it.min!=null?(it.s?' · ':'')+T(['min ','мін. '])+it.min+(it.u?' '+esc(it.u):''):'');
+  return '<div class="yn"><div class="l">'+esc(T(it.t))+(sub?'<small>'+sub+'</small>':'')+
+     '<span class="low" data-low="'+it.k+'" style="display:'+(supplyLow(it)?'block':'none')+'">'+T(['Low — goes to the order list','Мало — піде в список замовлення'])+'</span></div><div class="seg">'+
+     '<button type="button" class="y'+(v==='yes'?' on':'')+'" data-sk="'+it.k+'" data-v="yes">'+T(['Have it','Є'])+'</button>'+
+     '<input class="cnt'+(v==='cnt'?' on':'')+'" type="number" inputmode="numeric" min="0" step="1" data-ck="'+it.k+'" value="'+esc(String(c))+'" placeholder="'+esc(it.u||T(['qty','к-сть']))+'">'+
+     '<button type="button" class="n'+(v==='no'?' on':'')+'" data-sk="'+it.k+'" data-v="no">'+T(['Out','Немає'])+'</button>'+
+     '</div></div>';
+}
+function allSupplies(){ var a=[]; STOCK.forEach(function(g){ g.items.forEach(function(x){a.push(x)}) }); return a.concat(DRINKS); }
+
+/* milk that must be in the fridge every morning */
+var MILKS=[
+  {k:'whole',  t:['Whole milk','Незбиране молоко (Whole)'],       s:['In the under-counter fridge','У холодильнику під столом']},
+  {k:'two',    t:['2% milk','Молоко 2%'],                          s:['In the under-counter fridge','У холодильнику під столом']},
+  {k:'oat',    t:['Oat milk','Вівсяне молоко (Oat)'],              s:['1 carton, under-counter fridge','1 упаковка, холодильник під столом']},
+  {k:'almond', t:['Almond milk','Мигдальне молоко (Almond)'],      s:['1 carton, under-counter fridge','1 упаковка, холодильник під столом']}
+];
+
+/* ══════════════ COPY ══════════════ */
+var L=0; /* 0 = EN, 1 = UA */
+function T(a){ return Array.isArray(a)? (a[L]||a[0]) : a; }
+
+var UI={
+  back:['Back','Назад'], next:['Next step','Далі'], finish:['Finish & submit','Завершити'],
+  copy:['📋 Copy report','📋 Скопіювати звіт'], retry:['🔄 Retry sending','🔄 Надіслати ще раз'],
+  newOne:['Start a new closing','Почати нове закриття'],
+  kT:['Finished','Завершено'], kD:['Checks','Пункти'], kF:['Flags','Прапорці'],
+  dOk:['Café is closed','Кафе закрито'], dOkS:['Everything logged. Good night.','Все записано. На добраніч.'],
+  dWarn:['Closed — with flags','Закрито — є зауваження'], dWarnS:['Dmytro will see the flagged items.','Дмитро побачить зауваження.'],
+  sending:['Sending to the log…','Надсилаю в журнал…'],
+  sent:['✓ Sent to the closing log.','✓ Надіслано в журнал закриття.'],
+  offline:['No internet. Saved on this tablet — tap "Retry sending" when you are back online.','Немає інтернету. Збережено на планшеті — натисніть «Надіслати ще раз», коли зʼявиться звʼязок.'],
+  failed:['Could not send. Saved on this tablet — retry, or copy the report and send it to Dmytro.','Не вдалося надіслати. Збережено на планшеті — спробуйте ще раз або скопіюйте звіт і надішліть Дмитру.'],
+  copied:['Report copied','Звіт скопійовано'],
+  swapAsk:['Switch to the other shift?\n\nEverything you have filled in will be cleared.',
+           'Перейти на іншу зміну?\n\nВсе, що ви заповнили, буде очищено.'],
+  restore:['There is an unfinished closing from earlier today.\n\nContinue where you left off?','Є незавершене закриття за сьогодні.\n\nПродовжити з того місця?'],
+  confirmMiss:['You still have {n} required item(s) open:\n\n• {list}\n\nSubmit anyway? They will be recorded as not completed.',
+               'Залишилось {n} обовʼязкових пункт(ів):\n\n• {list}\n\nВсе одно надіслати? Вони запишуться як невиконані.'],
+  min:['min until we open','хв до відкриття'], ago:['We opened {n} min ago','Ми відкрилися {n} хв тому'],
+  since:['Open since','Відкрито з']
+};
+
+/* ══════════════ STEPS ══════════════ */
+var STEPS=[
+
+/* ═════ PART A · 30 MIN BEFORE CLOSE ═════ */
+
+/* 1 · DISHES */
+{ nav:['Dishes','Посуд'],
+  st:['Step 1 · 30 min before close','Крок 1 · за 30 хв до закриття'],
+  ti:['Collect the dishes','Зберіть посуд'],
+  ds:['Closing starts 30 minutes before we close. First — every cup and plate from the dining room goes to the sink.',
+      'Закриття починається за 30 хвилин до кінця. Спочатку — всі чашки й тарілки із залу в мийку.'],
+  cards:[
+    {h:['👤 Who is closing','👤 Хто закриває'], who:1},
+    {h:['☕ Cups and plates','☕ Чашки і тарілки'], tasks:[
+      {t:['All cups and dishes collected from tables — washing started','Всі чашки й посуд зібрані зі столів — миття почалось'],c:1}
+    ]}
+  ]},
+
+/* 2 · RESTOCK */
+{ nav:['Restock','Поповнення'],
+  st:['Step 2 · before close','Крок 2 · до закриття'],
+  ti:['Stock for the morning','Запаси на ранок'],
+  ds:['The same list the opener checks. Restock the bar, then mark each item — the morning shift should not search for cups at 7:00.',
+      'Той самий список, що перевіряють зранку. Поповніть бар і позначте кожну позицію — ранкова зміна не повинна шукати стакани о 7:00.'],
+  cards:[
+    {h:['📦 Bar stock','📦 Розхідники на барі'],
+     why:['Have it — plenty. Running low — type how many are left. Out — none at all. Low and out items go on the order list.',
+          'Є — достатньо. Мало — впишіть, скільки залишилось. Немає — зовсім немає. Мало і немає — підуть у список замовлення.'],
+     stock:1},
+    {h:['🥤 Drinks in the fridge','🥤 Напої в холодильнику'], drinks:1}
+  ]},
+
+/* 3 · MILK & FRIDGES */
+{ nav:['Milk & fridges','Молоко і холодильники'],
+  st:['Step 3 · before close','Крок 3 · до закриття'],
+  ti:['Milk and fridges','Молоко і холодильники'],
+  ds:['Enough milk for the morning, every fridge cold and clean — the same checks the opener does.',
+      'Молока вистачить на ранок, всі холодильники холодні й чисті — ті самі перевірки, що зранку.'],
+  cards:[
+    {h:['🥛 Milk for the morning','🥛 Молоко на ранок'], milk:1},
+    {h:['🌡️ Fridges & freezers — temperature and cleanliness','🌡️ Холодильники і морозилки — температура і чистота'],
+     why:['Read the thermometer inside each unit (°F), then look inside. Fridge 41°F or colder, freezer 0°F or colder. Out of range — write what you did.',
+          'Подивіться на термометр у кожному (°F), потім всередину. Холодильник — 41°F або холодніше, морозилка — 0°F або холодніше. Поза нормою — напишіть, що зробили.'],
+     clean:1},
+    {h:['🏷️ Food storage','🏷️ Зберігання'], tasks:[
+      {t:['Food covered, labeled, oldest in front (FIFO)','Продукти закриті, підписані, старі попереду (FIFO)'],c:1}
+    ]}
+  ]},
+
+/* 4 · DISPLAY CASE */
+{ nav:['Display case','Вітрина'],
+  st:['Step 4 · at close','Крок 4 · на закритті'],
+  ti:['Empty and clean the display case','Звільніть і помийте вітрину'],
+  ds:['Nothing stays in the display overnight.','На ніч у вітрині нічого не залишається.'],
+  cards:[
+    {h:['🍰 Display case','🍰 Вітрина'], tasks:[
+      {t:['All desserts out of the display — into the fridge or containers','Всі десерти з вітрини — в холодильник або контейнери'],c:1,
+       how:[['Arrange remaining pastries in containers','Macarons into their container','Everything goes into the fridge'],
+            ['Складіть десерти в контейнери','Макаруни — у свій контейнер','Все в холодильник']]},
+      {t:['Crumbs removed, glass clean inside and out','Крихти прибрані, скло чисте всередині та ззовні'],c:1}
+    ]}
+  ]},
+
+/* ═════ PART B · AFTER CLOSE — CLEANING ═════ */
+
+/* 5 · MACHINE & BAR */
+{ nav:['Machine & bar','Машина і бар'],
+  st:['Step 5 · after close','Крок 5 · після закриття'],
+  ti:['Coffee machine and bar','Кавомашина і бар'],
+  ds:['One group at a time — or the drain box overflows.','По одній групі — інакше переповниться дренаж.'],
+  cards:[
+    {h:['☕ La Marzocco','☕ La Marzocco'], tasks:[
+      {t:['Backflush both groups with powder, then rinse','Бекфлаш обох груп з порошком, потім промивка'],c:1,
+       how:[['Insert blind filter + add cleaning powder','Group 1: hold both outer buttons — let the auto-cycle finish','Group 2: same','Rinse: blind filter without powder — run the auto-cycle again on each group'],
+            ['Вставте сліпий фільтр + засипте порошок','Група 1: затисніть обидві крайні кнопки — дочекайтесь кінця циклу','Група 2: так само','Промивка: сліпий фільтр без порошку — ще раз цикл на кожній групі']]},
+      {t:['Portafilters, baskets and screens soaked and rinsed','Холдери, корзини і сітки замочені та промиті'],c:1,
+       how:[['Remove portafilters, knock out pucks','Remove dispersion screens','Soak in cleaning solution','Rinse with water, reinstall screens'],
+            ['Зніміть холдери, вибийте таблетки','Зніміть сітки','Замочіть у розчині','Промийте водою, поставте сітки назад']]},
+      {t:['Steam wands cleaned','Стимери почищені'],c:1,
+       how:[['Wipe the wands','Steam-wand cleaner in a pitcher — submerge wand, purge steam 2×','Empty the pitcher, rinse wands with cold water'],
+            ['Протріть стимери','Засіб у пітчер — занурте стимер, продуйте пару 2×','Вилийте, промийте стимери холодною водою']]},
+      {t:['Drip tray cleaned and rinsed','Піддон почищений і промитий'],c:1}
+    ]},
+    {h:['🧽 Bar','🧽 Бар'], tasks:[
+      {t:['Grinders, rinser, milk pitchers clean','Кавомолки, рінзер, пітчери чисті'],c:1,
+       how:[['Wash milk pitchers','Clean the rinser','Clean grinders, wipe tamper and puck press'],
+            ['Помийте пітчери','Почистіть рінзер','Почистіть кавомолки, протріть темпер і нок-бокс']]},
+      {t:['Bar surface and equipment wiped and sanitized','Стійка і обладнання протерті та продезінфіковані'],c:1},
+      {t:['Sanitizer bucket emptied and washed','Санітайзер вилитий, відро помите'],c:1}
+    ]}
+  ]},
+
+/* 6 · CLEANING */
+{ nav:['Cleaning','Прибирання'],
+  st:['Step 6 · after close','Крок 6 · після закриття'],
+  ti:['Clean the café','Прибирання кафе'],
+  ds:['The morning shift should walk into a clean café.','Ранкова зміна має зайти в чисте кафе.'],
+  cards:[
+    {h:['🪑 Dining room','🪑 Зал'], tasks:[
+      {t:['Tables wiped and sanitized, chairs in place','Столи протерті та продезінфіковані, стільці на місці'],c:1,
+       how:[['Crumbs with a dry cloth, then a damp cloth','Sanitize each table','Arrange chairs neatly'],
+            ['Крихти — сухою ганчіркою, потім вологою','Продезінфікуйте кожен стіл','Акуратно розставте стільці']]},
+      {t:['Floor swept and mopped — dining room, under tables, behind the bar','Підлога підметена і вимита — зал, під столами, за баром'],c:1}
+    ]},
+    {h:['🚻 Restroom','🚻 Туалет'], tasks:[
+      {t:['Restroom cleaned, toilet paper stocked','Туалет прибраний, папір є'],c:1}
+    ]},
+    {h:['🍽️ Dishes, trash, drain','🍽️ Посуд, сміття, злив'], tasks:[
+      {t:['All dishes washed, dry cups at the bar for the morning','Весь посуд вимитий, сухі стакани на барі до ранку'],c:1},
+      {t:['Trash taken out, new bags in','Сміття винесене, нові пакети'],c:1},
+      {t:['Drain: hot water + degreaser','Злив: гаряча вода + засіб'],c:1,
+       how:[['Pour 2–3 kettles of hot water down the drain','Add degreaser solution','Add odor eliminator'],
+            ['Вилийте 2–3 чайники гарячої води в злив','Додайте знежирювач','Додайте засіб від запаху']]}
+    ]}
+  ]},
+
+/* 7 · LEAVING */
+{ nav:['Leaving','Вихід'],
+  st:['Step 7 · last step','Крок 7 · останній'],
+  ti:['Lock up','Закриваємо'],
+  ds:['Last look around before you lock up.','Останній погляд перед тим, як закрити.'],
+  cards:[
+    {h:['🔒 Before you leave','🔒 Перед виходом'], tasks:[
+      {t:['Display case lighting and all lights off','Підсвітка вітрини і все світло вимкнені'],c:1},
+      {t:['All fridge and freezer doors closed tight','Всі дверцята холодильників і морозилок щільно закриті'],c:1},
+      {t:['Front door locked','Вхідні двері замкнені'],c:1}
+    ]},
+    {h:['📝 Notes for the morning','📝 Нотатки на ранок'],
+     why:['Anything the opener or Dmytro should know — something broke, ran out, or was not finished.',
+          'Що має знати ранкова зміна чи Дмитро — щось зламалось, закінчилось чи не доробили.'],
+     text:{id:'notes', ph:['Write anything worth knowing — or leave blank','Напишіть, що важливо — або залиште порожнім']}}
+  ]}
+];
+
+/* ══════════════ STATE ══════════════ */
+var MODE='close';
+var ST=[];
+var S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+var step=0, NS=0, lastRpt='', lastPayload=null;
+function buildST(){ ST=STEPS.filter(function(x){return !x.only||x.only===MODE}); NS=ST.length; }
+
+function $(i){return document.getElementById(i)}
+function p2(n){return (n<10?'0':'')+n}
+function today(){var d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},1900)}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+function save(){try{if(window.localStorage)localStorage.setItem(KEY,JSON.stringify({date:today(),S:S,L:L,mode:MODE}))}catch(e){}}
+function clearDraft(){try{if(window.localStorage)localStorage.removeItem(KEY)}catch(e){}}
+
+/* ══════════════ RENDER ══════════════ */
+function render(){
+  var w=$('wrap'); w.innerHTML='';
+  ST.forEach(function(sp,si){
+    var ph=document.createElement('div');
+    ph.className='phase'+(si===step?' on':''); ph.setAttribute('data-p',si);
+    var prev=L?(MODE==='open'?'вечірньої зміни':'ранкової зміни'):(MODE==='open'?'closing shift':'morning shift');
+    var stTxt=T(sp.st).replace(/\d+/, si+1);
+    var h='<div class="phead"><div class="st">'+esc(stTxt)+'</div><div class="ti">'+esc(T(sp.ti).replace('{prev}',prev))+
+          '</div><div class="ds">'+T(sp.ds).replace('{prev}',prev)+'</div></div>';
+    sp.cards.forEach(function(c,ci){
+      h+='<div class="card"><h2>'+esc(T(c.h))+'</h2>';
+      if(c.why) h+='<div class="why">'+T(c.why)+'</div>';
+      if(c.who) h+=whoHTML();
+      if(c.issues) h+=issuesHTML();
+      if(c.san) h+=sanHTML();
+      if(c.clean) h+=cleanHTML();
+      if(c.milk)  h+=milkHTML();
+      if(c.stock) h+=stockHTML();
+      if(c.drinks) h+=drinksHTML();
+      if(c.brews) h+=brewsHTML();
+      if(c.tasks) h+=tasksHTML(c.tasks,si+'_'+ci);
+      if(c.text) h+='<div class="f">'+(c.text.short
+        ?'<input type="text" data-txt="'+c.text.id+'" value="'+esc(S.txt[c.text.id]||'')+'" placeholder="'+esc(T(c.text.ph))+'">'
+        :'<textarea data-txt="'+c.text.id+'" placeholder="'+esc(T(c.text.ph))+'">'+esc(S.txt[c.text.id]||'')+'</textarea>')+'</div>';
+      h+='</div>';
+    });
+    if(si===NS-1) h+='<div class="alert warn" id="finalWarn"><b>'+
+      T(['Some required items are still open','Залишились обовʼязкові пункти'])+'</b><div id="fwList"></div></div>';
+    ph.innerHTML=h; w.appendChild(ph);
+  });
+  bind(); refresh();
+}
+
+function whoHTML(){
+  if(window.SVOI_USER){ S.who=window.SVOI_USER;
+    return '<div class="f"><select data-who="1" disabled style="font-weight:800"><option selected>'+esc(S.who)+'</option></select></div>'; }
+  var o='<option value="">'+T(['Select your name…','Оберіть своє імʼя…'])+'</option>';
+  STAFF.forEach(function(n){o+='<option'+(S.who===n?' selected':'')+'>'+esc(n)+'</option>'});
+  return '<div class="f"><select data-who="1">'+o+'</select></div>';
+}
+function tasksHTML(list,pfx){
+  var h='<div class="tasks">';
+  list.forEach(function(t,i){
+    var k=pfx+'_'+i, on=S.tasks[k];
+    var how=t.how?'<button type="button" class="howb" data-how="'+k+'">ⓘ '+T(['How','Як'])+'</button>'+
+      '<div class="howt" id="how-'+k+'"><ul><li>'+T(t.how).map(esc).join('</li><li>')+'</li></ul></div>':'';
+    h+='<div class="task'+(on?' done':'')+(t.c?' crit':'')+'" data-task="'+k+'" data-crit="'+(t.c?1:0)+'">'+
+       '<div class="box">✓</div><div class="tx"><b>'+esc(T(t.t))+'</b>'+
+       (t.s?'<small>'+esc(T(t.s))+'</small>':'')+how+'</div></div>';
+  });
+  return h+'</div>';
+}
+function issuesHTML(){
+  var h='<div class="chips">';
+  ISSUES.forEach(function(x){
+    h+='<button type="button" class="chip'+(x.ok?' allok':'')+(S.issues[x.k]?' on':'')+'" data-iss="'+x.k+'">'+
+       '<span class="ic">'+x.ic+'</span>'+esc(T(x.t))+'</button>';
+  });
+  return h+'</div><div class="alert bad" id="issAlert" style="margin-top:14px"><b>'+
+    T(['Report it now','Повідомте зараз'])+'</b>'+
+    T(['Tell the shift lead or message Dmytro before you start. Then clean it — do not just leave it.',
+       'Скажіть старшому зміни або напишіть Дмитру до початку роботи. Потім приберіть — не залишайте так.'])+'</div>';
+}
+function sanHTML(){
+  return '<div class="f"><label>'+T(['Quat sanitizer — measured (ppm)','Quat санітайзер — виміряно (ppm)'])+'</label>'+
+    '<div class="hint">'+T(['Target <b>200–400 ppm</b>. Dip the green strip, wait, compare to the chart, write the number.',
+                            'Ціль <b>200–400 ppm</b>. Вмочіть зелену смужку, зачекайте, порівняйте зі шкалою, запишіть число.'])+'</div>'+
+    '<input type="number" inputmode="numeric" data-san="ppm" value="'+esc(S.san.ppm||'')+'" placeholder="300"></div>'+
+    '<div class="alert bad" id="sanAlert"><b>'+T(['Out of range — remake the bucket','Поза діапазоном — переробіть відро'])+'</b>'+
+    T(['Must be 200–400 ppm. Dump it, mix fresh, test again before you write the number.',
+       'Має бути 200–400 ppm. Вилийте, змішайте свіже, перевірте ще раз перед записом.'])+'</div>';
+}
+function tempBad(u){ var v=parseFloat(S.temp[u.k]); return !isNaN(v)&&v>u.max; }
+function cleanHTML(){
+  var h='';
+  UNITS.forEach(function(u){
+    var v=S.clean[u.k], tv=S.temp[u.k]||'', bad=tempBad(u), has=tv!=='';
+    var lim=(u.type==='freezer'?'≤ 0°F':'≤ '+u.max+'°F')+(u.where?' · '+u.where:'');
+    h+='<div style="border-top:1px solid var(--line);padding-top:10px;margin-top:10px">'+
+       '<div class="tcell'+(has?(bad?' bad':' ok'):'')+'" data-tc="'+u.k+'" style="margin-bottom:8px">'+
+         '<label>'+(u.type==='freezer'?'❄️ ':'🧊 ')+esc(T(u.t))+'</label><div class="lim">'+esc(lim)+'</div>'+
+         '<input type="number" inputmode="decimal" step="0.1" placeholder="°F" data-tp="'+u.k+'" value="'+esc(tv)+'">'+
+         '<span class="flag" style="display:'+(bad?'block':'none')+'">'+T(['OUT OF RANGE','ПОЗА НОРМОЮ'])+'</span></div>'+
+       '<div class="f" data-fxw="'+u.k+'" style="display:'+(bad?'block':'none')+'"><input type="text" data-fx="'+u.k+'" value="'+esc(S.fix[u.k]||'')+'" placeholder="'+
+         esc(T(['What did you do? (closed the door, moved food, told Dmytro…)','Що зробили? (закрили двері, переклали продукти, сказали Дмитру…)']))+'"></div>'+
+       '<div class="yn"><div class="l">'+esc(T(['Inside is clean?','Всередині чисто?']))+'</div><div class="seg">'+
+       '<button type="button" class="y'+(v==='clean'?' on':'')+'" data-cl="'+u.k+'" data-v="clean">'+T(['Clean','Чистий'])+'</button>'+
+       '<button type="button" class="n'+(v==='dirty'?' on':'')+'" data-cl="'+u.k+'" data-v="dirty">'+T(['Dirty','Брудний'])+'</button>'+
+       '</div></div></div>';
+  });
+  return h;
+}
+function stockHTML(){
+  var h='';
+  STOCK.forEach(function(gr,gi){
+    h+='<div style="font-size:11.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--mid);'+
+       'margin:'+(gi?'18px':'0')+' 0 6px">'+esc(T(gr.g))+'</div>';
+    gr.items.forEach(function(it){ h+=supplyHTML(it); });
+  });
+  return h;
+}
+function drinksHTML(){
+  var h='';
+  DRINKS.forEach(function(it){ h+=supplyHTML(it); });
+  return h;
+}
+function milkHTML(){
+  var h='';
+  MILKS.forEach(function(m){
+    var v=S.milk[m.k];
+    h+='<div class="yn"><div class="l">'+esc(T(m.t))+'<small>'+esc(T(m.s))+'</small></div><div class="seg">'+
+       '<button type="button" class="y'+(v==='yes'?' on':'')+'" data-mk="'+m.k+'" data-v="yes">'+T(['In fridge','Є'])+'</button>'+
+       '<button type="button" class="n'+(v==='no'?' on':'')+'" data-mk="'+m.k+'" data-v="no">'+T(['Missing','Немає'])+'</button>'+
+       '</div></div>';
+  });
+  return h;
+}
+function brewsHTML(){
+  return brewOne('reg',['☕ Regular espresso','☕ Звичайна кава'],['Main grinder','Основний гріндер'])+
+         brewOne('dec',['🌿 Decaf','🌿 Декаф'],['Decaf grinder — dial it in separately, every single morning','Гріндер декафу — налаштовуйте окремо, щоранку']);
+}
+function brewOne(k,title,tag){
+  var b=S.brew[k]||{};
+  return '<div class="brew '+k+'"><h3>'+esc(T(title))+'</h3><div class="tag">'+esc(T(tag))+'</div>'+
+    '<div class="shot">'+
+    '<div class="s" data-cell="'+k+'-d"><label>'+T(['Ground coffee','Мелена кава'])+'</label>'+
+      '<input type="number" inputmode="decimal" data-brew="'+k+'.dose" value="'+esc(b.dose||'')+'" placeholder="18"><div class="u">'+
+      T(['grams · target 18','грам · ціль 18'])+'</div></div>'+
+    '<div class="s" data-cell="'+k+'-t"><label>'+T(['Shot time','Час проливу'])+'</label>'+
+      '<input type="number" inputmode="decimal" data-brew="'+k+'.sec" value="'+esc(b.sec||'')+'" placeholder="29"><div class="u">'+
+      T(['seconds · 26–33','секунд · 26–33'])+'</div></div>'+
+    '</div><div class="verdict" id="v-'+k+'"></div>'+
+    '<div class="f" style="margin-top:11px"><input type="text" data-brew="'+k+'.adj" value="'+esc(b.adj||'')+
+      '" placeholder="'+esc(T(['Grinder adjustment made — e.g. 2 notches finer, or: none','Що покрутили — напр. на 2 поділки дрібніше, або: нічого']))+'"></div>'+
+    '</div>';
+}
+
+
+/* ══════════════ BIND ══════════════ */
+function bind(){
+  var w=$('wrap');
+  w.querySelectorAll('[data-how]').forEach(function(b){
+    b.onclick=function(e){ e.stopPropagation(); var t=document.getElementById('how-'+this.getAttribute('data-how')); if(t) t.classList.toggle('on'); };
+  });
+  w.querySelectorAll('[data-task]').forEach(function(el){
+    el.onclick=function(e){ if(e&&e.target&&e.target.closest&&e.target.closest('.howt')) return; var k=this.getAttribute('data-task');
+      S.tasks[k]=!S.tasks[k]; this.classList.toggle('done',S.tasks[k]); refresh(); };
+  });
+  var whoEl=w.querySelector('[data-who]');
+  if(whoEl) whoEl.onchange=function(){S.who=this.value;refresh()};
+  w.querySelectorAll('[data-iss]').forEach(function(el){
+    el.onclick=function(){
+      var k=this.getAttribute('data-iss');
+      if(k==='ok'){ S.issues={}; S.issues.ok=!this.classList.contains('on'); }
+      else { S.issues.ok=false; S.issues[k]=!S.issues[k]; }
+      w.querySelectorAll('[data-iss]').forEach(function(c){ c.classList.toggle('on', !!S.issues[c.getAttribute('data-iss')]); });
+      refresh();
+    };
+  });
+  w.querySelectorAll('[data-san]').forEach(function(el){
+    el.oninput=el.onchange=function(){ S.san[this.getAttribute('data-san')]=this.value; refresh(); };
+  });
+  w.querySelectorAll('[data-tp]').forEach(function(el){
+    el.oninput=el.onchange=function(){
+      var k=this.getAttribute('data-tp'); S.temp[k]=this.value;
+      var u=UNITS.filter(function(x){return x.k===k})[0]; if(!u) return;
+      var bad=tempBad(u), c=w.querySelector('[data-tc="'+k+'"]');
+      if(c){ c.classList.toggle('ok',this.value!==''&&!bad); c.classList.toggle('bad',bad);
+        var f=c.querySelector('.flag'); if(f) f.style.display=bad?'block':'none'; }
+      var fw=w.querySelector('[data-fxw="'+k+'"]'); if(fw) fw.style.display=bad?'block':'none';
+      refresh();
+    };
+  });
+  w.querySelectorAll('[data-fx]').forEach(function(el){
+    el.oninput=el.onchange=function(){ S.fix[this.getAttribute('data-fx')]=this.value; refresh(); };
+  });
+  w.querySelectorAll('[data-cl]').forEach(function(b){
+    b.onclick=function(){
+      var k=this.getAttribute('data-cl'); S.clean[k]=this.getAttribute('data-v');
+      w.querySelectorAll('[data-cl="'+k+'"]').forEach(function(x){
+        x.classList.toggle('on',x.getAttribute('data-v')===S.clean[k]); });
+      refresh();
+    };
+  });
+  function supSync(k){
+    w.querySelectorAll('[data-sk="'+k+'"]').forEach(function(x){ x.classList.toggle('on',x.getAttribute('data-v')===S.stock[k]); });
+    var ci=w.querySelector('[data-ck="'+k+'"]'); if(ci) ci.classList.toggle('on',S.stock[k]==='cnt');
+    var it=allSupplies().filter(function(x){return x.k===k})[0], lw=w.querySelector('[data-low="'+k+'"]');
+    if(lw&&it) lw.style.display=supplyLow(it)?'block':'none';
+  }
+  w.querySelectorAll('[data-sk]').forEach(function(b){
+    b.onclick=function(){
+      var k=this.getAttribute('data-sk'); S.stock[k]=this.getAttribute('data-v'); delete S.cnt[k];
+      var ci=w.querySelector('[data-ck="'+k+'"]'); if(ci) ci.value='';
+      supSync(k); refresh();
+    };
+  });
+  w.querySelectorAll('[data-ck]').forEach(function(el){
+    el.oninput=el.onchange=function(){
+      var k=this.getAttribute('data-ck');
+      if(this.value===''){ delete S.cnt[k]; if(S.stock[k]==='cnt') delete S.stock[k]; }
+      else { S.cnt[k]=this.value; S.stock[k]='cnt'; }
+      supSync(k); refresh();
+    };
+  });
+  w.querySelectorAll('[data-mk]').forEach(function(b){
+    b.onclick=function(){
+      var k=this.getAttribute('data-mk'); S.milk[k]=this.getAttribute('data-v');
+      w.querySelectorAll('[data-mk="'+k+'"]').forEach(function(x){
+        x.classList.toggle('on',x.getAttribute('data-v')===S.milk[k]); });
+      refresh();
+    };
+  });
+  w.querySelectorAll('[data-brew]').forEach(function(el){
+    el.oninput=function(){
+      var p=this.getAttribute('data-brew').split('.');
+      if(!S.brew[p[0]])S.brew[p[0]]={};
+      S.brew[p[0]][p[1]]=this.value; refresh();
+    };
+  });
+  w.querySelectorAll('[data-txt]').forEach(function(el){
+    el.oninput=function(){S.txt[this.getAttribute('data-txt')]=this.value;refresh()};
+  });
+}
+
+/* ══════════════ VALIDATION ══════════════ */
+function brewOK(k){
+  var b=S.brew[k]||{}, d=parseFloat(b.dose), t=parseFloat(b.sec);
+  if(isNaN(d)||isNaN(t)) return null;
+  var dOK=Math.abs(d-DOSE)<=DOSE_TOL, tOK=(t>=T_MIN&&t<=T_MAX);
+  return {d:d,t:t,dOK:dOK,tOK:tOK,ok:dOK&&tOK};
+}
+function sanBad(){
+  var v=parseFloat(S.san.ppm);
+  if(isNaN(v)) return false;
+  return v<200||v>400;
+}
+function issueList(){
+  var o=[]; ISSUES.forEach(function(x){ if(x.k!=='ok'&&S.issues[x.k]) o.push(T(x.t)); }); return o;
+}
+function missing(){
+  var m=[];
+  function add(t,st,sel){ m.push({t:t, s:st, sel:sel}); }
+  var iStock=1, iFridge=2;
+  if(!S.who) add(T(['Your name — who is closing','Ваше імʼя — хто закриває']), 0, '[data-who]');
+  document.querySelectorAll('[data-task][data-crit="1"]').forEach(function(el){
+    if(!S.tasks[el.getAttribute('data-task')]){
+      var k=el.getAttribute('data-task');
+      add(el.querySelector('b').textContent, parseInt(k.split('_')[0],10), '[data-task="'+k+'"]');
+    }
+  });
+  STOCK.forEach(function(g){ g.items.forEach(function(x){
+    if(!S.stock[x.k]) add(T(['Restock: ','Поповнення: '])+T(x.t), iStock, '[data-sk="'+x.k+'"]');
+  }); });
+  DRINKS.forEach(function(x){ if(!S.stock[x.k]) add(T(['Drink: ','Напій: '])+T(x.t), iStock, '[data-sk="'+x.k+'"]'); });
+  MILKS.forEach(function(x){ if(!S.milk[x.k]) add(T(['Milk: ','Молоко: '])+T(x.t), iFridge, '[data-mk="'+x.k+'"]'); });
+  UNITS.forEach(function(u){
+    if(!S.temp[u.k]&&S.temp[u.k]!==0) add(T(['Temperature: ','Температура: '])+T(u.t), iFridge, '[data-tp="'+u.k+'"]');
+    else if(tempBad(u)&&!(S.fix[u.k]||'').trim()) add(T(u.t)+' — '+T(['out of range, write what you did','поза нормою, напишіть що зробили']), iFridge, '[data-fx="'+u.k+'"]');
+    if(!S.clean[u.k]) add(T(['Clean or dirty: ','Чистий чи брудний: '])+T(u.t), iFridge, '[data-cl="'+u.k+'"]');
+  });
+  return m;
+}
+
+/* индекс шага по ключевому слову навигации */
+function idxOf(kind){
+  var map={floor:1, san:2, coffee:3, stock:4};
+  var i=map[kind];
+  return (i!==undefined && i<NS) ? i : 0;
+}
+
+function refresh(){
+  /* brew verdicts */
+  ['reg','dec'].forEach(function(k){
+    var v=$('v-'+k); if(!v) return;
+    var b=brewOK(k);
+    var dc=document.querySelector('[data-cell="'+k+'-d"]'), tc=document.querySelector('[data-cell="'+k+'-t"]');
+    if(dc)dc.className='s'; if(tc)tc.className='s';
+    if(!b){ v.className='verdict'; return; }
+    if(dc)dc.className='s '+(b.dOK?'ok':'bad');
+    if(tc)tc.className='s '+(b.tOK?'ok':'bad');
+    v.className='verdict show '+(b.ok?'ok':'no');
+    if(b.ok) v.textContent=T(['✓ '+b.d+' g in '+b.t+' s — in spec. Taste it, then you are good.',
+                              '✓ '+b.d+' г за '+b.t+' с — в нормі. Спробуйте на смак і працюйте.']);
+    else{
+      var msg=[];
+      if(!b.dOK) msg.push(T(['Dose is '+b.d+' g — set the grinder to 18 g.','Доза '+b.d+' г — налаштуйте гріндер на 18 г.']));
+      if(b.t<T_MIN) msg.push(T(['Running fast at '+b.t+' s — grind FINER and pull again.','Швидко, '+b.t+' с — мелiть ДРІБНІШЕ і пролийте ще раз.']));
+      if(b.t>T_MAX) msg.push(T(['Running slow at '+b.t+' s — grind COARSER and pull again.','Повільно, '+b.t+' с — мелiть КРУПНІШЕ і пролийте ще раз.']));
+      v.textContent=msg.join(' ');
+    }
+  });
+
+  var sa=$('sanAlert'); if(sa) sa.classList.toggle('show',sanBad());
+  var ia=$('issAlert'); if(ia) ia.classList.toggle('show',issueList().length>0);
+
+  /* progress */
+  var allT=document.querySelectorAll('[data-task]').length, doneT=0;
+  document.querySelectorAll('[data-task]').forEach(function(e){ if(S.tasks[e.getAttribute('data-task')]) doneT++; });
+  var nStock=DRINKS.length; STOCK.forEach(function(g){nStock+=g.items.length});
+  var extra=UNITS.length*2+MILKS.length+nStock;
+  var got=UNITS.filter(function(u){return S.temp[u.k]!==undefined&&S.temp[u.k]!==''}).length+Object.keys(S.clean).length+Object.keys(S.milk).length+Object.keys(S.stock).length;
+  $('prog').style.width=Math.min(Math.round(((doneT+got)/(allT+extra))*100),100)+'%';
+
+  /* nav chips */
+  document.querySelectorAll('.pchip').forEach(function(c){
+    var i=parseInt(c.getAttribute('data-i'),10);
+    var ph=document.querySelector('.phase[data-p="'+i+'"]'); if(!ph) return;
+    var ok=true;
+    ph.querySelectorAll('[data-task]').forEach(function(e){ if(!S.tasks[e.getAttribute('data-task')]) ok=false; });
+    if(i===1) ok=ok&&Object.keys(S.stock).length===nStock;
+    if(i===2) ok=ok&&Object.keys(S.milk).length===MILKS.length&&UNITS.every(function(u){return S.clean[u.k]&&S.temp[u.k]!==undefined&&S.temp[u.k]!==''&&(!tempBad(u)||(S.fix[u.k]||'').trim())});
+    c.classList.toggle('done',ok);
+  });
+
+  var m=missing();
+  var fw=$('finalWarn');
+  if(fw){
+    fw.classList.toggle('show', step===NS-1 && m.length>0);
+    if(m.length) $('fwList').innerHTML='<ul><li>'+m.slice(0,10).map(function(x){return esc(x.t)}).join('</li><li>')+'</li></ul>';
+  }
+  var bf=$('bFin');
+  if(m.length){ bf.classList.add('blocked'); bf.textContent=T(['⛔ Not ready · ','⛔ Не готово · '])+m.length; }
+  else { bf.classList.remove('blocked'); bf.textContent=T(UI.finish); }
+  save();
+}
+
+/* ══════════════ NAV ══════════════ */
+function go(i){
+  step=Math.max(0,Math.min(NS-1,i));
+  document.querySelectorAll('.phase').forEach(function(p){p.classList.toggle('on',+p.getAttribute('data-p')===step)});
+  document.querySelectorAll('.pchip').forEach(function(c){c.classList.toggle('on',+c.getAttribute('data-i')===step)});
+  $('bBack').style.visibility=step===0?'hidden':'visible';
+  $('bNext').style.display=step===NS-1?'none':'block';
+  $('bFin').style.display=step===NS-1?'block':'none';
+  window.scrollTo(0,0);
+  var ch=document.querySelector('.pchip[data-i="'+step+'"]');
+  if(ch&&ch.scrollIntoView)ch.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  refresh();
+}
+function buildNav(){
+  var n=$('pnav'); n.innerHTML='';
+  ST.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='pchip'+(i===step?' on':''); b.setAttribute('data-i',i);
+    b.innerHTML='<span class="n">'+(i+1)+'</span>'+esc(T(s.nav));
+    b.onclick=function(){go(i)};
+    n.appendChild(b);
+  });
+}
+
+/* ══════════════ CLOCK ══════════════ */
+function tick(){
+  var n=new Date();
+  $('clk').textContent=p2(n.getHours())+':'+p2(n.getMinutes());
+  $('dat').textContent=n.toLocaleDateString(L?'uk-UA':'en-US',{weekday:'short',month:'short',day:'numeric'});
+  var c=$('cd'); c.classList.remove('late'); c.textContent=T(['🌙 Closing','🌙 Закриття']);
+}
+
+/* ══════════════ REPORT ══════════════ */
+function collect(){
+  var d=new Date(), o={
+    form:'shift_check', shift:'close', locName:'Central West End', ts:Date.now(), date:today(), time:p2(d.getHours())+':'+p2(d.getMinutes()),
+    weekday:d.toLocaleDateString('en-US',{weekday:'long'}), person:(window.SVOI_USER||S.who),
+    notes:(S.txt.notes||'').trim(),
+    tasksDone:0, tasksTotal:document.querySelectorAll('[data-task]').length,
+    flags:[], incomplete:missing().map(function(x){return x.t}), fridgeTemps:[], fridgeClean:{}, notDone:[],
+    milk:{}, stock:{}, drinks:{}, stockOut:[], supplyLog:[], lowStock:[]
+  };
+  UNITS.forEach(function(u){
+    var tv=S.temp[u.k], bad=tempBad(u);
+    o.fridgeClean[u.t[0]]=S.clean[u.k]||'';
+    if(S.clean[u.k]==='dirty') o.flags.push('DIRTY FRIDGE: '+u.t[0]);
+    o.fridgeTemps.push({unit:u.name, type:u.type, where:u.where, max:u.max, temp:(tv===undefined?'':tv),
+      status:(tv===undefined||tv==='')?'':(bad?'OUT':'OK'), clean:S.clean[u.k]||'', fix:(S.fix[u.k]||'').trim()});
+    if(bad) o.flags.push('TEMP OUT OF RANGE: '+u.name+' '+tv+'°F (max '+u.max+'°F)'+(S.fix[u.k]?' — '+S.fix[u.k]:''));
+  });
+  MILKS.forEach(function(x){ o.milk[x.t[0]]=S.milk[x.k]||''; if(S.milk[x.k]==='no') o.flags.push('MILK MISSING: '+x.t[0]); });
+  function sup(x,group,isDrink){
+    var st=S.stock[x.k]||'', cnt=(st==='cnt')?Number(S.cnt[x.k]):'';
+    var val=st==='cnt'?String(cnt):st;
+    if(isDrink) o.drinks[x.t[0]]=val; else o.stock[x.t[0]]=val;
+    if(st==='no'){ o.stockOut.push(x.t[0]); o.flags.push('OUT: '+x.t[0]); }
+    var low=supplyLow(x);
+    if(low){ o.lowStock.push({item:x.t[0], count:cnt, min:x.min, unit:x.u||''});
+      o.flags.push('LOW: '+x.t[0]+' — '+cnt+(x.u?' '+x.u:'')+' (min '+x.min+')'); }
+    o.supplyLog.push({item:x.t[0], group:group, unit:x.u||'', min:(x.min==null?'':x.min),
+      state:(st==='cnt'?'count':st), count:cnt, low:low});
+  }
+  STOCK.forEach(function(g){ g.items.forEach(function(x){ sup(x,g.g[0],false); }); });
+  DRINKS.forEach(function(x){ sup(x,'Drinks',true); });
+  document.querySelectorAll('[data-task]').forEach(function(e){
+    if(S.tasks[e.getAttribute('data-task')]) o.tasksDone++; else o.notDone.push(e.querySelector('b').textContent);
+  });
+  return o;
+}
+function report(o){
+  var R=[];
+  R.push('EVENING — CLOSING  |  PATISSERIE SVOi');
+  R.push(o.weekday+' '+o.date+'  ·  finished '+o.time);
+  R.push('Closed by: '+(o.person||'—'));
+  R.push('Checks: '+o.tasksDone+'/'+o.tasksTotal);
+  R.push('');
+  R.push('— STOCK FOR THE MORNING —');
+  R.push('  Out: '+(o.stockOut.length?o.stockOut.join(', '):'nothing'));
+  if(o.lowStock.length) R.push('  Low (order): '+o.lowStock.map(function(x){return x.item+' '+x.count+(x.unit?' '+x.unit:'')+' / min '+x.min}).join(', '));
+  var cnts=[]; STOCK.forEach(function(g){g.items.forEach(function(x){ if(S.stock[x.k]==='cnt') cnts.push(x.t[0]+' '+S.cnt[x.k]); })});
+  DRINKS.forEach(function(x){ if(S.stock[x.k]==='cnt') cnts.push(x.t[0]+' '+S.cnt[x.k]); });
+  if(cnts.length) R.push('  Counted: '+cnts.join(', '));
+  R.push('');
+  R.push('— MILK FOR THE MORNING —');
+  MILKS.forEach(function(x){R.push('  '+x.t[0]+': '+(o.milk[x.t[0]]==='yes'?'ok':o.milk[x.t[0]]==='no'?'** MISSING **':'—'))});
+  R.push('');
+  R.push('— FRIDGES —');
+  o.fridgeTemps.forEach(function(x){ R.push('  '+x.unit+': '+(x.temp!==''?x.temp+'°F':'—°F')+(x.status==='OUT'?' ** OUT (max '+x.max+') **':'')+
+    ' · '+(x.clean==='clean'?'clean':x.clean==='dirty'?'** DIRTY **':'—')+(x.fix?' · fix: '+x.fix:'')); });
+  if(o.notDone.length){ R.push(''); R.push('— NOT DONE —'); o.notDone.forEach(function(x){R.push('  ! '+x)}); }
+  if(o.notes){ R.push(''); R.push('— NOTES —'); R.push('  '+o.notes); }
+  return R.join('\n');
+}
+
+/* ══════════════ FINISH ══════════════ */
+function finish(){
+  var m=missing();
+  if(m.length){ showMissing(m); return; }
+  var o=collect(); lastPayload=o; lastRpt=report(o);
+  $('sT').textContent=o.time; $('sD').textContent=o.tasksDone+'/'+o.tasksTotal; $('sF').textContent=o.flags.length;
+  if(o.flags.length){ $('mark').className='mark warn'; $('mark').textContent='!';
+    $('dTitle').textContent=T(UI.dWarn); $('dSub').textContent=T(UI.dWarnS); }
+  else { $('mark').className='mark'; $('mark').textContent='✓';
+    $('dTitle').textContent=T(UI.dOk); $('dSub').textContent=T(UI.dOkS); }
+  $('rpt').textContent=lastRpt;
+  $('doneScr').classList.add('on'); window.scrollTo(0,0);
+  send(o);
+}
+function showMissing(m){
+  $('missClose').textContent = L ? 'Зрозуміло' : 'Got it';
+  $('missTitle').textContent = L
+    ? 'Зміну не можна закрити'
+    : 'You cannot close the shift yet';
+  $('missSub').textContent = L
+    ? 'Залишилось ' + m.length + ' обовʼязкових пункт(ів). Натисніть на будь-який — перейдете прямо до нього.'
+    : m.length + ' required item(s) left. Tap any of them to jump straight there.';
+
+  var host=$('missList'); host.innerHTML='';
+  m.forEach(function(x,i){
+    var b=document.createElement('button');
+    b.type='button'; b.className='miss-item';
+    b.innerHTML='<span class="n">'+(i+1)+'</span><span class="t"></span><span class="go">'+
+                (L?'перейти →':'go →')+'</span>';
+    b.querySelector('.t').textContent=x.t;
+    b.onclick=function(){ $('missScr').classList.remove('on'); jumpTo(x); };
+    host.appendChild(b);
+  });
+  $('missScr').classList.add('on');
+}
+
+function jumpTo(x){
+  go(x.s);
+  setTimeout(function(){
+    var el=document.querySelector('.phase.on '+x.sel) || document.querySelector(x.sel);
+    if(!el) return;
+    var box = el.closest('.task') || el.closest('.yn') || el.closest('.f') || el.closest('.card') || el;
+    box.scrollIntoView({block:'center',behavior:'smooth'});
+    box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+    setTimeout(function(){ box.classList.remove('flash'); }, 3400);
+    if(el.tagName==='INPUT'||el.tagName==='SELECT') try{ el.focus(); }catch(e){}
+  }, 160);
+}
+
+function send(o){
+  var b=$('sync'); b.className='sync pend'; b.textContent=T(UI.sending); $('bRetry').style.display='none';
+  if(!navigator.onLine){ b.className='sync err'; b.textContent=T(UI.offline); $('bRetry').style.display='block'; return; }
+  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)})
+    .then(function(){ b.className='sync ok'; b.textContent=T(UI.sent); clearDraft(); })
+    .catch(function(){ b.className='sync err'; b.textContent=T(UI.failed); $('bRetry').style.display='block'; });
+}
+function copyRpt(){
+  function done(){toast(T(UI.copied))}
+  function fb(){ var t=document.createElement('textarea');t.value=lastRpt;t.style.position='fixed';t.style.opacity='0';
+    document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}document.body.removeChild(t); }
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(lastRpt).then(done).catch(fb);
+  else fb();
+}
+
+/* ══════════════ LABELS ══════════════ */
+function labels(){
+  $('bBack').textContent=T(UI.back); $('bNext').textContent=T(UI.next); $('bFin').textContent=T(UI.finish);
+  $('bCopy').textContent=T(UI.copy); $('bRetry').textContent=T(UI.retry); $('bNew').textContent=T(UI.newOne);
+  $('kT').textContent=T(UI.kT); $('kD').textContent=T(UI.kD); $('kF').textContent=T(UI.kF);
+  var mo=MODE==='open';
+  $('h-title').textContent='🌙 BAR · '+(L?'Закриття зміни':'Closing shift');
+  $('sSub').textContent=L?'Кінець дня. Закриваємо кафе.':'End of the day. Let us close the café.';
+  $('sBar').textContent=L?'БАР · ЗАЛ':'BAR · FRONT OF HOUSE';
+  $('sOpenT').textContent=L?'Вечір — закриття':'Evening — closing';
+  $('sOpenS').textContent=L?'Останній на зміні. Залишаєте кафе чистим і готовим до ранку.':'Last person out. Leave the café clean and ready for the morning.';
+  $('sHandT').textContent=L?'День — приймання зміни':'Day — taking over';
+  $('sHandS').textContent=L?'Приймаєте кафе від ранкової зміни.':'You accept the café from the morning shift.';
+}
+
+/* ══════════════ INIT ══════════════ */
+(function(){
+  function boot(){ buildST(); labels(); buildNav(); render(); go(0); tick(); loadUnits(); }
+
+  var resumed=false;
+  try{
+    if(window.localStorage){
+      var raw=localStorage.getItem(KEY);
+      if(raw){ var d=JSON.parse(raw);
+        if(d&&d.date===today()&&d.mode){
+          if(confirm(T(UI.restore))){ S=d.S||S; S.temp=S.temp||{}; S.fix=S.fix||{}; S.cnt=S.cnt||{}; L=d.L||0; MODE=d.mode; resumed=true; }
+          else clearDraft();
+        } else clearDraft(); }
+    }
+  }catch(e){}
+
+  document.querySelectorAll('.smode').forEach(function(b){
+    b.onclick=function(){ MODE=this.getAttribute('data-mode'); $('startScr').classList.add('off'); boot(); };
+  });
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.onclick=function(){
+      L=this.getAttribute('data-l')==='ua'?1:0;
+      document.querySelectorAll('.lang button').forEach(function(x){x.classList.toggle('on',x===b)});
+      labels(); if(!$('startScr').classList.contains('off')) return;
+      buildNav(); render(); tick(); save();
+    };
+  });
+  $('bBack').onclick=function(){go(step-1)};
+  $('bNext').onclick=function(){go(step+1)};
+  $('bFin').onclick=finish;
+  $('bCopy').onclick=copyRpt;
+  $('bRetry').onclick=function(){send(lastPayload)};
+  $('bNew').onclick=function(){clearDraft();location.reload()};
+  $('missClose').onclick=function(){ $('missScr').classList.remove('on'); };
+  $('missScr').onclick=function(e){ if(e.target===this) this.classList.remove('on'); };
+  $('bSwap').onclick=function(){
+    if(!confirm(T(UI.swapAsk))) return;
+    clearDraft();
+    S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+    step=0; $('startScr').classList.remove('off');
+  };
+
+  loadUnits();
+  labels();
+  if(resumed){ $('startScr').classList.add('off'); boot(); }
+  else { document.querySelectorAll('.lang button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-l')===(L?'ua':'en'))}); }
+
+  window.addEventListener('beforeunload',function(e){
+    if(!$('doneScr').classList.contains('on')&&Object.keys(S.tasks).length>2){e.preventDefault();e.returnValue=''}
+  });
+})();
+</script>
+</body>
+</html>
