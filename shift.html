@@ -71,6 +71,15 @@ button,input,select,textarea{font-family:inherit}
 .card>.why{font-size:12.5px;color:var(--mid);margin:7px 0 14px;line-height:1.45}
 .card>h2+.tasks,.card>h2+.f,.card>h2+div:not(.why){margin-top:14px}
 
+.task.tri.done b,.task.tri.done .tx b{text-decoration:none!important;color:var(--ink,#1a2633)!important;opacity:1!important}
+.task.tri{flex-direction:column;gap:9px;cursor:default}
+.tbs{display:flex;gap:7px;flex-wrap:wrap}
+.tb{font:inherit;font-size:14px;font-weight:700;padding:9px 13px;border-radius:11px;border:2px solid var(--line);background:#fff;color:#334;cursor:pointer}
+.tb-ok.on{background:#E3F4EA;border-color:#2E8B57;color:#1F6B40}
+.tb-fx.on{background:#FDF1DC;border-color:#C98A1B;color:#7A4F06}
+.tb-pr.on{background:#FBE5E5;border-color:#C0392B;color:#8E1F16}
+.tcm{display:none;width:100%;font:inherit;font-size:15px;padding:10px 12px;border:2px solid #C0392B;border-radius:11px}
+.tcm.show{display:block}
 .task{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .task:last-child{border-bottom:none;padding-bottom:0}
 .task:first-child{padding-top:0}
@@ -188,7 +197,7 @@ textarea{min-height:84px;resize:vertical;line-height:1.5}
 .ref{background:var(--sky);border-radius:12px;padding:13px 15px;font-size:12.5px;color:#20465F;line-height:1.6;margin-top:13px}
 .ref b{color:var(--navy)}
 
-.foot{position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
+.foot{transform:translateZ(0);-webkit-transform:translateZ(0);position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(255,255,255,.97);
   backdrop-filter:blur(12px);border-top:1px solid var(--line);
   padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;gap:10px;max-width:780px;margin:0 auto}
 .foot button{flex:1;padding:16px;border-radius:13px;border:none;font-size:15.5px;font-weight:800;cursor:pointer}
@@ -756,12 +765,12 @@ var STEPS=[
           'Занадто слабкий не дезінфікує. Занадто сильний — хімічна небезпека. Завжди міряйте смужкою — не на око.'],
      san:1,
      tasks:[
-       {t:['Fresh sanitizer bucket made in the kitchen','Свіже відро санітайзера зроблене на кухні'],c:1},
-       {t:['Tested with a strip — number written above','Перевірено смужкою — число записане вище'],c:1}
+       {d:1,t:['Fresh sanitizer bucket made in the kitchen','Свіже відро санітайзера зроблене на кухні'],c:1},
+       {d:1,t:['Tested with a strip — number written above','Перевірено смужкою — число записане вище'],c:1}
      ]},
     {h:['🧽 2 · The cloth','🧽 2 · Ганчірка'], tasks:[
-       {t:['Cloth wrung out in the sanitizer','Ганчірка віджата в санітайзері'],c:1},
-       {t:['Cloth stays IN the bucket between uses','Ганчірка лежить У ВІДРІ між використаннями'],
+       {d:1,t:['Cloth wrung out in the sanitizer','Ганчірка віджата в санітайзері'],c:1},
+       {d:1,t:['Cloth stays IN the bucket between uses','Ганчірка лежить У ВІДРІ між використаннями'],
         s:['A cloth left on the counter is a violation and it spreads bacteria across every surface.',
            'Ганчірка на столі — це порушення, і вона розносить бактерії по всіх поверхнях.'],c:1}
     ]},
@@ -792,8 +801,8 @@ var STEPS=[
   cards:[
     {h:['🚿 Clean before you taste','🚿 Спочатку помийте'], tasks:[
       {t:['Portafilters and baskets scrubbed, no old grounds','Портафільтри і кошики вимиті, без старої кави'],c:1},
-      {t:['Group heads purged','Групи пролиті'],c:1},
-      {t:['Steam wands purged and wiped with the dedicated cloth','Пароуправління пролите і протерте окремою ганчіркою'],
+      {d:1,t:['Group heads purged','Групи пролиті'],c:1},
+      {d:1,t:['Steam wands purged and wiped with the dedicated cloth','Пароуправління пролите і протерте окремою ганчіркою'],
        s:['That cloth is for wands only — never for the counter.','Ця ганчірка тільки для пари — ніколи для столу.'],c:1},
       {t:['Drip tray and drain clear','Піддон і злив чисті']},
       {t:['Scale, tamper, knock box clean','Ваги, темпер, нокбокс чисті']}
@@ -823,7 +832,7 @@ var STEPS=[
      why:['Look at the case as a customer would. Empty spots cost sales — the kitchen needs to know now, not at 4pm.',
           'Подивіться на вітрину очима гостя. Порожні місця — це втрачені продажі. Кухня має знати зараз, а не о 16:00.'],
      tasks:[
-      {t:['Display case is full — all desserts are out','Вітрина повна — всі десерти виставлені'],c:1},
+      {d:1,t:['Display case is full — all desserts are out','Вітрина повна — всі десерти виставлені'],c:1},
       {t:['Nothing looks dry, cracked or day-old','Нічого не виглядає сухим, тріснутим або вчорашнім'],c:1}
     ]},
     {h:['🥤 Drinks in the fridge','🥤 Напої в холодильнику'],
@@ -845,10 +854,10 @@ var STEPS=[
   ds:['Doors open, and anything the owner needs to know.','Відчиняємо двері і все, що має знати власник.'],
   cards:[
     {h:['🔓 Doors','🔓 Двері'], tasks:[
-      {t:['A-frame sign out on the street','Штендер виставлений на вулицю'],c:1},
-      {t:['Music on','Музика увімкнена']},
-      {t:['Apron on, hair tied back, hands washed','Фартух, волосся зібране, руки помиті'],c:1},
-      {t:['Front door unlocked, OPEN sign on','Двері відчинені, табличка OPEN'],c:1}
+      {d:1,t:['A-frame sign out on the street','Штендер виставлений на вулицю'],c:1},
+      {d:1,t:['Music on','Музика увімкнена']},
+      {d:1,t:['Apron on, hair tied back, hands washed','Фартух, волосся зібране, руки помиті'],c:1},
+      {d:1,t:['Front door unlocked, OPEN sign on','Двері відчинені, табличка OPEN'],c:1}
     ]},
     {h:['📝 Notes for Dmytro','📝 Нотатки для Дмитра'],
      why:['Low stock, broken equipment, a delivery that did not arrive, anything worth knowing.',
@@ -865,9 +874,9 @@ var STEPS=[
       'Тепер кафе на вас. Все вище — це те, що ви прийняли, і про що вас спитають на закритті.'],
   cards:[
     {h:['🤝 Handover','🤝 Передача зміни'], tasks:[
-      {t:['Apron on, hair tied back, hands washed','Фартух, волосся зібране, руки помиті'],c:1},
-      {t:['Morning shift told me about open orders and pickups','Ранкова зміна розповіла про відкриті замовлення і самовивіз'],c:1},
-      {t:['Anything they left unfinished is written below','Все, що вони не доробили, записано нижче'],c:1}
+      {d:1,t:['Apron on, hair tied back, hands washed','Фартух, волосся зібране, руки помиті'],c:1},
+      {d:1,t:['Morning shift told me about open orders and pickups','Ранкова зміна розповіла про відкриті замовлення і самовивіз'],c:1},
+      {d:1,t:['Anything they left unfinished is written below','Все, що вони не доробили, записано нижче'],c:1}
     ]},
     {h:['📋 Left over from the morning shift','📋 Залишилось від ранкової зміни'],
      why:['What did they not finish? Be specific and factual — this is not a complaint box, it is a record.',
@@ -882,9 +891,10 @@ var STEPS=[
 ];
 
 /* ══════════════ STATE ══════════════ */
+var MINJS=true;
 var MODE='open';
 var ST=[];
-var S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+var S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:'',tc:{}};
 var step=0, NS=0, lastRpt='', lastPayload=null;
 function buildST(){ ST=STEPS.filter(function(x){return !x.only||x.only===MODE}); NS=ST.length; }
 
@@ -941,10 +951,15 @@ function whoHTML(){
 function tasksHTML(list,pfx){
   var h='<div class="tasks">';
   list.forEach(function(t,i){
-    var k=pfx+'_'+i, on=S.tasks[k];
-    h+='<div class="task'+(on?' done':'')+(t.c?' crit':'')+'" data-task="'+k+'" data-crit="'+(t.c?1:0)+'">'+
-       '<div class="box">✓</div><div class="tx"><b>'+esc(T(t.t))+'</b>'+
-       (t.s?'<small>'+esc(T(t.s))+'</small>':'')+'</div></div>';
+    var k=pfx+'_'+i, v=S.tasks[k]||'', acc=!t.d;
+    function b(s,ic,lab){ return '<button type="button" class="tb tb-'+s+(v===s?' on':'')+'" data-ts="'+s+'">'+ic+' '+esc(T(lab))+'</button>'; }
+    h+='<div class="task tri'+(v?' done':'')+'" data-task="'+k+'" data-crit="'+(t.c||!MINJS?1:0)+'" data-ua="'+esc(t.t[1]||t.t[0])+'">'+
+       '<div class="tx"><b>'+esc(T(t.t))+'</b>'+(t.s?'<small>'+esc(T(t.s))+'</small>':'')+'</div>'+
+       '<div class="tbs">'+(acc? b('ok','✓',['Clean','Чисто'])+b('fx','🔧',['I fixed it','Я виправив'])
+                               : b('ok','✓',['Done','Зроблено']))+
+       b('pr','⚠️',['Can’t fix','Не можу'])+'</div>'+
+       '<input type="text" class="tcm'+(v==='pr'?' show':'')+'" data-tc="'+k+'" value="'+esc(S.tc[k]||'')+'" placeholder="'+
+       esc(T(['What is wrong — short','Що не так — коротко']))+'"></div>';
   });
   return h+'</div>';
 }
@@ -1038,8 +1053,16 @@ function brewOne(k,title,tag){
 function bind(){
   var w=$('wrap');
   w.querySelectorAll('[data-task]').forEach(function(el){
-    el.onclick=function(){ var k=this.getAttribute('data-task');
-      S.tasks[k]=!S.tasks[k]; this.classList.toggle('done',S.tasks[k]); refresh(); };
+    var k=el.getAttribute('data-task');
+    el.querySelectorAll('[data-ts]').forEach(function(bt){
+      bt.onclick=function(){ var s=this.getAttribute('data-ts'); S.tasks[k]=s;
+        el.querySelectorAll('[data-ts]').forEach(function(x){ x.classList.toggle('on', x===bt); });
+        el.classList.add('done');
+        var c=el.querySelector('[data-tc]'); c.classList.toggle('show', s==='pr'); if(s==='pr') c.focus();
+        refresh(); };
+    });
+    var c=el.querySelector('[data-tc]');
+    c.oninput=function(){ S.tc[k]=this.value; refresh(); };
   });
   var whoEl=w.querySelector('[data-who]');
   if(whoEl) whoEl.onchange=function(){S.who=this.value;refresh()};
@@ -1141,11 +1164,11 @@ function missing(){
 
   if(!S.who) add(T(['Your name — who is opening','Ваше імʼя — хто відкриває']), 0, '[data-who]');
 
-  document.querySelectorAll('[data-task][data-crit="1"]').forEach(function(el){
-    if(!S.tasks[el.getAttribute('data-task')]){
-      var k=el.getAttribute('data-task');
-      add(el.querySelector('b').textContent, parseInt(k.split('_')[0],10), '[data-task="'+k+'"]');
-    }
+  
+  document.querySelectorAll('[data-task]').forEach(function(el){
+    var k=el.getAttribute('data-task'), nm=el.querySelector('b').textContent, st=parseInt(k.split('_')[0],10);
+    if(!S.tasks[k]&&el.getAttribute('data-crit')==='1') add(nm, st, '[data-task="'+k+'"]');
+    else if(S.tasks[k]==='pr'&&!(S.tc[k]||'').trim()) add(nm+' — '+T(['write what is wrong','напишіть, що не так']), st, '[data-tc="'+k+'"]');
   });
 
   if(!S.issues.ok && issueList().length===0)
@@ -1224,7 +1247,7 @@ function refresh(){
     var i=parseInt(c.getAttribute('data-i'),10);
     var ph=document.querySelector('.phase[data-p="'+i+'"]'); if(!ph) return;
     var ok=true;
-    ph.querySelectorAll('[data-task]').forEach(function(e){ if(!S.tasks[e.getAttribute('data-task')]) ok=false; });
+    ph.querySelectorAll('[data-task]').forEach(function(e){ var v=S.tasks[e.getAttribute('data-task')]; if((!v&&(e.getAttribute('data-crit')==='1'))||(v==='pr'&&!(S.tc[e.getAttribute('data-task')]||'').trim())) ok=false; });
     if(i===1) ok=ok&&(S.issues.ok||issueList().length>0);
     if(i===2) ok=ok&&UNITS.every(function(u){return S.clean[u.k]&&S.temp[u.k]!==undefined&&S.temp[u.k]!==''&&(!tempBad(u)||(S.fix[u.k]||'').trim())})&&!!S.san.ppm&&!sanBad();
     if(i===3){ var a=brewOK('reg'),b2=brewOK('dec');
@@ -1253,9 +1276,10 @@ function go(i){
   $('bBack').style.visibility=step===0?'hidden':'visible';
   $('bNext').style.display=step===NS-1?'none':'block';
   $('bFin').style.display=step===NS-1?'block':'none';
-  window.scrollTo(0,0);
-  var ch=document.querySelector('.pchip[data-i="'+step+'"]');
-  if(ch&&ch.scrollIntoView)ch.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'});
+  if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+  var ch=document.querySelector('.pchip[data-i="'+step+'"]'), nv=$('pnav');
+  if(ch&&nv) nv.scrollLeft=Math.max(0, ch.offsetLeft-(nv.clientWidth-ch.offsetWidth)/2);
+  window.scrollTo(0,0); requestAnimationFrame(function(){ window.scrollTo(0,0); });
   refresh();
 }
 function buildNav(){
@@ -1294,6 +1318,14 @@ function collect(){
     tasksDone:0, tasksTotal:document.querySelectorAll('[data-task]').length,
     flags:[], incomplete:missing()
   };
+  o.previousShift=(S.txt.prev||'').trim(); o.fixed=[]; o.problems=[]; o.checks={};
+  document.querySelectorAll('[data-task]').forEach(function(e){
+    var k=e.getAttribute('data-task'), v=S.tasks[k], p=parseInt(e.closest('.phase').getAttribute('data-p'),10);
+    var it={step:ST[p].nav[1], item:e.getAttribute('data-ua')};
+    o.checks[it.step+': '+it.item]=v==='ok'?'OK':v==='fx'?'FIXED':v==='pr'?'PROBLEM':'';
+    if(v==='fx'){ o.fixed.push(it); o.flags.push('FIXED (left by previous shift): '+it.step+': '+it.item); }
+    if(v==='pr'){ it.comment=(S.tc[k]||'').trim(); o.problems.push(it); o.flags.push('PROBLEM: '+it.step+': '+it.item+' — '+it.comment); }
+  });
   o.fridgeTemps=[];
   UNITS.forEach(function(u){
     o.fridgeClean[u.t[0]]=S.clean[u.k]||'';
@@ -1337,6 +1369,19 @@ function collect(){
   return o;
 }
 function report(o){
+  var R=[], other=o.flags.filter(function(f){return f.indexOf('FIXED')!==0&&f.indexOf('PROBLEM')!==0});
+  R.push((o.shift==='open'?'☀️ Відкриття':'🔄 Прийом зміни')+' · '+o.date+' '+o.time+' · '+(o.person||'—')+(o.previousShift?' · попередня зміна: '+o.previousShift:''));
+  if(o.fixed.length){ R.push(''); R.push('🔧 Залишила попередня зміна — виправлено ('+o.fixed.length+'):');
+    o.fixed.forEach(function(x){R.push('• '+x.step+': '+x.item)}); }
+  if(o.problems.length){ R.push(''); R.push('❌ Потрібна ваша дія ('+o.problems.length+'):');
+    o.problems.forEach(function(x){R.push('• '+x.step+': '+x.item+' — «'+x.comment+'»')}); }
+  if(other.length){ R.push(''); R.push('⚠️ Інше ('+other.length+'):'); other.forEach(function(f){R.push('• '+f)}); }
+  if(o.notes){ R.push(''); R.push('📝 '+o.notes); }
+  if(!o.fixed.length&&!o.problems.length&&!other.length&&!o.notes){ R.push(''); R.push('✅ Без зауважень'); }
+  o.message=R.join('\n');
+  return o.message;
+}
+function reportFull(o){
   var R=[];
   R.push((o.shift==='open'?'MORNING — OPENING':'DAY — SHIFT HANDOVER')+'  |  PATISSERIE SVOi');
   R.push(o.weekday+' '+o.date+'  ·  finished '+o.time);
@@ -1507,7 +1552,7 @@ window.svoiOnLogin=function(){
   $('bSwap').onclick=function(){
     if(!confirm(T(UI.swapAsk))) return;
     clearDraft();
-    S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:''};
+    S={tasks:{},clean:{},temp:{},fix:{},stock:{},cnt:{},milk:{},issues:{},txt:{},brew:{reg:{},dec:{}},san:{},who:'',tc:{}};
     step=0; $('startScr').classList.remove('off');
   };
 
@@ -1519,6 +1564,18 @@ window.svoiOnLogin=function(){
   window.addEventListener('beforeunload',function(e){
     if(!$('doneScr').classList.contains('on')&&Object.keys(S.tasks).length>2){e.preventDefault();e.returnValue=''}
   });
+})();
+</script>
+<script>
+(function(){
+  function fixFoot(){
+    var f=document.querySelector('.foot'); if(!f) return;
+    f.style.display='none'; void f.offsetHeight; f.style.display='';
+    window.scrollTo(window.pageXOffset, window.pageYOffset);
+  }
+  document.addEventListener('focusout', function(){ setTimeout(fixFoot, 60); setTimeout(fixFoot, 350); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize', function(){ setTimeout(fixFoot, 60); });
+  window.addEventListener('orientationchange', function(){ setTimeout(fixFoot, 300); });
 })();
 </script>
 </body>
